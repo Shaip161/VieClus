@@ -4,7 +4,9 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "augmented_Qgraph.h"
+//#include "augmented_Qgraph.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/augmented_Qgraph.h"
 
 augmented_Qgraph::augmented_Qgraph() : m_max_vertex_weight_difference(0) {
                 

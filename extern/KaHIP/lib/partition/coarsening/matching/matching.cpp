@@ -4,7 +4,9 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "matching.h"
+//#include "matching.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/matching/matching.h"
 
 matching::matching() {
 

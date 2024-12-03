@@ -4,7 +4,9 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "path.h"
+#//include "path.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/matching/gpa/path.h"
 
 path::path() : head(UNDEFINED_NODE), tail(UNDEFINED_NODE), length(0), active(false) {
                 

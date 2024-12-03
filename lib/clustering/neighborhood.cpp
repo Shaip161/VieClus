@@ -4,7 +4,9 @@
  * Source of VieClus -- Vienna Graph Clustering 
  *****************************************************************************/
 
-#include "neighborhood.h"
+//#include "neighborhood.h"
+
+#include "extern/VieClus/lib/clustering/neighborhood.h"
 
 using namespace std;
 
@@ -21,7 +23,7 @@ Neighborhood::~Neighborhood()
 }
 
 
-void Neighborhood::initialize(graph_access* G)
+void Neighborhood::initialize(KaHIP::graph_access* G)
 {
     // update the graph we are working on
     m_G = G;

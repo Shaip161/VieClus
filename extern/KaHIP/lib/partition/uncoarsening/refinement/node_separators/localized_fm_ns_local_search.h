@@ -5,27 +5,33 @@
 #ifndef LOCALIZED_FM_NS_LOCAL_SEARCH_PY14MVLH
 #define LOCALIZED_FM_NS_LOCAL_SEARCH_PY14MVLH
 
-#include "data_structure/priority_queues/maxNodeHeap.h"
-#include "definitions.h"
-#include "partition_config.h"
-#include "data_structure/graph_access.h"
-#include "fm_ns_local_search.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "fm_ns_local_search.h"
+
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/fm_ns_local_search.h"
 
 class localized_fm_ns_local_search {
 public:
         localized_fm_ns_local_search();
         virtual ~localized_fm_ns_local_search();
 
-        EdgeWeight perform_refinement(const PartitionConfig & config, graph_access & G, bool balance = false, PartitionID to = 4);
-        EdgeWeight perform_refinement(const PartitionConfig & config, graph_access & G, std::vector< NodeWeight > & block_weight, 
+        EdgeWeight perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, bool balance = false, PartitionID to = 4);
+        EdgeWeight perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, std::vector< NodeWeight > & block_weight, 
                                       std::vector< bool > & moved_out_of_separator,
                                       PartialBoundary & separator, bool balance = false, PartitionID to = 4);
 
-        EdgeWeight perform_refinement_internal(const PartitionConfig & config, graph_access & G, 
+        EdgeWeight perform_refinement_internal(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
                                                std::vector< NodeID > & start_nodes, std::vector< bool > & moved_out_of_separator, 
                                                bool balance = false, PartitionID to = 4);
 
-       EdgeWeight perform_refinement_internal(const PartitionConfig & config, graph_access & G, 
+       EdgeWeight perform_refinement_internal(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
                                               std::vector< NodeID > & start_nodes, 
                                               std::vector< NodeWeight > & block_weights, 
                                               std::vector< bool > & moved_out_of_separator, 
@@ -34,14 +40,14 @@ public:
 
 
 private:
-        void compute_gain( graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS);
-        void move_node( graph_access & G,  NodeID & node, PartitionID & to_block, PartitionID & other_block, 
+        void compute_gain( KaHIP::graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS);
+        void move_node( KaHIP::graph_access & G,  NodeID & node, PartitionID & to_block, PartitionID & other_block, 
                         std::vector< NodeWeight > & block_weights,
                         std::vector< bool > & moved_out_of_S,
                         std::vector< maxNodeHeap > & heaps,
                         std::vector< change_set > & rollback_info);
 
-        void move_node( graph_access & G,  NodeID & node, PartitionID & to_block, PartitionID & other_block, 
+        void move_node( KaHIP::graph_access & G,  NodeID & node, PartitionID & to_block, PartitionID & other_block, 
                         std::vector< NodeWeight > & block_weights,
                         std::vector< bool > & moved_out_of_S,
                         std::vector< maxNodeHeap > & heaps,
@@ -52,7 +58,7 @@ private:
 };
 
 inline
-void localized_fm_ns_local_search::compute_gain( graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS) {
+void localized_fm_ns_local_search::compute_gain( KaHIP::graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS) {
         toLHS = G.getNodeWeight(node);
         toRHS = G.getNodeWeight(node);
 
@@ -68,7 +74,7 @@ void localized_fm_ns_local_search::compute_gain( graph_access & G, NodeID node, 
 }
 
 inline
-void localized_fm_ns_local_search::move_node( graph_access & G, NodeID & node, PartitionID & to_block, PartitionID & other_block, 
+void localized_fm_ns_local_search::move_node( KaHIP::graph_access & G, NodeID & node, PartitionID & to_block, PartitionID & other_block, 
                                     std::vector< NodeWeight > & block_weights,
                                     std::vector< bool > & moved_out_of_S, 
                                     std::vector< maxNodeHeap > & queues,
@@ -133,7 +139,7 @@ void localized_fm_ns_local_search::move_node( graph_access & G, NodeID & node, P
 }
 
 inline
-void localized_fm_ns_local_search::move_node( graph_access & G, NodeID & node, PartitionID & to_block, PartitionID & other_block, 
+void localized_fm_ns_local_search::move_node( KaHIP::graph_access & G, NodeID & node, PartitionID & to_block, PartitionID & other_block, 
                                     std::vector< NodeWeight > & block_weights,
                                     std::vector< bool > & moved_out_of_S, 
                                     std::vector< maxNodeHeap > & queues,

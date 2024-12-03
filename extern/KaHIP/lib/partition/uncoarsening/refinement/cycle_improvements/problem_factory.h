@@ -8,31 +8,35 @@
 #ifndef PROBLEM_FACTORY_KHGQXT9H
 #define PROBLEM_FACTORY_KHGQXT9H
 
-#include "definitions.h"
-#include "partition_config.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
 
 class problem_factory {
         public:
                 problem_factory();
                 virtual ~problem_factory();
 
-                void build_cycle_problem( PartitionConfig & partition_config,
-                                          complete_boundary & boundary, 
-                                          graph_access & G_bar, 
-                                          graph_access & cycle_problem, 
+                void build_cycle_problem( KaHIP::PartitionConfig & partition_config,
+                                          KaHIP::complete_boundary & boundary, 
+                                          KaHIP::graph_access & G_bar, 
+                                          KaHIP::graph_access & cycle_problem, 
                                           NodeID & s); 
 
-                void build_cycle_problem_with_reverse( PartitionConfig & partition_config, 
-                                                       complete_boundary & boundary, 
-                                                       graph_access & G_bar, 
-                                                       graph_access & cycle_problem, 
+                void build_cycle_problem_with_reverse( KaHIP::PartitionConfig & partition_config, 
+                                                       KaHIP::complete_boundary & boundary, 
+                                                       KaHIP::graph_access & G_bar, 
+                                                       KaHIP::graph_access & cycle_problem, 
                                                        NodeID & s);
 
-                void build_shortest_path_problem( PartitionConfig & partition_config, 
-                                                  complete_boundary & boundary, 
-                                                  graph_access & G_bar, 
-                                                  graph_access & shortest_path_problem, 
+                void build_shortest_path_problem( KaHIP::PartitionConfig & partition_config, 
+                                                  KaHIP::complete_boundary & boundary, 
+                                                  KaHIP::graph_access & G_bar, 
+                                                  KaHIP::graph_access & shortest_path_problem, 
                                                   NodeID & s,
                                                   NodeID & t); 
 
@@ -40,10 +44,10 @@ class problem_factory {
 };
 
 inline
-void problem_factory::build_cycle_problem( PartitionConfig & partition_config, 
-                                           complete_boundary & boundary, 
-                                           graph_access & G_bar, 
-                                           graph_access & cycle_problem, 
+void problem_factory::build_cycle_problem( KaHIP::PartitionConfig & partition_config, 
+                                           KaHIP::complete_boundary & boundary, 
+                                           KaHIP::graph_access & G_bar, 
+                                           KaHIP::graph_access & cycle_problem, 
                                            NodeID & s) {
         //build new graph
         cycle_problem.start_construction(G_bar.number_of_nodes()+1, G_bar.number_of_nodes() + G_bar.number_of_edges());
@@ -67,10 +71,10 @@ void problem_factory::build_cycle_problem( PartitionConfig & partition_config,
 }
 
 inline
-void problem_factory::build_cycle_problem_with_reverse( PartitionConfig & partition_config, 
-                                                        complete_boundary & boundary, 
-                                                        graph_access & G_bar, 
-                                                        graph_access & cycle_problem, 
+void problem_factory::build_cycle_problem_with_reverse( KaHIP::PartitionConfig & partition_config, 
+                                                        KaHIP::complete_boundary & boundary, 
+                                                        KaHIP::graph_access & G_bar, 
+                                                        KaHIP::graph_access & cycle_problem, 
                                                         NodeID & s) {
         //build new graph
         cycle_problem.start_construction(G_bar.number_of_nodes()+1, 2*G_bar.number_of_nodes() + G_bar.number_of_edges());
@@ -101,10 +105,10 @@ void problem_factory::build_cycle_problem_with_reverse( PartitionConfig & partit
 }
 
 inline
-void problem_factory::build_shortest_path_problem( PartitionConfig & partition_config, 
-                                                   complete_boundary & boundary, 
-                                                   graph_access & G_bar, 
-                                                   graph_access & shortest_path_problem, 
+void problem_factory::build_shortest_path_problem( KaHIP::PartitionConfig & partition_config, 
+                                                   KaHIP::complete_boundary & boundary, 
+                                                   KaHIP::graph_access & G_bar, 
+                                                   KaHIP::graph_access & shortest_path_problem, 
                                                    NodeID & s,
                                                    NodeID & t) {
         //build new graph

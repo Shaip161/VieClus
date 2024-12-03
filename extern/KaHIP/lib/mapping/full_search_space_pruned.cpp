@@ -4,9 +4,11 @@
  * Source of KaHIP -- Karlsruhe High Quality Graph Partitioning 
  *****************************************************************************/
 
-#include "full_search_space_pruned.h"
+//#include "full_search_space_pruned.h"
 
-full_search_space_pruned::full_search_space_pruned(PartitionConfig & config, NodeID number_of_nodes) {
+#include "extern/KaHIP/lib/mapping/full_search_space_pruned.h"
+
+full_search_space_pruned::full_search_space_pruned(KaHIP::PartitionConfig & config, NodeID number_of_nodes) {
         m_ub         = config.search_space_s*(config.search_space_s-1);
         m_ub /= 2;
         this->config   = config;

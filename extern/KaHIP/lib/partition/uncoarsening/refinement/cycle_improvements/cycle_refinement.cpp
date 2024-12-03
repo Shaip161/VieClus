@@ -6,10 +6,15 @@
 
 #include <algorithm>
 
-#include "algorithms/cycle_search.h"
-#include "augmented_Qgraph_fabric.h"
-#include "cycle_refinement.h"
-#include "quality_metrics.h"
+//#include "algorithms/cycle_search.h"
+//#include "augmented_Qgraph_fabric.h"
+//#include "cycle_refinement.h"
+//#include "quality_metrics.h"
+
+#include "extern/KaHIP/lib/algorithms/cycle_search.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/augmented_Qgraph_fabric.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
 
 cycle_refinement::cycle_refinement() {
 
@@ -19,11 +24,11 @@ cycle_refinement::~cycle_refinement() {
 
 }
 
-EdgeWeight cycle_refinement::perform_refinement(PartitionConfig & partition_config, 
-                graph_access & G, 
-                complete_boundary & boundary) {
+EdgeWeight cycle_refinement::perform_refinement(KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
+                KaHIP::complete_boundary & boundary) {
         Gain overall_gain = 0;
-        PartitionConfig copy = partition_config;
+        KaHIP::PartitionConfig copy = partition_config;
 
         switch(partition_config.cycle_refinement_algorithm) {
                 case CYCLE_REFINEMENT_ALGORITHM_ULTRA_MODEL:
@@ -42,17 +47,17 @@ EdgeWeight cycle_refinement::perform_refinement(PartitionConfig & partition_conf
 }
 
 
-EdgeWeight cycle_refinement::playfield_algorithm(PartitionConfig & partition_config, 
-                                graph_access & G, 
-                                complete_boundary & boundary) {
+EdgeWeight cycle_refinement::playfield_algorithm(KaHIP::PartitionConfig & partition_config, 
+                                KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary) {
         greedy_ultra_model(partition_config, G, boundary);
         greedy_ultra_model_plus(partition_config, G, boundary);
         return 0;
 }
 
-EdgeWeight cycle_refinement::greedy_ultra_model(PartitionConfig & partition_config, 
-                graph_access & G, 
-                complete_boundary & boundary) {
+EdgeWeight cycle_refinement::greedy_ultra_model(KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
+                KaHIP::complete_boundary & boundary) {
 
         augmented_Qgraph_fabric augmented_fabric;
         unsigned s             = partition_config.kaba_internal_no_aug_steps_aug;
@@ -87,7 +92,7 @@ EdgeWeight cycle_refinement::greedy_ultra_model(PartitionConfig & partition_conf
                 }
 
                 if(unsucc_count >= partition_config.kaba_unsucc_iterations ) {
-                        graph_access G_bar;
+                        KaHIP::graph_access G_bar;
                         boundary.getUnderlyingQuotientGraph(G_bar); 
                         overloaded = false;
                         forall_nodes(G_bar, block) {
@@ -117,9 +122,9 @@ EdgeWeight cycle_refinement::greedy_ultra_model(PartitionConfig & partition_conf
         return 0; 
 }
 
-EdgeWeight cycle_refinement::greedy_ultra_model_plus(PartitionConfig & partition_config, 
-                graph_access & G, 
-                complete_boundary & boundary) {
+EdgeWeight cycle_refinement::greedy_ultra_model_plus(KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
+                KaHIP::complete_boundary & boundary) {
         unsigned s             = partition_config.kaba_internal_no_aug_steps_aug;
         bool something_changed = false;
         bool overloaded        = false;
@@ -160,7 +165,7 @@ EdgeWeight cycle_refinement::greedy_ultra_model_plus(PartitionConfig & partition
                 }
 
                 if(unsucc_count > 19 && first_level) {
-                        graph_access G_bar;
+                        KaHIP::graph_access G_bar;
                         boundary.getUnderlyingQuotientGraph(G_bar); 
                         overloaded = false;
                         forall_nodes(G_bar, block) {

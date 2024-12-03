@@ -12,14 +12,23 @@
 #include <sstream>
 #include <stdio.h>
 
-#include "diversifyer.h"
-#include "exchange/exchanger.h"
-#include "galinier_combine/construct_partition.h"
-#include "graph_io.h"
-#include "graph_partitioner.h"
-#include "parallel_mh_async.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
+//#include "diversifyer.h"
+//#include "exchange/exchanger.h"
+//#include "galinier_combine/construct_partition.h"
+//#include "graph_io.h"
+//#include "graph_partitioner.h"
+//#include "parallel_mh_async.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+
+#include "extern/KaHIP/lib/parallel_mh/diversifyer.h"
+#include "extern/KaHIP/lib/parallel_mh/exchange/exchanger.h"
+#include "extern/KaHIP/lib/parallel_mh/galinier_combine/construct_partition.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/parallel_mh/parallel_mh_async.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 parallel_mh_async::parallel_mh_async() : MASTER(0), m_time_limit(0) {
         m_best_global_objective = std::numeric_limits<EdgeWeight>::max();
@@ -46,7 +55,7 @@ parallel_mh_async::~parallel_mh_async() {
         delete[] m_best_global_map;
 }
 
-void parallel_mh_async::perform_partitioning(const PartitionConfig & partition_config, graph_access & G) {
+void parallel_mh_async::perform_partitioning(const KaHIP::PartitionConfig & partition_config, KaHIP::graph_access & G) {
         m_time_limit      = partition_config.time_limit;
         m_island          = new population(m_communicator, partition_config);
         m_best_global_map = new PartitionID[G.number_of_nodes()];
@@ -54,13 +63,13 @@ void parallel_mh_async::perform_partitioning(const PartitionConfig & partition_c
         srand(partition_config.seed*m_size+m_rank);
         random_functions::setSeed(partition_config.seed*m_size+m_rank);
 
-        PartitionConfig ini_working_config  = partition_config; 
+        KaHIP::PartitionConfig ini_working_config  = partition_config; 
         initialize( ini_working_config, G);
 
         m_t.restart();
         exchanger ex(m_communicator);
         do {
-                PartitionConfig working_config  = partition_config; 
+                KaHIP::PartitionConfig working_config  = partition_config; 
 
                 working_config.graph_allready_partitioned  = false;
                 if(!partition_config.strong)
@@ -107,7 +116,7 @@ void parallel_mh_async::perform_partitioning(const PartitionConfig & partition_c
         delete m_island;
 }
 
-void parallel_mh_async::initialize(PartitionConfig & working_config, graph_access & G) {
+void parallel_mh_async::initialize(KaHIP::PartitionConfig & working_config, KaHIP::graph_access & G) {
         // each PE performs a partitioning
         // estimate the runtime of a partitioner call 
         // calculate the poolsize and async Bcast the poolsize.
@@ -157,7 +166,7 @@ void parallel_mh_async::initialize(PartitionConfig & working_config, graph_acces
 
 }
 
-EdgeWeight parallel_mh_async::collect_best_partitioning(graph_access & G, const PartitionConfig & config) {
+EdgeWeight parallel_mh_async::collect_best_partitioning(KaHIP::graph_access & G, const KaHIP::PartitionConfig & config) {
         //perform partitioning locally
         EdgeWeight min_objective = 0;
         m_island->apply_fittest(G, min_objective);
@@ -215,7 +224,7 @@ EdgeWeight parallel_mh_async::collect_best_partitioning(graph_access & G, const 
         return best_global_objective;
 }
 
-EdgeWeight parallel_mh_async::perform_local_partitioning(PartitionConfig & working_config, graph_access & G) {
+EdgeWeight parallel_mh_async::perform_local_partitioning(KaHIP::PartitionConfig & working_config, KaHIP::graph_access & G) {
 
         quality_metrics qm;
         unsigned local_repetitions = working_config.local_partitioning_repetitions;

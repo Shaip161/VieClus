@@ -4,12 +4,15 @@
  * Source of KaHIP -- Karlsruhe High Quality Graph Partitioning 
  *****************************************************************************/
 
-#include "communication_graph_search_space.h"
-#include "tools/random_functions.h"
+//#include "communication_graph_search_space.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/mapping/communication_graph_search_space.h"
 
 int global_num_nodes = 0;
 
-communication_graph_search_space::communication_graph_search_space(PartitionConfig & config, NodeID number_of_nodes) {
+communication_graph_search_space::communication_graph_search_space(KaHIP::PartitionConfig & config, NodeID number_of_nodes) {
         m_pointer       = 0;
         m_last_pointer  = 0;
         m_unsucc_tries  = 0;
@@ -20,7 +23,7 @@ communication_graph_search_space::communication_graph_search_space(PartitionConf
 	this->config = config;
 }
 
-void communication_graph_search_space::set_graph_ref( graph_access * C) { 
+void communication_graph_search_space::set_graph_ref( KaHIP::graph_access * C) { 
 	this->C = C;
         if( config.communication_neighborhood_dist == 1 ) {
                 forall_nodes((*C), node) {

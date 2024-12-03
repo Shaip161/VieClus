@@ -10,13 +10,17 @@
 
 #include <unordered_map>
 
-#include "partition_config.h"
-#include "quotient_graph_scheduling.h"
-#include "random_functions.h"
+//#include "partition_config.h"
+//#include "quotient_graph_scheduling.h"
+//#include "random_functions.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_scheduling/quotient_graph_scheduling.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 class active_block_quotient_graph_scheduler : public quotient_graph_scheduling {
         public:
-                active_block_quotient_graph_scheduler( const PartitionConfig & config,
+                active_block_quotient_graph_scheduler( const KaHIP::PartitionConfig & config,
                                 QuotientGraphEdges & qgraph_edges, 
                                 unsigned int bank_account);
 
@@ -52,7 +56,7 @@ inline void active_block_quotient_graph_scheduler::init() {
                 }
         }
 
-        random_functions::permutate_vector_good_small(m_active_quotient_graph_edges);
+        KaHIP::random_functions::permutate_vector_good_small(m_active_quotient_graph_edges);
 
         for( unsigned int i = 0; i < m_is_block_active.size(); i++) {
                 m_is_block_active[i] = false;

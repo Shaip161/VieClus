@@ -8,21 +8,23 @@
 #ifndef BIPARTITION_7I4IR31Y
 #define BIPARTITION_7I4IR31Y
 
-#include "initial_partitioner.h"
+//#include "initial_partitioner.h"
+
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_partitioner.h"
 
 class bipartition : public initial_partitioner {
         public:
                 bipartition();
                 virtual ~bipartition();
 
-                void initial_partition( const PartitionConfig & config, 
+                void initial_partition( const KaHIP::PartitionConfig & config, 
                                         const unsigned int seed, 
-                                        graph_access & G, 
+                                        KaHIP::graph_access & G, 
                                         int* partition_map); 
 
-                void initial_partition( const PartitionConfig & config, 
+                void initial_partition( const KaHIP::PartitionConfig & config, 
                                 const unsigned int seed,  
-                                graph_access & G, 
+                                KaHIP::graph_access & G, 
                                 int* xadj,
                                 int* adjncy, 
                                 int* vwgt, 
@@ -30,15 +32,15 @@ class bipartition : public initial_partitioner {
                                 int* partition_map); 
 
         private:
-                void grow_regions_bfs(const PartitionConfig & config, graph_access & G);
-                void grow_regions_fm(const PartitionConfig & config, graph_access & G);
-                NodeID find_start_node( const PartitionConfig & config, graph_access & G);
-                void post_fm(const PartitionConfig & config, graph_access & G);
-                inline Gain compute_gain( graph_access & G, NodeID node, PartitionID targeting_partition);
+                void grow_regions_bfs(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G);
+                void grow_regions_fm(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G);
+                NodeID find_start_node( const KaHIP::PartitionConfig & config, KaHIP::graph_access & G);
+                void post_fm(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G);
+                inline Gain compute_gain( KaHIP::graph_access & G, NodeID node, PartitionID targeting_partition);
 
 };
 
-inline Gain bipartition::compute_gain( graph_access & G, NodeID node, PartitionID targeting_partition) {
+inline Gain bipartition::compute_gain( KaHIP::graph_access & G, NodeID node, PartitionID targeting_partition) {
         //compute how connected is the target to the current partition
         Gain gain = 0;
         forall_out_edges(G, e, node) {

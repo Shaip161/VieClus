@@ -5,15 +5,21 @@
  *
  *****************************************************************************/
 
-#ifndef GRAPH_ACCESS_EFRXO4X2
-#define GRAPH_ACCESS_EFRXO4X2
+#ifndef GRAPH_ACCESS_EFRXO4X2_2
+#define GRAPH_ACCESS_EFRXO4X2_2
 
 #include <bitset>
 #include <cassert>
 #include <iostream>
 #include <vector>
 
-#include "definitions.h"
+//#include "definitions.h"
+
+#include "lib/definitions.h"
+
+
+// Start the custom namespace
+namespace KaHIP {
 
 struct Node {
     EdgeID firstEdge;
@@ -33,6 +39,10 @@ struct refinementNode {
 struct coarseningEdge {
     EdgeRatingType rating;
 };
+
+}
+
+namespace KaHIP {
 
 class graph_access;
 
@@ -137,6 +147,7 @@ private:
     NodeID node; //current node that is constructed
     EdgeID e;    //current edge that is constructed
 };
+}
 
 //makros - graph access
 #define forall_edges(G,e) { for(EdgeID e = 0, end = G.number_of_edges(); e < end; ++e) {
@@ -146,6 +157,7 @@ private:
 #define forall_blocks(G,p) { for (PartitionID p = 0, end = G.get_partition_count(); p < end; p++) {
 #define endfor }}
 
+namespace KaHIP {
 
 class complete_boundary;
 
@@ -566,6 +578,8 @@ inline void graph_access::copy(graph_access & G_bar) {
 
         G_bar.m_selfLoops = m_selfLoops;
         G_bar.finish_construction();
+}
+
 }
 
 #endif /* end of include guard: GRAPH_ACCESS_EFRXO4X2 */

@@ -5,7 +5,9 @@
  *****************************************************************************/
 
 
-#include "contractor.h"
+//#include "contractor.h"
+
+#include "extern/VieClus/lib/clustering/coarsening/contractor.h"
 
 using namespace std;
 
@@ -20,9 +22,9 @@ Contractor::~Contractor()
 }
 
 
-void Contractor::contractClustering(const PartitionConfig &config,
-                                    graph_access &finer,
-                                    graph_access &coarser,
+void Contractor::contractClustering(const KaHIP::PartitionConfig &config,
+                                    KaHIP::graph_access &finer,
+                                    KaHIP::graph_access &coarser,
                                     const CoarseMapping &coarseMapping,
                                     const std::vector<std::vector<NodeID> > &reverseCoarseMapping)
 {

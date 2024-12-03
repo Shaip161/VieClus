@@ -6,8 +6,13 @@
  *****************************************************************************/
 
 #include <unordered_map>
-#include "graph_extractor.h"
 
+//#include "graph_extractor.h"
+
+#include "extern/KaHIP/lib/tools/graph_extractor.h"
+
+
+namespace KaHIP {
 
 graph_extractor::graph_extractor() {
 
@@ -17,8 +22,8 @@ graph_extractor::~graph_extractor() {
 
 }
 
-void graph_extractor::extract_block(graph_access & G, 
-                                    graph_access & extracted_block, 
+void graph_extractor::extract_block(KaHIP::graph_access & G, 
+                                    KaHIP::graph_access & extracted_block, 
                                     PartitionID block, 
                                     std::vector<NodeID> & mapping) {
 
@@ -56,9 +61,9 @@ void graph_extractor::extract_block(graph_access & G,
 }
 
 
-void graph_extractor::extract_two_blocks(graph_access & G, 
-                                         graph_access & extracted_block_lhs, 
-                                         graph_access & extracted_block_rhs, 
+void graph_extractor::extract_two_blocks(KaHIP::graph_access & G, 
+                                         KaHIP::graph_access & extracted_block_lhs, 
+                                         KaHIP::graph_access & extracted_block_rhs, 
                                          std::vector<NodeID> & mapping_lhs,
                                          std::vector<NodeID> & mapping_rhs,
                                          NodeWeight & partition_weight_lhs,
@@ -126,12 +131,12 @@ void graph_extractor::extract_two_blocks(graph_access & G,
 
 // Method takes a number of nodes and extracts the underlying subgraph from G
 // it also assignes block informations
-void graph_extractor::extract_two_blocks_connected(graph_access & G, 
+void graph_extractor::extract_two_blocks_connected(KaHIP::graph_access & G, 
                                                    std::vector<NodeID> lhs_nodes,
                                                    std::vector<NodeID> rhs_nodes,
                                                    PartitionID lhs, 
                                                    PartitionID rhs,
-                                                   graph_access & pair,
+                                                   KaHIP::graph_access & pair,
                                                    std::vector<NodeID> & mapping) {
         //// build reverse mapping
         std::unordered_map<NodeID,NodeID> reverse_mapping;
@@ -192,4 +197,4 @@ void graph_extractor::extract_two_blocks_connected(graph_access & G,
         pair.finish_construction();
 }
 
-
+}

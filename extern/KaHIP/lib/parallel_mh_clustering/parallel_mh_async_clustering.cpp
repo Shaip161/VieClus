@@ -12,13 +12,21 @@
 #include <sstream>
 #include <stdio.h>
 
-#include "diversifyer.h"
-#include "exchange/exchanger_clustering.h"
-#include "graph_io.h"
-#include "graph_partitioner.h"
-#include "parallel_mh_async_clustering.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
+//#include "diversifyer.h"
+//#include "exchange/exchanger_clustering.h"
+//#include "graph_io.h"
+//#include "graph_partitioner.h"
+//#include "parallel_mh_async_clustering.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+
+#include "extern/KaHIP/lib/parallel_mh_clustering/diversifyer.h"
+#include "extern/KaHIP/lib/parallel_mh_clustering/exchange/exchanger_clustering.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/parallel_mh_clustering/parallel_mh_async_clustering.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 parallel_mh_async_clustering::parallel_mh_async_clustering() : MASTER(0), m_time_limit(0) {
         m_best_global_objective = std::numeric_limits<EdgeWeight>::max();
@@ -45,7 +53,7 @@ parallel_mh_async_clustering::~parallel_mh_async_clustering() {
         delete[] m_best_global_map;
 }
 
-void parallel_mh_async_clustering::perform_partitioning(const PartitionConfig & partition_config, graph_access & G) {
+void parallel_mh_async_clustering::perform_partitioning(const KaHIP::PartitionConfig & partition_config, KaHIP::graph_access & G) {
         m_time_limit      = partition_config.time_limit;
         m_island          = new population_clustering(m_communicator, partition_config);
         m_best_global_map = new PartitionID[G.number_of_nodes()];
@@ -54,13 +62,13 @@ void parallel_mh_async_clustering::perform_partitioning(const PartitionConfig & 
         srand(partition_config.seed*m_size+m_rank);
         random_functions::setSeed(partition_config.seed*m_size+m_rank);
 
-        PartitionConfig ini_working_config  = partition_config; 
+        KaHIP::PartitionConfig ini_working_config  = partition_config; 
         initialize( ini_working_config, G);
 
         m_t.restart();
         exchanger_clustering ex(m_communicator);
         do {
-                PartitionConfig working_config  = partition_config; 
+                KaHIP::PartitionConfig working_config  = partition_config; 
 
                 perform_local_partitioning( working_config, G );
                 if(m_rank == ROOT) {
@@ -98,7 +106,7 @@ void parallel_mh_async_clustering::perform_partitioning(const PartitionConfig & 
         delete m_island;
 }
 
-void parallel_mh_async_clustering::initialize(PartitionConfig & working_config, graph_access & G) {
+void parallel_mh_async_clustering::initialize(KaHIP::PartitionConfig & working_config, KaHIP::graph_access & G) {
         // each PE performs a clustering 
         // estimate the runtime of a partitioner call 
         // calculate the poolsize and async Bcast the poolsize.
@@ -138,7 +146,7 @@ void parallel_mh_async_clustering::initialize(PartitionConfig & working_config, 
 
 }
 
-double parallel_mh_async_clustering::collect_best_partitioning(graph_access & G, const PartitionConfig & config) {
+double parallel_mh_async_clustering::collect_best_partitioning(KaHIP::graph_access & G, const KaHIP::PartitionConfig & config) {
         //perform partitioning locally
         double max_objective = 0;
         m_island->apply_fittest(G, max_objective);
@@ -171,9 +179,9 @@ double parallel_mh_async_clustering::collect_best_partitioning(graph_access & G,
         return best_global_objective;
 }
 
-double parallel_mh_async_clustering::perform_local_partitioning(PartitionConfig & working_config, graph_access & G) {
+double parallel_mh_async_clustering::perform_local_partitioning(KaHIP::PartitionConfig & working_config, KaHIP::graph_access & G) {
 
-        quality_metrics qm;
+        KaHIP::quality_metrics qm;
         unsigned local_repetitions = working_config.local_partitioning_repetitions;
 
         //start a new round

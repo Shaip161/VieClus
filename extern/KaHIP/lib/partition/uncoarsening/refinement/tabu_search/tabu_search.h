@@ -8,20 +8,26 @@
 #ifndef TABU_SEARCH_RC6W8GX
 #define TABU_SEARCH_RC6W8GX
 
-#include "data_structure/matrix/matrix.h"
-#include "data_structure/matrix/normal_matrix.h"
-#include "definitions.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
-#include "uncoarsening/refinement/refinement.h"
+//#include "data_structure/matrix/matrix.h"
+//#include "data_structure/matrix/normal_matrix.h"
+//#include "definitions.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+//#include "uncoarsening/refinement/refinement.h"
+
+#include "extern/KaHIP/lib/data_structure/matrix/matrix.h"
+#include "extern/KaHIP/lib/data_structure/matrix/normal_matrix.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
 
 class tabu_search : public refinement {
         public:
                 tabu_search();
                 virtual ~tabu_search();
 
-                virtual EdgeWeight perform_refinement(PartitionConfig & config, 
-                                                      graph_access & G, 
-                                                      complete_boundary & boundary); 
+                virtual EdgeWeight perform_refinement(KaHIP::PartitionConfig & config, 
+                                                      KaHIP::graph_access & G, 
+                                                      KaHIP::complete_boundary & boundary); 
 
 	private:
 		unsigned compute_tenure(unsigned iteration, unsigned max_iteration) {
@@ -58,7 +64,7 @@ class tabu_search : public refinement {
 		
 		}
 
-                kway_graph_refinement_commons* commons;
+                KaHIP::kway_graph_refinement_commons* commons;
                 matrix* m;
 };
 

@@ -8,16 +8,19 @@
 #ifndef MATCHING_QL4RUO3D
 #define MATCHING_QL4RUO3D
 
-#include "data_structure/graph_access.h"
-#include "partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "partition_config.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 class matching {
         public:
                 matching();
                 virtual ~matching();
 
-                virtual void match(const PartitionConfig & partition_config, 
-                                   graph_access & G, 
+                virtual void match(const KaHIP::PartitionConfig & partition_config, 
+                                   KaHIP::graph_access & G, 
                                    Matching & _matching, 
                                    CoarseMapping & mapping, 
                                    NodeID & no_of_coarse_vertices,

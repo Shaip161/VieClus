@@ -7,11 +7,17 @@
 #include <algorithm>
 #include <unordered_map>
 
-#include "kway_graph_refinement.h"
-#include "kway_graph_refinement_core.h"
-#include "kway_stop_rule.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
+//#include "kway_graph_refinement.h"
+//#include "kway_graph_refinement_core.h"
+//#include "kway_stop_rule.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 kway_graph_refinement::kway_graph_refinement() {
 }
@@ -20,10 +26,10 @@ kway_graph_refinement::~kway_graph_refinement() {
 
 }
 
-EdgeWeight kway_graph_refinement::perform_refinement(PartitionConfig & config, graph_access & G, 
-                                                     complete_boundary & boundary) {
+EdgeWeight kway_graph_refinement::perform_refinement(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                                     KaHIP::complete_boundary & boundary) {
 
-        commons = kway_graph_refinement_commons::getInstance(config);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
         kway_graph_refinement_core refinement_core;
         
         EdgeWeight overall_improvement = 0;
@@ -58,7 +64,7 @@ EdgeWeight kway_graph_refinement::perform_refinement(PartitionConfig & config, g
         return (EdgeWeight) overall_improvement; 
 }
 
-void kway_graph_refinement::setup_start_nodes(PartitionConfig & config, graph_access & G, complete_boundary & boundary,  boundary_starting_nodes & start_nodes) {
+void kway_graph_refinement::setup_start_nodes(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, KaHIP::complete_boundary & boundary,  boundary_starting_nodes & start_nodes) {
         QuotientGraphEdges quotient_graph_edges;
         boundary.getQuotientGraphEdges(quotient_graph_edges);
 

@@ -8,9 +8,13 @@
 #ifndef VERTEX_SEPARATOR_FLOW_SOLVER_FLA4518Q
 #define VERTEX_SEPARATOR_FLOW_SOLVER_FLA4518Q
 
-#include "definitions.h"
-#include "partition_config.h"
-#include "data_structure/flow_graph.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+//#include "data_structure/flow_graph.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "lib/data_structure/flow_graph.h"
 
 class vertex_separator_flow_solver  {
 
@@ -18,8 +22,8 @@ public:
         vertex_separator_flow_solver();
         virtual ~vertex_separator_flow_solver();
 
-        bool build_flow_pb( const PartitionConfig & config, 
-                               graph_access & G, 
+        bool build_flow_pb( const KaHIP::PartitionConfig & config, 
+                               KaHIP::graph_access & G, 
                                PartitionID & lhs, 
                                PartitionID & rhs, 
                                std::vector<NodeID> & lhs_nodes,
@@ -29,8 +33,8 @@ public:
 
 
 
-        void find_separator(const PartitionConfig & config, 
-                            graph_access & G, 
+        void find_separator(const KaHIP::PartitionConfig & config, 
+                            KaHIP::graph_access & G, 
                             PartitionID lhs, 
                             PartitionID rhs,  
                             boundary_starting_nodes start_nodes_lhs,

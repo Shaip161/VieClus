@@ -6,8 +6,11 @@
 
 #include <algorithm>
 
-#include "random_functions.h"
-#include "topological_sort.h"
+//#include "random_functions.h"
+//#include "topological_sort.h"
+
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/algorithms/topological_sort.h"
 
 topological_sort::topological_sort() {
                 
@@ -17,12 +20,12 @@ topological_sort::~topological_sort() {
                 
 }
 
-void topological_sort::sort( graph_access & G, std::vector<NodeID> & sorted_sequence) {
+void topological_sort::sort( KaHIP::graph_access & G, std::vector<NodeID> & sorted_sequence) {
         std::vector<int> dfsnum(G.number_of_nodes(), -1);
         int dfscount = 0;
 
         std::vector<NodeID> nodes(G.number_of_nodes());
-        random_functions::permutate_vector_good(nodes, true);
+        KaHIP::random_functions::permutate_vector_good(nodes, true);
 
         forall_nodes(G, node) {
                 NodeID curNode = nodes[node];
@@ -35,7 +38,7 @@ void topological_sort::sort( graph_access & G, std::vector<NodeID> & sorted_sequ
 }
 
 
-void topological_sort::sort_dfs(NodeID node, graph_access & G, 
+void topological_sort::sort_dfs(NodeID node, KaHIP::graph_access & G, 
                                 std::vector<int> & dfsnum, 
                                 int & dfscount,
                                 std::vector<NodeID> & sorted_sequence){ 

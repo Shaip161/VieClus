@@ -5,16 +5,21 @@
  *****************************************************************************/
 
 
-#ifndef PARSE_PARAMETERS_GPJMGSM8
-#define PARSE_PARAMETERS_GPJMGSM8
+#ifndef PARSE_PARAMETERS_GPJMGSM8_2
+#define PARSE_PARAMETERS_GPJMGSM8_2
 
 #include <omp.h>
 #include <mpi.h>
 #include <sstream>
-#include "configuration.h"
+
+#include <argtable3.h>
+
+//#include "configuration.h"
+
+#include "extern/VieClus/app/configuration.h"
 
 int parse_parameters(int argn, char **argv,
-                     PartitionConfig & partition_config,
+                     KaHIP::PartitionConfig & partition_config,
                      std::string & graph_filename,
                      bool & is_graph_weighted,
                      bool & suppress_program_output,
@@ -104,7 +109,7 @@ int parse_parameters(int argn, char **argv,
         partition_config.k = 2;
         recursive = false;
 
-        configuration cfg;
+        VieClus::configuration cfg;
         cfg.standard(partition_config);
 
         cfg.strong(partition_config);

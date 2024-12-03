@@ -8,9 +8,11 @@
 #ifndef CONTRACTOR_H
 #define CONTRACTOR_H
 
+//#include "data_structure/graph_access.h"
+//#include "partition/partition_config.h"
 
-#include "data_structure/graph_access.h"
-#include "partition/partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 /**
  *  \brief Contracts fine graphs to coarser ones.
@@ -36,9 +38,9 @@ class Contractor
          *  cluster) in the coarser graph. Edge weights within clusters of the
          *  fine graph are represented by self loops in the coarser graph.
          */
-        static void contractClustering(const PartitionConfig &config,
-                                       graph_access &finer,
-                                       graph_access &coarser,
+        static void contractClustering(const KaHIP::PartitionConfig &config,
+                                       KaHIP::graph_access &finer,
+                                       KaHIP::graph_access &coarser,
                                        const CoarseMapping &coarseMapping,
                                        const std::vector<std::vector<NodeID> > &reverseCoarseMapping);
 

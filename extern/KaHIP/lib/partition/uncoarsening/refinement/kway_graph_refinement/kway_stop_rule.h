@@ -10,7 +10,7 @@
 
 class kway_stop_rule {
 public:
-        kway_stop_rule(PartitionConfig & config) {};
+        kway_stop_rule(KaHIP::PartitionConfig & config) {};
         kway_stop_rule() {};
         virtual ~kway_stop_rule() {};
 
@@ -23,7 +23,7 @@ public:
 
 class kway_simple_stop_rule : public kway_stop_rule {
 public:
-        kway_simple_stop_rule(PartitionConfig & config) {};
+        kway_simple_stop_rule(KaHIP::PartitionConfig & config) {};
         virtual ~kway_simple_stop_rule() {};
 
         void push_statistics(Gain gain) {};
@@ -42,7 +42,7 @@ inline bool kway_simple_stop_rule::search_should_stop(unsigned int min_cut_idx,
 
 class kway_adaptive_stop_rule : public kway_stop_rule {
 public:
-        kway_adaptive_stop_rule(PartitionConfig & config) : m_steps(0), 
+        kway_adaptive_stop_rule(KaHIP::PartitionConfig & config) : m_steps(0), 
                                                             m_expected_gain(0.0), 
                                                             m_expected_variance2(0.0), 
                                                             pconfig(&config) {}
@@ -80,7 +80,7 @@ private:
         unsigned m_steps;
         double   m_expected_gain;
         double   m_expected_variance2;
-        PartitionConfig * pconfig;
+        KaHIP::PartitionConfig * pconfig;
 };
 
 inline bool kway_adaptive_stop_rule::search_should_stop(unsigned int min_cut_idx, 

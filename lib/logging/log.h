@@ -7,7 +7,10 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-#include "bexception.h"
+//#include "bexception.h"
+
+#include "extern/VieClus/lib/logging/bexception.h"
+
 #include <sstream>
 #include <string>
 #include <stdio.h>

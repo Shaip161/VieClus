@@ -8,12 +8,15 @@
 #ifndef SIMPLE_QUOTIENT_GRAPH_SCHEDULER_YG9BEBH0
 #define SIMPLE_QUOTIENT_GRAPH_SCHEDULER_YG9BEBH0
 
-#include "partition_config.h"
-#include "quotient_graph_scheduling.h"
+//#include "partition_config.h"
+//#include "quotient_graph_scheduling.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_scheduling/quotient_graph_scheduling.h"
 
 class simple_quotient_graph_scheduler : public quotient_graph_scheduling  { 
 public:
-        simple_quotient_graph_scheduler(PartitionConfig & config, 
+        simple_quotient_graph_scheduler(KaHIP::PartitionConfig & config, 
                                         QuotientGraphEdges & qgraph_edges,  
                                         unsigned int account);
 

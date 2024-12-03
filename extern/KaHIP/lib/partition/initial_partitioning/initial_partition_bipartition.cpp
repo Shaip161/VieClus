@@ -5,10 +5,16 @@
  *****************************************************************************/
 
 #include <fstream>
-#include "initial_partition_bipartition.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
-#include "uncoarsening/refinement/mixed_refinement.h"
-#include "graph_partitioner.h"
+
+//#include "initial_partition_bipartition.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+//#include "uncoarsening/refinement/mixed_refinement.h"
+//#include "graph_partitioner.h"
+
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_partition_bipartition.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/mixed_refinement.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
 
 initial_partition_bipartition::initial_partition_bipartition() {
 
@@ -18,11 +24,11 @@ initial_partition_bipartition::~initial_partition_bipartition() {
 
 }
 
-void initial_partition_bipartition::initial_partition( const PartitionConfig & config, 
+void initial_partition_bipartition::initial_partition( const KaHIP::PartitionConfig & config, 
                                                        const unsigned int seed,  
-                                                       graph_access & G, int* partition_map) {
+                                                       KaHIP::graph_access & G, int* partition_map) {
         graph_partitioner gp;
-        PartitionConfig rec_config                  = config;
+        KaHIP::PartitionConfig rec_config                  = config;
         rec_config.initial_partitioning_type        = INITIAL_PARTITIONING_BIPARTITION;
         rec_config.initial_partitioning_repetitions = 0;
         rec_config.global_cycle_iterations          = 1;
@@ -58,9 +64,9 @@ void initial_partition_bipartition::initial_partition( const PartitionConfig & c
 
 } 
 
-void initial_partition_bipartition::initial_partition( const PartitionConfig & config, 
+void initial_partition_bipartition::initial_partition( const KaHIP::PartitionConfig & config, 
                                                        const unsigned int seed,  
-                                                       graph_access & G, 
+                                                       KaHIP::graph_access & G, 
                                                        int* xadj,
                                                        int* adjncy, 
                                                        int* vwgt, 

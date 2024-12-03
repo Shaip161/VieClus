@@ -8,7 +8,11 @@
 #ifndef NEIGHBORHOOD_H
 #define NEIGHBORHOOD_H
 
-#include "data_structure/graph_access.h"
+//#include "data_structure/graph_access.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/definitions.h"
+
 #include <vector>
 
 
@@ -28,7 +32,7 @@ class Neighborhood
 
             \param G The new current graph we use.
          */
-        void initialize(graph_access *G);
+        void initialize(KaHIP::graph_access *G);
 
 
         /**
@@ -49,7 +53,7 @@ class Neighborhood
 
     protected:
         /// Current graph that is evaluated.
-        graph_access *m_G;
+        KaHIP::graph_access *m_G;
         /// Edge weights to the clusters in the neighborhood of the current node.
         std::vector<EdgeWeight> m_edgeWeightsToNeighboringClusters;
         /// Occurring cluster IDs in the neighborhood of the current node.

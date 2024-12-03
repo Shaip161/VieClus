@@ -11,16 +11,19 @@
 #include <stack>
 #include <vector>
 
-#include "data_structure/graph_access.h"
-#include "definitions.h"
+//#include "data_structure/graph_access.h"
+//#include "definitions.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
 
 class strongly_connected_components {
 public:
         strongly_connected_components();
         virtual ~strongly_connected_components();
 
-        int strong_components( graph_access & G, std::vector<int> & comp_num);       
-        void explicit_scc_dfs(NodeID node, graph_access & G); 
+        int strong_components( KaHIP::graph_access & G, std::vector<int> & comp_num);       
+        void explicit_scc_dfs(NodeID node, KaHIP::graph_access & G); 
 
 private:
         int m_dfscount; 

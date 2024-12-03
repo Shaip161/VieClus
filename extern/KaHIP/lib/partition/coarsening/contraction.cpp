@@ -3,9 +3,13 @@
  *
  *****************************************************************************/
 
-#include "contraction.h"
-#include "../uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
-#include "macros_assertions.h"
+//#include "contraction.h"
+//#include "../uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+//#include "macros_assertions.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/contraction.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+#include "lib/tools/macros_assertions.h"
 
 contraction::contraction() {
 
@@ -16,9 +20,9 @@ contraction::~contraction() {
 }
 
 // for documentation see technical reports of christian schulz  
-void contraction::contract(const PartitionConfig & partition_config, 
-                           graph_access & G, 
-                           graph_access & coarser, 
+void contraction::contract(const KaHIP::PartitionConfig & partition_config, 
+                           KaHIP::graph_access & G, 
+                           KaHIP::graph_access & coarser, 
                            const Matching & edge_matching,
                            const CoarseMapping & coarse_mapping,
                            const NodeID & no_of_coarse_vertices,
@@ -89,9 +93,9 @@ void contraction::contract(const PartitionConfig & partition_config,
         coarser.finish_construction();
 }
 
-void contraction::contract_clustering(const PartitionConfig & partition_config, 
-                              graph_access & G, 
-                              graph_access & coarser, 
+void contraction::contract_clustering(const KaHIP::PartitionConfig & partition_config, 
+                              KaHIP::graph_access & G, 
+                              KaHIP::graph_access & coarser, 
                               const Matching & edge_matching,
                               const CoarseMapping & coarse_mapping,
                               const NodeID & no_of_coarse_vertices,
@@ -111,7 +115,7 @@ void contraction::contract_clustering(const PartitionConfig & partition_config,
 
         G.set_partition_count(no_of_coarse_vertices);
 
-        complete_boundary bnd(&G);
+        KaHIP::complete_boundary bnd(&G);
         bnd.build();
         bnd.getUnderlyingQuotientGraph(coarser);
 
@@ -130,9 +134,9 @@ void contraction::contract_clustering(const PartitionConfig & partition_config,
 
 
 // for documentation see technical reports of christian schulz  
-void contraction::contract_partitioned(const PartitionConfig & partition_config, 
-                                       graph_access & G, 
-                                       graph_access & coarser, 
+void contraction::contract_partitioned(const KaHIP::PartitionConfig & partition_config, 
+                                       KaHIP::graph_access & G, 
+                                       KaHIP::graph_access & coarser, 
                                        const Matching & edge_matching,
                                        const CoarseMapping & coarse_mapping,
                                        const NodeID & no_of_coarse_vertices,

@@ -4,10 +4,14 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "complete_boundary.h"
-#include "quality_metrics.h"
+//#include "complete_boundary.h"
+//#include "quality_metrics.h"
 
-complete_boundary::complete_boundary(graph_access * G) {
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+
+
+KaHIP::complete_boundary::complete_boundary(KaHIP::graph_access * G) {
         m_graph_ref   = G;
         m_pb_lhs_lazy = 0;
         m_pb_rhs_lazy = 0;
@@ -18,13 +22,13 @@ complete_boundary::complete_boundary(graph_access * G) {
         Q.graphref    = NULL;
 }
 
-complete_boundary::~complete_boundary() {
+KaHIP::complete_boundary::~complete_boundary() {
 }
 
-void complete_boundary::postMovedBoundaryNodeUpdates(NodeID node, boundary_pair * pair, 
+void KaHIP::complete_boundary::postMovedBoundaryNodeUpdates(NodeID node, boundary_pair * pair, 
                                                      bool update_edge_cuts, bool update_all_boundaries) {
 
-        graph_access & G = *m_graph_ref;
+        KaHIP::graph_access & G = *m_graph_ref;
         PartitionID to   = m_graph_ref->getPartitionIndex(node);
         PartitionID from = to == pair->lhs ? pair->rhs : pair->lhs;
         ASSERT_NEQ(from, to);
@@ -85,7 +89,7 @@ void complete_boundary::postMovedBoundaryNodeUpdates(NodeID node, boundary_pair 
         } endfor
 }      
 
-void complete_boundary::balance_singletons(const PartitionConfig & config, graph_access & G) {
+void KaHIP::complete_boundary::balance_singletons(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
         for( unsigned i = 0; i < m_singletons.size(); i++) {
                 NodeWeight min = m_block_infos[0].block_weight;
                 PartitionID p  = 0;

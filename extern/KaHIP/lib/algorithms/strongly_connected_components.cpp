@@ -7,7 +7,9 @@
 #include <stack>
 #include <vector>
 
-#include "strongly_connected_components.h"
+//#include "strongly_connected_components.h"
+
+#include "extern/KaHIP/lib/algorithms/strongly_connected_components.h"
 
 strongly_connected_components::strongly_connected_components() {
 
@@ -17,7 +19,7 @@ strongly_connected_components::~strongly_connected_components() {
 
 }
 
-int strongly_connected_components::strong_components( graph_access & G, std::vector<int> & comp_num) {
+int strongly_connected_components::strong_components( KaHIP::graph_access & G, std::vector<int> & comp_num) {
 
         m_dfsnum.resize(G.number_of_nodes());
         m_comp_num.resize(G.number_of_nodes());
@@ -43,7 +45,7 @@ int strongly_connected_components::strong_components( graph_access & G, std::vec
         return m_comp_count;
 }
 
-void strongly_connected_components::explicit_scc_dfs(NodeID node, graph_access & G){ 
+void strongly_connected_components::explicit_scc_dfs(NodeID node, KaHIP::graph_access & G){ 
 
         iteration_stack.push( std::pair<NodeID,EdgeID>( node, G.get_first_edge(node) ) );
 

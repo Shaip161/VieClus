@@ -4,12 +4,19 @@
  * Source of KaHIP -- Karlsruhe High Quality Graph Partitioning 
  *****************************************************************************/
 
-#include "tools/quality_metrics.h"
-#include "tools/random_functions.h"
-#include "tools/timer.h"
-#include "local_search_mapping.h"
-#include "full_search_space.h"
-#include "communication_graph_search_space.h"
+//#include "tools/quality_metrics.h"
+//#include "tools/random_functions.h"
+//#include "tools/timer.h"
+//#include "local_search_mapping.h"
+//#include "full_search_space.h"
+//#include "communication_graph_search_space.h"
+
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "lib/tools/timer.h"
+#include "extern/KaHIP/lib/mapping/local_search_mapping.h"
+#include "extern/KaHIP/lib/mapping/full_search_space.h"
+#include "extern/KaHIP/lib/mapping/communication_graph_search_space.h"
 
 local_search_mapping::local_search_mapping() {
 
@@ -20,7 +27,7 @@ local_search_mapping::~local_search_mapping() {
 }
 
 
-bool local_search_mapping::perform_single_swap(graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs) {
+bool local_search_mapping::perform_single_swap(KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs) {
         NodeWeight old_volume      = total_volume;
         NodeWeight old_lhs_contrib = node_contribution[swap_lhs];
         NodeWeight old_rhs_contrib = node_contribution[swap_rhs];
@@ -77,7 +84,7 @@ bool local_search_mapping::perform_single_swap(graph_access & C, matrix & D, std
         }
 }
 
-void local_search_mapping::update_node_contribution( graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs) {
+void local_search_mapping::update_node_contribution( KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs) {
         forall_out_edges(C, e, swap_lhs) {
                 NodeID target                   = C.getEdgeTarget(e);
                 NodeWeight comm_vol             = C.getEdgeWeight(e);

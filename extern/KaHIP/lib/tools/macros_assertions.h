@@ -5,6 +5,8 @@
  *
  *****************************************************************************/
 
+/*
+
 #ifndef ASSERT_H
 #define ASSERT_H
 
@@ -177,5 +179,5 @@
 #endif
 
 
-#endif // ifndef ASSERT_H
+#endif // ifndef ASSERT_H */
 

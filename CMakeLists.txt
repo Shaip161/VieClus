@@ -10,9 +10,10 @@ if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
 endif()
-project(KaHIP C CXX)
+#project(KaHIP C CXX)
+project(KaHIP LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
@@ -84,8 +85,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/io)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/partition)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/tools)
-
-
+include_directories(${cpi_SOURCE_DIR})  # Adjust if the actual path is different
 
 set(LIBPADYGRCL_FILES 
 lib/clustering/louvainmethod.cpp
@@ -105,8 +105,8 @@ extern/KaHIP/lib/tools/random_functions.cpp
 extern/KaHIP/lib/partition/coarsening/matching/matching.cpp
 extern/KaHIP/lib/partition/coarsening/clustering/node_ordering.cpp
 extern/KaHIP/lib/partition/coarsening/clustering/size_constraint_label_propagation.cpp
-lib/logging/bexception.cpp
-extern/argtable3-3.0.3/argtable3.c)
+lib/logging/bexception.cpp )
+#extern/argtable3-3.0.3/argtable3.c)
 add_library(libeval OBJECT ${LIBEVAL_FILES})
 
 set(LIBKAFFPA_SOURCE_FILES
@@ -170,9 +170,13 @@ extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/fm_ns_local_s
 extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/localized_fm_ns_local_search.cpp 
 extern/KaHIP/lib/algorithms/cycle_search.cpp
 extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.cpp
-extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_search.cpp
-extern/argtable3-3.0.3/argtable3.c)
-add_library(libkaffpa OBJECT ${LIBKAFFPA_SOURCE_FILES})
+extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_search.cpp )
+#extern/argtable3-3.0.3/argtable3.c)
+add_library(libkaffpa_kahip OBJECT ${LIBKAFFPA_SOURCE_FILES})
+
+set(ARGTABLE_SOURCE_FILES
+  extern/argtable3-3.0.3/argtable3.c)
+add_library(argtab_kahip STATIC ${ARGTABLE_SOURCE_FILES})
 
 set(LIBCLUSTERING_SOURCE_FILES
 lib/parallel_mh_clustering/parallel_mh_async_clustering.cpp
@@ -190,21 +194,74 @@ lib/tools/mpi_tools.cpp)
 add_library(libclustering OBJECT ${LIBCLUSTERING_SOURCE_FILES})
 target_include_directories(libclustering PUBLIC ${MPI_CXX_INCLUDE_PATH})
 
-add_executable(graphchecker extern/KaHIP/app/graphchecker.cpp $<TARGET_OBJECTS:libkaffpa>)
+# Link cpi with the required libraries in VieClus
+target_link_libraries(libpadygrcl PRIVATE cpi)
+target_link_libraries(libkaffpa_kahip PRIVATE cpi)
+target_link_libraries(libeval PRIVATE cpi)
+target_link_libraries(libclustering PRIVATE cpi)
+
+target_link_libraries(libeval PRIVATE argtab_kahip)
+target_link_libraries(libkaffpa_kahip PRIVATE argtab_kahip)
+
+target_include_directories(libpadygrcl PRIVATE ${STXXL_INCLUDE_DIRS})
+target_include_directories(libkaffpa_kahip PRIVATE ${STXXL_INCLUDE_DIRS})
+
+# Example: Explicitly setting PUBLIC for visibility to external projects
+#target_link_libraries(libkaffpa_kahip PUBLIC ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
+#target_link_libraries(libpadygrcl PUBLIC ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
+
+# After defining the OBJECT libraries, create a static library target
+add_library(VieClus STATIC
+    $<TARGET_OBJECTS:libclustering>
+    $<TARGET_OBJECTS:libkaffpa_kahip>
+    $<TARGET_OBJECTS:libpadygrcl>
+    $<TARGET_OBJECTS:libeval>
+)
+
+# Ensure the library is position-independent (if needed)
+set_target_properties(VieClus PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+# Set the C++ standard (if required)
+#set_target_properties(VieClus PROPERTIES CXX_STANDARD 20)
+
+target_link_libraries(VieClus
+    PUBLIC
+    cpi
+    argtab_kahip
+    ${MPI_CXX_LIBRARIES}
+    ${OpenMP_CXX_LIBRARIES}
+)
+
+target_include_directories(VieClus
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/app
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/argtable3-3.0.3
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/app
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/io
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/partition
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/KaHIP/lib/tools
+    ${cpi_SOURCE_DIR}
+)
+
+
+add_executable(graphchecker extern/KaHIP/app/graphchecker.cpp $<TARGET_OBJECTS:libkaffpa_kahip>)
 target_compile_definitions(graphchecker PRIVATE "-DMODE_GRAPHCHECKER")
 target_link_libraries(graphchecker ${OpenMP_CXX_LIBRARIES})
 install(TARGETS graphchecker DESTINATION bin)
 
-
 add_executable(evaluator app/evaluator.cpp $<TARGET_OBJECTS:libeval> $<TARGET_OBJECTS:libpadygrcl> )
 target_compile_definitions(evaluator PRIVATE "-DMODE_EVALUATOR")
 target_include_directories(evaluator PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_link_libraries(evaluator ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
+target_link_libraries(evaluator argtab_kahip ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
 install(TARGETS evaluator DESTINATION bin)
 
-add_executable(evolutionary_clustering app/evo_clustering.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libclustering> )
+add_executable(evolutionary_clustering app/evo_clustering.cpp $<TARGET_OBJECTS:libkaffpa_kahip> $<TARGET_OBJECTS:libclustering> )
 target_compile_definitions(evolutionary_clustering PRIVATE "-DMODE_KAFFPAE")
 target_include_directories(evolutionary_clustering PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_link_libraries(evolutionary_clustering ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
+target_link_libraries(evolutionary_clustering argtab_kahip ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
 install(TARGETS evolutionary_clustering DESTINATION bin)
 

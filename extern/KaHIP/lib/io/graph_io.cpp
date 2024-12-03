@@ -5,7 +5,9 @@
  *****************************************************************************/
 
 #include <sstream>
-#include "graph_io.h"
+//#include "graph_io.h"
+
+#include "extern/KaHIP/lib/io/graph_io.h"
 
 graph_io::graph_io() {
 
@@ -15,7 +17,7 @@ graph_io::~graph_io() {
 
 }
 
-int graph_io::writeGraphWeighted(graph_access & G, std::string filename) {
+int graph_io::writeGraphWeighted(KaHIP::graph_access & G, std::string filename) {
         std::ofstream f(filename.c_str());
         f << G.number_of_nodes() <<  " " <<  G.number_of_edges()/2 <<  " 11" <<  std::endl;
 
@@ -31,7 +33,7 @@ int graph_io::writeGraphWeighted(graph_access & G, std::string filename) {
         return 0;
 }
 
-int graph_io::writeGraph(graph_access & G, std::string filename) {
+int graph_io::writeGraph(KaHIP::graph_access & G, std::string filename) {
         std::ofstream f(filename.c_str());
         f << G.number_of_nodes() <<  " " <<  G.number_of_edges()/2 << std::endl;
 
@@ -46,7 +48,7 @@ int graph_io::writeGraph(graph_access & G, std::string filename) {
         return 0;
 }
 
-int graph_io::readPartition(graph_access & G, std::string filename) {
+int graph_io::readPartition(KaHIP::graph_access & G, std::string filename) {
         std::string line;
 
         // open file for reading
@@ -78,7 +80,7 @@ int graph_io::readPartition(graph_access & G, std::string filename) {
         return 0;
 }
 
-int graph_io::readGraphWeighted(graph_access & G, std::string filename) {
+int graph_io::readGraphWeighted(KaHIP::graph_access & G, std::string filename) {
         std::string line;
 
         // open file for reading
@@ -205,7 +207,7 @@ int graph_io::naive(const std::string& str, size_t & line_ptr) {
 
 
 // from Alexander Noe
-int graph_io::readGraphWeightedFast(graph_access & G, std::string filename) {
+int graph_io::readGraphWeightedFast(KaHIP::graph_access & G, std::string filename) {
         std::string line;
 
         // open file for reading
@@ -319,9 +321,10 @@ int graph_io::readGraphWeightedFast(graph_access & G, std::string filename) {
 
 
 
-void graph_io::writePartition(graph_access & G, std::string filename) {
+void graph_io::writePartition(KaHIP::graph_access & G, std::string filename, long overall_max_RSS) {
         std::ofstream f(filename.c_str());
-        std::cout << "writing partition to " << filename << " ... " << std::endl;
+        std::cout<<"Space in KB : "<< overall_max_RSS<<std::endl;
+        std::cout <<"writing partition to " << filename << " ... " << std::endl;
 
         forall_nodes(G, node) {
                 f << G.getPartitionIndex(node) <<  std::endl;

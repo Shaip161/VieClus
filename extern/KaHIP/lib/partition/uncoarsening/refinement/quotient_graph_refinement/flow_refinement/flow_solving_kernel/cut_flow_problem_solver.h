@@ -8,16 +8,19 @@
 #ifndef CUT_FLOW_PROBLEM_SOLVER_4P49OMM
 #define CUT_FLOW_PROBLEM_SOLVER_4P49OMM
 
-#include "partition_config.h"
-#include "data_structure/flow_graph.h"
+//#include "partition_config.h"
+//#include "data_structure/flow_graph.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "lib/data_structure/flow_graph.h"
 
 class cut_flow_problem_solver  {
         public:
                 cut_flow_problem_solver( );
                 virtual ~cut_flow_problem_solver();
 
-                EdgeWeight get_min_flow_max_cut(const PartitionConfig & config, 
-                                                graph_access & G, 
+                EdgeWeight get_min_flow_max_cut(const KaHIP::PartitionConfig & config, 
+                                                KaHIP::graph_access & G, 
                                                 PartitionID & lhs, 
                                                 PartitionID & rhs, 
                                                 std::vector<NodeID> & lhs_boundary_stripe,
@@ -28,7 +31,7 @@ class cut_flow_problem_solver  {
                                                 NodeWeight & rhs_stripe_weight,
                                                 std::vector<NodeID> & new_rhs_nodes);               
 
-                EdgeID regions_no_edges(graph_access & G,
+                EdgeID regions_no_edges(KaHIP::graph_access & G,
                                         std::vector<NodeID> & lhs_boundary_stripe,
                                         std::vector<NodeID> & rhs_boundary_stripe,
                                         PartitionID & lhs, 
@@ -38,8 +41,8 @@ class cut_flow_problem_solver  {
 
 
                 //modified parse code from hi_pr
-                EdgeWeight convert_ds(const PartitionConfig & config, 
-                                      graph_access & G, 
+                EdgeWeight convert_ds(const KaHIP::PartitionConfig & config, 
+                                      KaHIP::graph_access & G, 
                                       PartitionID & lhs, 
                                       PartitionID & rhs, 
                                       std::vector<NodeID> & lhs_boundary_stripe,

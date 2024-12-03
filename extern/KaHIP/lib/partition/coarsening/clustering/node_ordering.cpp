@@ -5,7 +5,9 @@
  *****************************************************************************/
 
 
-#include "node_ordering.h"
+//#include "node_ordering.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/clustering/node_ordering.h"
 
 node_ordering::node_ordering() {
                 

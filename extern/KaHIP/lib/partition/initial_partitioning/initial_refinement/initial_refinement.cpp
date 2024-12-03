@@ -5,9 +5,14 @@
  *
  *****************************************************************************/
 
-#include "initial_refinement.h"
-#include "coarsening/coarsening.h"
-#include "uncoarsening/uncoarsening.h"
+//#include "initial_refinement.h"
+//#include "coarsening/coarsening.h"
+//#include "uncoarsening/uncoarsening.h"
+
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_refinement/initial_refinement.h"
+#include "extern/KaHIP/lib/partition/coarsening/coarsening.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/uncoarsening.h"
+
 
 initial_refinement::initial_refinement() {
                 
@@ -17,9 +22,9 @@ initial_refinement::~initial_refinement() {
                 
 }
 
-int initial_refinement::optimize( const PartitionConfig & config, graph_access & G, EdgeWeight & initial_cut) {
+int initial_refinement::optimize( const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, EdgeWeight & initial_cut) {
 
-        PartitionConfig partition_config                      = config;
+        KaHIP::PartitionConfig partition_config                      = config;
         partition_config.graph_allready_partitioned           = true;
         partition_config.stop_rule                            = STOP_RULE_STRONG;
         partition_config.fm_search_limit                      = partition_config.initial_partition_optimize_fm_limits;
@@ -30,7 +35,7 @@ int initial_refinement::optimize( const PartitionConfig & config, graph_access &
         partition_config.gpa_grow_paths_between_blocks        = false;
         partition_config.kaffpa_perfectly_balanced_refinement = false; // for runtime reasons
         
-        graph_hierarchy hierarchy;
+        KaHIP::graph_hierarchy hierarchy;
 
         coarsening coarsen;
         coarsen.perform_coarsening(partition_config, G, hierarchy);

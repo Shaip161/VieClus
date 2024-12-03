@@ -10,7 +10,9 @@
 
 #include <math.h>
 
-#include "partition_config.h"
+//#include "partition_config.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 class stop_rule {
         public:
@@ -21,7 +23,7 @@ class stop_rule {
 
 class separator_simple_stop_rule : public stop_rule {
         public:
-                separator_simple_stop_rule(PartitionConfig & config, NodeID number_of_nodes) {
+                separator_simple_stop_rule(KaHIP::PartitionConfig & config, NodeID number_of_nodes) {
 	                num_stop = config.sep_num_vert_stop;
                         if(config.disable_max_vertex_weight_constraint) {
                                 config.max_vertex_weight = config.upper_bound_partition; 
@@ -45,7 +47,7 @@ inline bool separator_simple_stop_rule::stop(NodeID no_of_finer_vertices, NodeID
 
 class simple_stop_rule : public stop_rule {
         public:
-                simple_stop_rule(PartitionConfig & config, NodeID number_of_nodes) {
+                simple_stop_rule(KaHIP::PartitionConfig & config, NodeID number_of_nodes) {
                         double x = 60;
 	                num_stop = std::max(number_of_nodes/(2.0*x*config.k), 60.0*config.k);
                         if(config.disable_max_vertex_weight_constraint) {
@@ -67,7 +69,7 @@ inline bool simple_stop_rule::stop(NodeID no_of_finer_vertices, NodeID no_of_coa
 }
 class strong_stop_rule : public stop_rule {
         public:
-                strong_stop_rule(PartitionConfig & config, NodeID number_of_nodes) {
+                strong_stop_rule(KaHIP::PartitionConfig & config, NodeID number_of_nodes) {
                         num_stop = config.k;
                         config.max_vertex_weight = config.upper_bound_partition;
                 };
@@ -85,7 +87,7 @@ inline bool strong_stop_rule::stop(NodeID no_of_finer_vertices, NodeID no_of_coa
 
 class multiple_k_stop_rule : public stop_rule {
         public:
-                multiple_k_stop_rule (PartitionConfig & config, NodeID number_of_nodes) {
+                multiple_k_stop_rule (KaHIP::PartitionConfig & config, NodeID number_of_nodes) {
                         num_stop = config.num_vert_stop_factor*config.k;
 
                         if(config.disable_max_vertex_weight_constraint) {

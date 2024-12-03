@@ -5,10 +5,14 @@
  *
  *****************************************************************************/
 
-#ifndef PARTITION_CONFIG_DI1ES4T0
-#define PARTITION_CONFIG_DI1ES4T0
+#ifndef PARTITION_CONFIG_DI1ES4T0_1
+#define PARTITION_CONFIG_DI1ES4T0_1
 
-#include "definitions.h"
+//#include "definitions.h"
+
+#include "lib/definitions.h"
+
+namespace KaHIP {
 
 // Configuration for the partitioning.
 struct PartitionConfig
@@ -430,6 +434,7 @@ struct PartitionConfig
         double mh_mutate_fraction;
 
 };
+}
 
 
 

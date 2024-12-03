@@ -5,6 +5,8 @@
  *
  *****************************************************************************/
 
+/*
+
 #ifndef GRAPH_PARTITION_ASSERTIONS_609QZZDM
 #define GRAPH_PARTITION_ASSERTIONS_609QZZDM
 

@@ -8,10 +8,16 @@
 #define PARALLEL_MH_ASYNC_HF106Y0G
 
 #include <mpi.h>
-#include "data_structure/graph_access.h"
+
+/*#include "data_structure/graph_access.h"
 #include "partition_config.h"
 #include "population_clustering.h"
-#include "timer.h"
+#include "timer.h"*/
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/VieClus/lib/parallel_mh_clustering/population_clustering.h"
+#include "lib/tools/timer.h"
 
 class parallel_mh_async_clustering {
 public:
@@ -19,11 +25,11 @@ public:
         parallel_mh_async_clustering(MPI_Comm communicator);
         virtual ~parallel_mh_async_clustering();
 
-        void perform_partitioning(const PartitionConfig & graph_partitioner_config, graph_access & G);
-        void initialize(PartitionConfig & graph_partitioner_config, graph_access & G);
-        double perform_local_partitioning(PartitionConfig & graph_partitioner_config, graph_access & G);
-        double collect_best_partitioning(graph_access & G, const PartitionConfig & config);
-        void perform_cycle_partitioning(PartitionConfig & graph_partitioner_config, graph_access & G);
+        void perform_partitioning(const KaHIP::PartitionConfig & graph_partitioner_config, KaHIP::graph_access & G);
+        void initialize(KaHIP::PartitionConfig & graph_partitioner_config, KaHIP::graph_access & G);
+        double perform_local_partitioning(KaHIP::PartitionConfig & graph_partitioner_config, KaHIP::graph_access & G);
+        double collect_best_partitioning(KaHIP::graph_access & G, const KaHIP::PartitionConfig & config);
+        void perform_cycle_partitioning(KaHIP::PartitionConfig & graph_partitioner_config, KaHIP::graph_access & G);
 
 private:
         //misc

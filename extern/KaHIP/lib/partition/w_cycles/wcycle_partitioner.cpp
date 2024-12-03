@@ -5,7 +5,7 @@
  *
  *****************************************************************************/
 
-#include "coarsening/coarsening_configurator.h"
+/*#include "coarsening/coarsening_configurator.h"
 #include "coarsening/contraction.h"
 #include "coarsening/edge_rating/edge_ratings.h"
 #include "coarsening/matching/gpa/gpa_matching.h"
@@ -20,10 +20,27 @@
 #include "uncoarsening/refinement/mixed_refinement.h"
 #include "uncoarsening/refinement/label_propagation_refinement/label_propagation_refinement.h"
 #include "uncoarsening/refinement/refinement.h"
-#include "wcycle_partitioner.h"
+#include "wcycle_partitioner.h"*/
 
-int wcycle_partitioner::perform_partitioning(const PartitionConfig & config, graph_access & G) {
-        PartitionConfig  cfg = config; 
+#include "extern/KaHIP/lib/partition/coarsening/coarsening_configurator.h"
+#include "extern/KaHIP/lib/partition/coarsening/contraction.h"
+#include "extern/KaHIP/lib/partition/coarsening/edge_rating/edge_ratings.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/gpa/gpa_matching.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/random_matching.h"
+#include "extern/KaHIP/lib/partition/coarsening/stop_rules/stop_rules.h"
+#include "extern/KaHIP/lib/data_structure/graph_hierarchy.h"
+#include "lib/definitions.h"
+#include "lib/tools/graph_partition_assertions.h"
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_partitioning.h"
+#include "lib/tools/misc.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/mixed_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/label_propagation_refinement/label_propagation_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
+#include "extern/KaHIP/lib/partition/w_cycles/wcycle_partitioner.h"
+
+int wcycle_partitioner::perform_partitioning(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
+        KaHIP::PartitionConfig  cfg = config; 
 
         if(config.stop_rule == STOP_RULE_SIMPLE) {
                 m_coarsening_stop_rule = new simple_stop_rule(cfg, G.number_of_nodes());
@@ -37,9 +54,9 @@ int wcycle_partitioner::perform_partitioning(const PartitionConfig & config, gra
         return improvement;
 }
 
-int wcycle_partitioner::perform_partitioning_recursive( PartitionConfig & partition_config, 
-                                                        graph_access & G, 
-                                                        complete_boundary ** c_boundary) {
+int wcycle_partitioner::perform_partitioning_recursive( KaHIP::PartitionConfig & partition_config, 
+                                                        KaHIP::graph_access & G, 
+                                                        KaHIP::complete_boundary ** c_boundary) {
 
         //if graph not small enough
         //      perform matching two times
@@ -56,11 +73,11 @@ int wcycle_partitioner::perform_partitioning_recursive( PartitionConfig & partit
         edge_ratings rating(partition_config);
         CoarseMapping* coarse_mapping =  new CoarseMapping();
 
-        graph_access* finer                      = &G;
+        KaHIP::graph_access* finer                      = &G;
         matching* edge_matcher                   = NULL;
         contraction* contracter                  = new contraction();
-        PartitionConfig copy_of_partition_config = partition_config;
-        graph_access* coarser                    = new graph_access();
+        KaHIP::PartitionConfig copy_of_partition_config = partition_config;
+        KaHIP::graph_access* coarser                    = new KaHIP::graph_access();
 
         Matching edge_matching;
         NodePermutationMap permutation;
@@ -86,11 +103,11 @@ int wcycle_partitioner::perform_partitioning_recursive( PartitionConfig & partit
         }
 
         coarser->set_partition_count(partition_config.k);
-        complete_boundary* coarser_boundary =  NULL;
+        KaHIP::complete_boundary* coarser_boundary =  NULL;
         refinement* refine = NULL;
 
         if(!partition_config.label_propagation_refinement) {
-                coarser_boundary = new complete_boundary(coarser);
+                coarser_boundary = new KaHIP::complete_boundary(coarser);
                 refine = new mixed_refinement();
         } else {
                 refine = new label_propagation_refinement();
@@ -98,7 +115,7 @@ int wcycle_partitioner::perform_partitioning_recursive( PartitionConfig & partit
 
         if(!m_coarsening_stop_rule->stop(no_of_finer_vertices, no_of_coarser_vertices)) {
 
-                PartitionConfig cfg; cfg = partition_config;
+                KaHIP::PartitionConfig cfg; cfg = partition_config;
 
                 double factor = partition_config.balance_factor;
                 cfg.upper_bound_partition = (factor +1.0)*partition_config.upper_bound_partition;
@@ -125,13 +142,13 @@ int wcycle_partitioner::perform_partitioning_recursive( PartitionConfig & partit
                                 if(!partition_config.label_propagation_refinement) {
                                         delete coarser_boundary;
 
-                                        coarser_boundary                = new complete_boundary(coarser);
+                                        coarser_boundary                = new KaHIP::complete_boundary(coarser);
                                 }
                                 m_have_been_level_down[m_level] = true;
 
                                 // configurate the algorithm to use the same amount
                                 // of imbalance as was allowed on this level 
-                                PartitionConfig cfg;
+                                KaHIP::PartitionConfig cfg;
                                 cfg = partition_config;
                                 cfg.set_upperbound = false;
 
@@ -152,8 +169,8 @@ int wcycle_partitioner::perform_partitioning_recursive( PartitionConfig & partit
         }
         
         //project
-        graph_access& fRef = *finer;
-        graph_access& cRef = *coarser;
+        KaHIP::graph_access& fRef = *finer;
+        KaHIP::graph_access& cRef = *coarser;
         forall_nodes(fRef, n) {
                 NodeID coarser_node              = (*coarse_mapping)[n];
                 PartitionID coarser_partition_id = cRef.getPartitionIndex(coarser_node);
@@ -161,13 +178,13 @@ int wcycle_partitioner::perform_partitioning_recursive( PartitionConfig & partit
         } endfor
 
         finer->set_partition_count(coarser->get_partition_count());
-        complete_boundary* current_boundary = NULL;
+        KaHIP::complete_boundary* current_boundary = NULL;
         if(!partition_config.label_propagation_refinement) {
-                current_boundary = new complete_boundary(finer);
+                current_boundary = new KaHIP::complete_boundary(finer);
                 current_boundary->build_from_coarser(coarser_boundary, no_of_coarser_vertices, coarse_mapping ); 
         }
 
-        PartitionConfig cfg; cfg = partition_config;
+        KaHIP::PartitionConfig cfg; cfg = partition_config;
         double cur_factor = partition_config.balance_factor/(m_deepest_level-m_level);
 
         //only set the upperbound if it is the first time 

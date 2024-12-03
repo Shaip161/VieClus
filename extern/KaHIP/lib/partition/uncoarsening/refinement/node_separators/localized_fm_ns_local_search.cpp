@@ -3,9 +3,14 @@
 // 
 
 #include <algorithm>
-#include "localized_fm_ns_local_search.h"
-#include "data_structure/priority_queues/maxNodeHeap.h"
-#include "tools/random_functions.h"
+
+//#include "localized_fm_ns_local_search.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/localized_fm_ns_local_search.h"
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 localized_fm_ns_local_search::localized_fm_ns_local_search() {
                 
@@ -14,7 +19,7 @@ localized_fm_ns_local_search::localized_fm_ns_local_search() {
 localized_fm_ns_local_search::~localized_fm_ns_local_search() {
                 
 }
-EdgeWeight localized_fm_ns_local_search::perform_refinement(const PartitionConfig & config, graph_access & G, 
+EdgeWeight localized_fm_ns_local_search::perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
                                                            std::vector< NodeWeight > & block_weight, 
                                                            std::vector< bool > & moved_out_of_separator,
                                                            PartialBoundary & separator, bool balance, PartitionID to) {
@@ -23,14 +28,14 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement(const PartitionConfi
         forall_boundary_nodes(separator, node) {
                 start_nodes.push_back(node);
         } endfor
-        random_functions::permutate_vector_good(start_nodes, false);
+        KaHIP::random_functions::permutate_vector_good(start_nodes, false);
 
         EdgeWeight improvement = 0;
         while( start_nodes.size() > 0 ) {
                 std::vector< NodeID > real_start_nodes;
                 int no_rnd_nodes = std::min(config.sep_loc_fm_no_snodes, (int)start_nodes.size());
                 for( int i = 0; i < no_rnd_nodes; i++) { 
-                        int idx = random_functions::nextInt(0, start_nodes.size()-1);
+                        int idx = KaHIP::random_functions::nextInt(0, start_nodes.size()-1);
                         NodeID cur_node = start_nodes[idx];
                         std::swap( start_nodes[idx], start_nodes[start_nodes.size()-1]);
                         start_nodes.pop_back();
@@ -51,7 +56,7 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement(const PartitionConfi
         return improvement;
 }
 
-EdgeWeight localized_fm_ns_local_search::perform_refinement(const PartitionConfig & config, graph_access & G, 
+EdgeWeight localized_fm_ns_local_search::perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
                                                             bool balance, PartitionID to) {
 
         std::vector< bool > moved_out_of_separator(G.number_of_nodes(), false);
@@ -61,14 +66,14 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement(const PartitionConfi
                         start_nodes.push_back(node);
                 }
         } endfor
-        random_functions::permutate_vector_good(start_nodes, false);
+        KaHIP::random_functions::permutate_vector_good(start_nodes, false);
 
         EdgeWeight improvement = 0;
         while( start_nodes.size() > 0 ) {
                 std::vector< NodeID > real_start_nodes;
                 int no_rnd_nodes = std::min(config.sep_loc_fm_no_snodes, (int)start_nodes.size());
                 for( int i = 0; i < no_rnd_nodes; i++) { 
-                        int idx = random_functions::nextInt(0, start_nodes.size()-1);
+                        int idx = KaHIP::random_functions::nextInt(0, start_nodes.size()-1);
                         NodeID cur_node = start_nodes[idx];
                         std::swap( start_nodes[idx], start_nodes[start_nodes.size()-1]);
                         start_nodes.pop_back();
@@ -85,7 +90,7 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement(const PartitionConfi
         return improvement;
 }
 
-EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const PartitionConfig & config, graph_access & G,
+EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G,
                                                                      std::vector< NodeID > & start_nodes, 
                                                                      std::vector< NodeWeight > & block_weights, 
                                                                      std::vector< bool > & moved_out_of_separator, 
@@ -127,7 +132,7 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const Parti
                 } else {
                         if( gainToA == gainToB ) {
                                 top_gain = gainToA;
-                                to_block = random_functions::nextInt(0,1); 
+                                to_block = KaHIP::random_functions::nextInt(0,1); 
                         } else {
                                 top_gain = gainToA > gainToB ? gainToA : gainToB;
                                 to_block = top_gain == gainToA ? 0 : 1;
@@ -154,7 +159,7 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const Parti
                                         queues[0].deleteMax();
                                         queues[1].deleteMax();
                                 } else {
-                                        int block = random_functions::nextInt(0,1);
+                                        int block = KaHIP::random_functions::nextInt(0,1);
                                         queues[block].deleteMax();
                                 }
                         }
@@ -187,7 +192,7 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const Parti
 
 }
 
-EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const PartitionConfig & config, graph_access & G, std::vector< NodeID > & start_nodes, std::vector< bool > & moved_out_of_separator, bool balance, PartitionID to) {
+EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, std::vector< NodeID > & start_nodes, std::vector< bool > & moved_out_of_separator, bool balance, PartitionID to) {
 
         std::vector< maxNodeHeap > queues; queues.resize(2);
         std::vector< change_set > rollback_info;
@@ -232,7 +237,7 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const Parti
                 } else {
                         if( gainToA == gainToB ) {
                                 top_gain = gainToA;
-                                to_block = random_functions::nextInt(0,1); 
+                                to_block = KaHIP::random_functions::nextInt(0,1); 
                         } else {
                                 top_gain = gainToA > gainToB ? gainToA : gainToB;
                                 to_block = top_gain == gainToA ? 0 : 1;
@@ -259,7 +264,7 @@ EdgeWeight localized_fm_ns_local_search::perform_refinement_internal(const Parti
                                         queues[0].deleteMax();
                                         queues[1].deleteMax();
                                 } else {
-                                        int block = random_functions::nextInt(0,1);
+                                        int block = KaHIP::random_functions::nextInt(0,1);
                                         queues[block].deleteMax();
                                 }
                         }

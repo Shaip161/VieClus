@@ -5,7 +5,9 @@
  *
  *****************************************************************************/
 
-#include "refinement.h"
+//#include "refinement.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
 
 refinement::refinement() {
                 

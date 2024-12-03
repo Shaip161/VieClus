@@ -4,9 +4,13 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "macros_assertions.h"
-#include "random_functions.h"
-#include "random_matching.h"
+//#include "macros_assertions.h"
+//#include "random_functions.h"
+//#include "random_matching.h"
+
+#include "lib/tools/macros_assertions.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/random_matching.h"
 
 random_matching::random_matching() {
 
@@ -16,8 +20,8 @@ random_matching::~random_matching() {
 
 }
 
-void random_matching::match(const PartitionConfig & partition_config, 
-                            graph_access & G, 
+void random_matching::match(const KaHIP::PartitionConfig & partition_config, 
+                            KaHIP::graph_access & G, 
                             Matching & edge_matching,
                             CoarseMapping & coarse_mapping,
                             NodeID & no_of_coarse_vertices,
@@ -31,7 +35,7 @@ void random_matching::match(const PartitionConfig & partition_config,
         no_of_coarse_vertices = 0;
 
         if(!(partition_config.matching_type == MATCHING_RANDOM_GPA)) { 
-                random_functions::permutate_entries(partition_config, permutation, true);
+                KaHIP::random_functions::permutate_entries(partition_config, permutation, true);
         } else {
                 for( unsigned int i = 0; i < permutation.size(); i++) {
                         permutation[i] = i;

@@ -8,15 +8,19 @@
 #define FULL_SEARCH_SPACE_H49ZQ8A4
 
 #include <utility>
-#include "data_structure/graph_access.h"
-#include "partition_config.h"
+
+//#include "data_structure/graph_access.h"
+//#include "partition_config.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 class full_search_space {
 public:
-        full_search_space(PartitionConfig & config, NodeID number_of_nodes);
+        full_search_space(KaHIP::PartitionConfig & config, NodeID number_of_nodes);
         virtual ~full_search_space();
 
-        void set_graph_ref( graph_access * C ) {}
+        void set_graph_ref( KaHIP::graph_access * C ) {}
 
         bool done() {
              return !(m_unsucc_tries < m_ub);

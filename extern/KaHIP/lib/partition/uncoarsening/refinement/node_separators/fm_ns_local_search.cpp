@@ -3,9 +3,14 @@
 // 
 
 #include <algorithm>
-#include "fm_ns_local_search.h"
-#include "data_structure/priority_queues/maxNodeHeap.h"
-#include "tools/random_functions.h"
+
+//#include "fm_ns_local_search.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/fm_ns_local_search.h"
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 fm_ns_local_search::fm_ns_local_search() {
                 
@@ -15,7 +20,7 @@ fm_ns_local_search::~fm_ns_local_search() {
                 
 }
 
-EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config, graph_access & G, bool balance, PartitionID to) {
+EdgeWeight fm_ns_local_search::perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, bool balance, PartitionID to) {
 
         std::vector< maxNodeHeap > queues; queues.resize(2);
         std::vector< bool > moved_out_of_separator(G.number_of_nodes(), false);
@@ -28,7 +33,7 @@ EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config
                 }
         } endfor
 
-        random_functions::permutate_vector_good(start_nodes, false);
+        KaHIP::random_functions::permutate_vector_good(start_nodes, false);
         
         for( NodeID node : start_nodes ) {
                 Gain toLHS = 0;
@@ -70,7 +75,7 @@ EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config
                 } else {
                         if( gainToA == gainToB ) {
                                 top_gain = gainToA;
-                                to_block = random_functions::nextInt(0,1); 
+                                to_block = KaHIP::random_functions::nextInt(0,1); 
                         } else {
                                 top_gain = gainToA > gainToB ? gainToA : gainToB;
                                 to_block = top_gain == gainToA ? 0 : 1;
@@ -97,7 +102,7 @@ EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config
                                         queues[0].deleteMax();
                                         queues[1].deleteMax();
                                 } else {
-                                        int block = random_functions::nextInt(0,1);
+                                        int block = KaHIP::random_functions::nextInt(0,1);
                                         queues[block].deleteMax();
                                 }
                         }
@@ -126,7 +131,7 @@ EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config
 
 }
 
-EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config, graph_access & G, 
+EdgeWeight fm_ns_local_search::perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
                                                   std::vector< NodeWeight > & block_weights, 
                                                   std::vector< bool > & moved_out_of_separator,
                                                   PartialBoundary & separator, bool balance, PartitionID to) {
@@ -139,7 +144,7 @@ EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config
                  start_nodes.push_back(node);
         } endfor 
 
-        random_functions::permutate_vector_good(start_nodes, false);
+        KaHIP::random_functions::permutate_vector_good(start_nodes, false);
         
         for( NodeID node : start_nodes ) {
                 Gain toLHS = 0;
@@ -172,7 +177,7 @@ EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config
                 } else {
                         if( gainToA == gainToB ) {
                                 top_gain = gainToA;
-                                to_block = random_functions::nextInt(0,1); 
+                                to_block = KaHIP::random_functions::nextInt(0,1); 
                         } else {
                                 top_gain = gainToA > gainToB ? gainToA : gainToB;
                                 to_block = top_gain == gainToA ? 0 : 1;
@@ -199,7 +204,7 @@ EdgeWeight fm_ns_local_search::perform_refinement(const PartitionConfig & config
                                         queues[0].deleteMax();
                                         queues[1].deleteMax();
                                 } else {
-                                        int block = random_functions::nextInt(0,1);
+                                        int block = KaHIP::random_functions::nextInt(0,1);
                                         queues[block].deleteMax();
                                 }
                         }

@@ -12,21 +12,38 @@
 #include <sstream>
 #include <set>
 
-#include "diversifyer.h"
-#include "balance_configuration.h"
-#include "graph_partitioner.h"
-#include "population_clustering.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "timer.h"
-#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
-#include "clustering/louvainmethod.h"
-#include "clustering/coarsening/contractor.h"
-#include "partition/coarsening/clustering/size_constraint_label_propagation.h"
-#include "tools/modularitymetric.h"
-#include "tools/graph_extractor.h"
+//#include "diversifyer.h"
+//#include "balance_configuration.h"
+//#include "graph_partitioner.h"
+//#include "population_clustering.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "timer.h"
+//#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+//#include "clustering/louvainmethod.h"
+//#include "clustering/coarsening/contractor.h"
+//#include "partition/coarsening/clustering/size_constraint_label_propagation.h"
+//#include "tools/modularitymetric.h"
+//#include "tools/graph_extractor.h"
 
-population_clustering::population_clustering( MPI_Comm communicator, const PartitionConfig & partition_config ) {
+#include "extern/KaHIP/lib/parallel_mh_clustering/diversifyer.h"
+#include "extern/KaHIP/app/balance_configuration.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/parallel_mh_clustering/population_clustering.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "lib/tools/timer.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+#include "extern/VieClus/lib/clustering/louvainmethod.h"
+#include "extern/VieClus/lib/clustering/coarsening/contractor.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/size_constraint_label_propagation.h"
+#include "extern/VieClus/lib/tools/modularitymetric.h"
+#include "extern/KaHIP/lib/tools/graph_extractor.h"
+
+
+
+
+population_clustering::population_clustering( MPI_Comm communicator, const KaHIP::PartitionConfig & partition_config ) {
         m_population_clustering_size    = partition_config.mh_pool_size;
         m_no_partition_calls = 0;
         m_num_NCs            = partition_config.mh_num_ncs_to_compute;
@@ -48,17 +65,17 @@ void population_clustering::set_pool_size(int size) {
         m_population_clustering_size = size;
 }
 
-void population_clustering::createIndividuum(const PartitionConfig & config, 
-                graph_access & G, 
+void population_clustering::createIndividuum(const KaHIP::PartitionConfig & config, 
+                KaHIP::graph_access & G, 
                 Individuum & ind, bool output) {
 
-        PartitionConfig copy = config;
+        KaHIP::PartitionConfig copy = config;
 
         copy.upper_bound_partition                     = G.number_of_nodes() + 1;
         copy.graph_allready_partitioned                = false;
         copy.node_ordering                             = RANDOM_NODEORDERING;
 
-        int lp_levels = random_functions::nextInt(0,10);
+        int lp_levels = KaHIP::random_functions::nextInt(0,10);
         if( 0 <= lp_levels && lp_levels <= 7) 
                 copy.lm_number_of_label_propagation_levels = 0; 
         if( lp_levels == 8) 
@@ -94,7 +111,7 @@ void population_clustering::createIndividuum(const PartitionConfig & config,
         }
 }
 
-void population_clustering::insert(graph_access & G, Individuum & ind) {
+void population_clustering::insert(KaHIP::graph_access & G, Individuum & ind) {
 
         m_no_partition_calls++;
         if(m_internal_population_clustering.size() < m_population_clustering_size) {
@@ -163,8 +180,8 @@ void population_clustering::replace(Individuum & in, Individuum & out) {
         }
 }
 
-void population_clustering::combine_basic_flat(const PartitionConfig & partition_config, 
-                graph_access & G, 
+void population_clustering::combine_basic_flat(const KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
                 Individuum & first_ind, 
                 Individuum & second_ind, 
                 Individuum & output_ind) {
@@ -179,7 +196,7 @@ void population_clustering::combine_basic_flat(const PartitionConfig & partition
         } endfor
 
         output = maxmimum_overlap( lhs, rhs);
-        graph_access contracted_graph = contract_by_clustering(G, output);
+        KaHIP::graph_access contracted_graph = contract_by_clustering(G, output);
 
         clustering_t contracted_clustering; double quality;
         std::tie(contracted_clustering, quality) = do_louvain(contracted_graph);
@@ -208,8 +225,8 @@ void population_clustering::combine_basic_flat(const PartitionConfig & partition
         //std::cout <<  "performed basic combine with result " <<  output_ind.objective  << std::endl;
 }
 
-void population_clustering::combine_improved_multilevel(const PartitionConfig & partition_config, 
-                graph_access & G, 
+void population_clustering::combine_improved_multilevel(const KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
                 Individuum & first_ind, 
                 Individuum & second_ind, 
                 Individuum & output_ind) {
@@ -226,11 +243,11 @@ void population_clustering::combine_improved_multilevel(const PartitionConfig & 
 
         output = maxmimum_overlap( lhs, rhs);
 
-        graph_access* Q = new graph_access();
+        KaHIP::graph_access* Q = new KaHIP::graph_access();
         G.copy(*Q);
 
-        graph_hierarchy hierarchy;
-        std::list<graph_access*> junk{ Q };
+        KaHIP::graph_hierarchy hierarchy;
+        std::list<KaHIP::graph_access*> junk{ Q };
 
         std::vector< unsigned > current_clustering;
         std::vector< unsigned > contracted_overlap = output;
@@ -249,7 +266,7 @@ void population_clustering::combine_improved_multilevel(const PartitionConfig & 
                 if(!(q - q_ > eps)) { break; }
 
                 {
-                        PartitionConfig config; // never read!
+                        KaHIP::PartitionConfig config; // never read!
                         Q = Coarsening::performCoarsening(config, *Q, hierarchy, junk);
                 }
 
@@ -302,8 +319,8 @@ void population_clustering::combine_improved_multilevel(const PartitionConfig & 
         for(auto* g: junk) { delete g; }
 }
 
-void population_clustering::combine_improved_flat(const PartitionConfig & partition_config, 
-                graph_access & G, 
+void population_clustering::combine_improved_flat(const KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
                 Individuum & first_ind, 
                 Individuum & second_ind, 
                 Individuum & output_ind) {
@@ -318,7 +335,7 @@ void population_clustering::combine_improved_flat(const PartitionConfig & partit
         } endfor
 
         output = maxmimum_overlap( lhs, rhs);
-        graph_access contracted_graph = contract_by_clustering(G, output);
+        KaHIP::graph_access contracted_graph = contract_by_clustering(G, output);
 
         clustering_t contracted_clustering;
         if( first_ind.objective > second_ind.objective ) {
@@ -358,8 +375,8 @@ void population_clustering::combine_improved_flat(const PartitionConfig & partit
         //std::cout <<  "performed improved flat with result " <<  output_ind.objective  << " input: " <<  first_ind.objective << " " << second_ind.objective << std::endl;
 }
 
-void population_clustering::combine_improved_flat_with_partitioning(const PartitionConfig & partition_config, 
-                graph_access & G, 
+void population_clustering::combine_improved_flat_with_partitioning(const KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
                 Individuum & first_ind, 
                 Individuum & output_ind) {
 
@@ -373,12 +390,12 @@ void population_clustering::combine_improved_flat_with_partitioning(const Partit
         } endfor
 
 
-        PartitionConfig cross_config;
-        configuration{}.standard(cross_config);
-        configuration{}.fastsocial(cross_config);
+        KaHIP::PartitionConfig cross_config;
+        VieClus::configuration{}.standard(cross_config);
+        VieClus::configuration{}.fastsocial(cross_config);
 
-        int kfactor    = random_functions::nextInt(2,64);
-        unsigned larger_imbalance = random_functions::nextInt(3,50);
+        int kfactor    = KaHIP::random_functions::nextInt(2,64);
+        unsigned larger_imbalance = KaHIP::random_functions::nextInt(3,50);
         double epsilon = larger_imbalance/100.0;
         cross_config.k                                    = kfactor;
         cross_config.kaffpa_perfectly_balanced_refinement = false;
@@ -399,7 +416,7 @@ void population_clustering::combine_improved_flat_with_partitioning(const Partit
         } endfor
 
         output = maxmimum_overlap( lhs, rhs);
-        graph_access contracted_graph = contract_by_clustering(G, output);
+        KaHIP::graph_access contracted_graph = contract_by_clustering(G, output);
 
         clustering_t contracted_clustering = apply_fine_clustering_to_coarse_graph(lhs, output, contracted_graph.number_of_nodes());
         forall_nodes(contracted_graph, node) {
@@ -432,8 +449,8 @@ void population_clustering::combine_improved_flat_with_partitioning(const Partit
 }
 
 
-void population_clustering::combine_improved_flat_with_sclp(const PartitionConfig & partition_config, 
-                graph_access & G, 
+void population_clustering::combine_improved_flat_with_sclp(const KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
                 Individuum & first_ind, 
                 Individuum & output_ind) {
 
@@ -447,19 +464,19 @@ void population_clustering::combine_improved_flat_with_sclp(const PartitionConfi
         } endfor
 
 
-        PartitionConfig misc;
-        configuration cfg;
+        KaHIP::PartitionConfig misc;
+        VieClus::configuration cfg;
         cfg.fastsocial(misc);
 
         misc.graph_allready_partitioned = false;
-        misc.cluster_upperbound = random_functions::nextInt(10, G.number_of_nodes());
+        misc.cluster_upperbound = KaHIP::random_functions::nextInt(10, G.number_of_nodes());
         misc.upper_bound_partition = misc.cluster_upperbound; 
 
         unsigned no_blocks = 0;
         size_constraint_label_propagation{}.label_propagation( misc, G, rhs, no_blocks);
 
         output = maxmimum_overlap( lhs, rhs);
-        graph_access contracted_graph = contract_by_clustering(G, output);
+        KaHIP::graph_access contracted_graph = contract_by_clustering(G, output);
 
         clustering_t contracted_clustering = apply_fine_clustering_to_coarse_graph(lhs, output, contracted_graph.number_of_nodes());
         forall_nodes(contracted_graph, node) {
@@ -491,7 +508,7 @@ void population_clustering::combine_improved_flat_with_sclp(const PartitionConfi
         } endfor
 }
 
-void population_clustering::mutate( const PartitionConfig & partition_config, graph_access & G, Individuum & first_ind, Individuum & second_ind, Individuum & output_ind) {
+void population_clustering::mutate( const KaHIP::PartitionConfig & partition_config, KaHIP::graph_access & G, Individuum & first_ind, Individuum & second_ind, Individuum & output_ind) {
         Individuum output_a;
         Individuum output_b;
         mutate_random(partition_config, G, first_ind, output_a);
@@ -505,14 +522,14 @@ void population_clustering::mutate( const PartitionConfig & partition_config, gr
         delete output_b.cut_edges;
 }
 
-void population_clustering::mutate_random( const PartitionConfig & partition_config, graph_access & G, Individuum & first_ind, Individuum & output_ind) {
+void population_clustering::mutate_random( const KaHIP::PartitionConfig & partition_config, KaHIP::graph_access & G, Individuum & first_ind, Individuum & output_ind) {
         std::vector< unsigned > clustering(G.number_of_nodes(), 0);
         std::mt19937 gen{ std::random_device{}() };
         forall_nodes(G, node) {
                 clustering[node] = first_ind.partition_map[node];
         } endfor
 
-        double l = random_functions::nextDouble(0.01,partition_config.mh_mutate_fraction);
+        double l = KaHIP::random_functions::nextDouble(0.01,partition_config.mh_mutate_fraction);
         unsigned c = *std::max_element(clustering.begin(), clustering.end()) + 1;
         unsigned clusters_to_select = std::ceil(l * c);
 
@@ -531,13 +548,13 @@ void population_clustering::mutate_random( const PartitionConfig & partition_con
 
         std::uniform_real_distribution<double> dist_eps{ 0.1, 0.5 };
         for(unsigned cluster: selected_clusters) {
-                graph_access E;
+                KaHIP::graph_access E;
                 std::vector<unsigned> mapping;
                 graph_extractor{ }.extract_block(G, E, cluster, mapping);
 
-                PartitionConfig partition_config;
+                KaHIP::PartitionConfig partition_config;
 
-                configuration cfg;
+                VieClus::configuration cfg;
                 partition_config.k         = 2;
                 cfg.standard(partition_config);
 
@@ -594,12 +611,12 @@ void population_clustering::extinction( ) {
 }
 
 void population_clustering::get_two_random_individuals(Individuum & first, Individuum & second) {
-        int first_idx = random_functions::nextInt(0, m_internal_population_clustering.size()-1);
+        int first_idx = KaHIP::random_functions::nextInt(0, m_internal_population_clustering.size()-1);
         first = m_internal_population_clustering[first_idx];
 
-        int second_idx = random_functions::nextInt(0, m_internal_population_clustering.size()-1);
+        int second_idx = KaHIP::random_functions::nextInt(0, m_internal_population_clustering.size()-1);
         while( first_idx == second_idx ) {
-                second_idx = random_functions::nextInt(0, m_internal_population_clustering.size()-1);
+                second_idx = KaHIP::random_functions::nextInt(0, m_internal_population_clustering.size()-1);
         }
 
         second = m_internal_population_clustering[second_idx];
@@ -625,7 +642,7 @@ void population_clustering::get_two_individuals_tournament(Individuum & first, I
 }
 
 void population_clustering::get_random_individuum(Individuum & ind) {
-        int idx = random_functions::nextInt(0, m_internal_population_clustering.size()-1);
+        int idx = KaHIP::random_functions::nextInt(0, m_internal_population_clustering.size()-1);
         ind     = m_internal_population_clustering[idx];
 }
 
@@ -647,7 +664,7 @@ bool population_clustering::is_full() {
         return m_internal_population_clustering.size() == m_population_clustering_size;
 }
 
-void population_clustering::apply_fittest( graph_access & G, double & objective ) {
+void population_clustering::apply_fittest( KaHIP::graph_access & G, double & objective ) {
         double max_objective = -1;
         unsigned idx         = 0;
 

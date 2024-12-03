@@ -11,13 +11,17 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "algorithms/push_relabel.h"
-#include "cut_flow_problem_solver.h"
-#include "most_balanced_minimum_cuts/most_balanced_minimum_cuts.h"
-#include "data_structure/flow_graph.h"
-#include "io/graph_io.h"
+//#include "algorithms/push_relabel.h"
+//#include "cut_flow_problem_solver.h"
+//#include "most_balanced_minimum_cuts/most_balanced_minimum_cuts.h"
+//#include "data_structure/flow_graph.h"
+//#include "io/graph_io.h"
 
-
+#include "extern/KaHIP/lib/algorithms/push_relabel.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/flow_solving_kernel/cut_flow_problem_solver.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/most_balanced_minimum_cuts/most_balanced_minimum_cuts.h"
+#include "lib/data_structure/flow_graph.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
 
 cut_flow_problem_solver::cut_flow_problem_solver() {
 }
@@ -25,7 +29,7 @@ cut_flow_problem_solver::cut_flow_problem_solver() {
 cut_flow_problem_solver::~cut_flow_problem_solver() {
 }
 
-EdgeID cut_flow_problem_solver::regions_no_edges( graph_access & G,
+EdgeID cut_flow_problem_solver::regions_no_edges( KaHIP::graph_access & G,
                                                std::vector<NodeID> & lhs_boundary_stripe,
                                                std::vector<NodeID> & rhs_boundary_stripe,
                                                PartitionID & lhs, 
@@ -62,8 +66,8 @@ EdgeID cut_flow_problem_solver::regions_no_edges( graph_access & G,
         return no_of_edges; 
 }
 
-EdgeWeight cut_flow_problem_solver::convert_ds( const PartitionConfig & config, 
-                                             graph_access & G, 
+EdgeWeight cut_flow_problem_solver::convert_ds( const KaHIP::PartitionConfig & config, 
+                                             KaHIP::graph_access & G, 
                                              PartitionID & lhs, 
                                              PartitionID & rhs, 
                                              std::vector<NodeID> & lhs_boundary_stripe,
@@ -139,8 +143,8 @@ EdgeWeight cut_flow_problem_solver::convert_ds( const PartitionConfig & config,
         return true;
 }
 
-EdgeWeight cut_flow_problem_solver::get_min_flow_max_cut(const PartitionConfig & config, 
-                                                      graph_access & G, 
+EdgeWeight cut_flow_problem_solver::get_min_flow_max_cut(const KaHIP::PartitionConfig & config, 
+                                                      KaHIP::graph_access & G, 
                                                       PartitionID & lhs, 
                                                       PartitionID & rhs, 
                                                       std::vector<NodeID> & lhs_boundary_stripe,
@@ -174,7 +178,7 @@ EdgeWeight cut_flow_problem_solver::get_min_flow_max_cut(const PartitionConfig &
                         }
                 } endfor
         } else {
-                graph_access residualGraph;
+                KaHIP::graph_access residualGraph;
                 residualGraph.start_construction(fG.number_of_nodes(),fG.number_of_edges());
 
                 forall_nodes(fG, node) {

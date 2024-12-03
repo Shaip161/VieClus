@@ -10,18 +10,23 @@
 
 #include <unordered_map>
 
-#include "data_structure/graph_access.h"
-#include "data_structure/flow_graph.h"
-#include "partition_config.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+//#include "data_structure/graph_access.h"
+//#include "data_structure/flow_graph.h"
+//#include "partition_config.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/data_structure/flow_graph.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
 
 class vertex_separator_algorithm {
         public:
                 vertex_separator_algorithm();
                 virtual ~vertex_separator_algorithm();
 
-                void build_flow_problem(const PartitionConfig & config, 
-                                        graph_access & G, 
+                void build_flow_problem(const KaHIP::PartitionConfig & config, 
+                                        KaHIP::graph_access & G, 
                                         std::vector< NodeID > & lhs_nodes,
                                         std::vector< NodeID > & rhs_nodes,
                                         std::vector< NodeID > & separator_nodes,
@@ -29,67 +34,67 @@ class vertex_separator_algorithm {
                                         std::vector< NodeID > & forward_mapping, 
                                         NodeID & source, NodeID & sink);
  
-                void compute_vertex_separator(const PartitionConfig & config, 
-                                              graph_access & G, 
-                                              complete_boundary & boundary, 
+                void compute_vertex_separator(const KaHIP::PartitionConfig & config, 
+                                              KaHIP::graph_access & G, 
+                                              KaHIP::complete_boundary & boundary, 
                                               std::vector<NodeID> & overall_separator);
 
-                NodeWeight improve_vertex_separator_internal(const PartitionConfig & config, 
-                                              graph_access & G, 
+                NodeWeight improve_vertex_separator_internal(const KaHIP::PartitionConfig & config, 
+                                              KaHIP::graph_access & G, 
                                               std::vector<NodeID> & input_separator,
                                               std::vector<NodeID> & output_separator);
 
-                NodeWeight improve_vertex_separator(const PartitionConfig & config, 
-                                              graph_access & G, 
+                NodeWeight improve_vertex_separator(const KaHIP::PartitionConfig & config, 
+                                              KaHIP::graph_access & G, 
                                               std::vector<NodeID> & input_separator,
                                               std::vector<NodeID> & output_separator);
 
-		NodeWeight improve_vertex_separator(const PartitionConfig & config, 
-                                                    graph_access & G, 
+		NodeWeight improve_vertex_separator(const KaHIP::PartitionConfig & config, 
+                                                    KaHIP::graph_access & G, 
 					            std::vector< NodeWeight > & block_weight,
                                                     PartialBoundary & separator); 
 
 
-		NodeWeight improve_vertex_separator_internal(const PartitionConfig & config, 
-	                                                     graph_access & G, 
+		NodeWeight improve_vertex_separator_internal(const KaHIP::PartitionConfig & config, 
+	                                                     KaHIP::graph_access & G, 
 							     std::vector< NodeWeight > & block_weight,
 			 				     PartialBoundary & separator,
                                                              std::vector< NodeID > & lhs_nodes, 
                                                              std::vector< NodeID > & rhs_nodes,
                                                              std::vector< NodeID > & start_nodes );
 
-                void compute_vertex_separator_simple(const PartitionConfig & config, 
-                                                     graph_access & G, 
-                                                     complete_boundary & boundary, 
+                void compute_vertex_separator_simple(const KaHIP::PartitionConfig & config, 
+                                                     KaHIP::graph_access & G, 
+                                                     KaHIP::complete_boundary & boundary, 
                                                      std::vector<NodeID> & overall_separator);
 
-                void compute_vertex_separator_simpler(const PartitionConfig & config, 
-                                                     graph_access & G, 
-                                                     complete_boundary & boundary, 
+                void compute_vertex_separator_simpler(const KaHIP::PartitionConfig & config, 
+                                                     KaHIP::graph_access & G, 
+                                                     KaHIP::complete_boundary & boundary, 
                                                      std::vector<NodeID> & overall_separator);
 
-                void compute_vertex_separator(const PartitionConfig & config, 
-                                              graph_access & G, 
-                                              complete_boundary & boundary);
+                void compute_vertex_separator(const KaHIP::PartitionConfig & config, 
+                                              KaHIP::graph_access & G, 
+                                              KaHIP::complete_boundary & boundary);
 
         private:
-                void convert_residualGraph( graph_access & G, std::vector< NodeID > & forward_mapping, 
+                void convert_residualGraph( KaHIP::graph_access & G, std::vector< NodeID > & forward_mapping, 
                                             NodeID & source, NodeID & sink, 
-                                            flow_graph & rG, graph_access & residualGraph);
+                                            flow_graph & rG, KaHIP::graph_access & residualGraph);
 
-                void apply_vectors( graph_access & G,   
+                void apply_vectors( KaHIP::graph_access & G,   
                                     std::vector< NodeID > & lhs_nodes, 
                                     std::vector< NodeID > & rhs_nodes,
                                     std::vector< NodeID > & separator);
                 //ASSERTIONS
-                bool is_vertex_separator(graph_access & G, std::unordered_map<NodeID, bool> & separator);
+                bool is_vertex_separator(KaHIP::graph_access & G, std::unordered_map<NodeID, bool> & separator);
 
 };
 
 inline
-void vertex_separator_algorithm::convert_residualGraph( graph_access & G, std::vector< NodeID > & forward_mapping, 
+void vertex_separator_algorithm::convert_residualGraph( KaHIP::graph_access & G, std::vector< NodeID > & forward_mapping, 
                                                         NodeID & source, NodeID & sink, 
-                                                        flow_graph & rG, graph_access & residualGraph) {
+                                                        flow_graph & rG, KaHIP::graph_access & residualGraph) {
 
         residualGraph.start_construction(rG.number_of_nodes(), rG.number_of_edges());
         forall_nodes(rG, node) {
@@ -119,7 +124,7 @@ void vertex_separator_algorithm::convert_residualGraph( graph_access & G, std::v
 
 
 inline
-void vertex_separator_algorithm::apply_vectors( graph_access & G,   
+void vertex_separator_algorithm::apply_vectors( KaHIP::graph_access & G,   
                     std::vector< NodeID > & lhs_nodes, 
                     std::vector< NodeID > & rhs_nodes,
                     std::vector< NodeID > & separator) {

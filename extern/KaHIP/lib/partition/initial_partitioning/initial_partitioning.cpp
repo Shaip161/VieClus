@@ -7,16 +7,27 @@
 
 #include <math.h>
 
-#include "bipartition.h"
-#include "graph_partition_assertions.h"
-#include "graph_partitioner.h"
-#include "initial_partition_bipartition.h"
-#include "initial_partitioning.h"
-#include "initial_refinement/initial_refinement.h"
-#include "initial_node_separator.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "timer.h"
+//#include "bipartition.h"
+//#include "graph_partition_assertions.h"
+//#include "graph_partitioner.h"
+//#include "initial_partition_bipartition.h"
+//#include "initial_partitioning.h"
+//#include "initial_refinement/initial_refinement.h"
+//#include "initial_node_separator.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "timer.h"
+
+#include "extern/KaHIP/lib/partition/initial_partitioning/bipartition.h"
+#include "lib/tools/graph_partition_assertions.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_partition_bipartition.h"
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_partitioning.h"
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_refinement/initial_refinement.h"
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_node_separator.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "lib/tools/timer.h"
 
 initial_partitioning::initial_partitioning() {
 
@@ -26,8 +37,8 @@ initial_partitioning::~initial_partitioning() {
 
 }
 
-void initial_partitioning::perform_initial_partitioning(const PartitionConfig & config, graph_hierarchy & hierarchy) {
-        graph_access& G = *hierarchy.get_coarsest();
+void initial_partitioning::perform_initial_partitioning(const KaHIP::PartitionConfig & config, KaHIP::graph_hierarchy & hierarchy) {
+        KaHIP::graph_access& G = *hierarchy.get_coarsest();
         if(config.mode_node_separators) {
                 perform_initial_partitioning_separator(config, G);
         } else {
@@ -36,7 +47,7 @@ void initial_partitioning::perform_initial_partitioning(const PartitionConfig & 
 }
 
 
-void initial_partitioning::perform_initial_partitioning(const PartitionConfig & config, graph_access &  G) {
+void initial_partitioning::perform_initial_partitioning(const KaHIP::PartitionConfig & config, KaHIP::graph_access &  G) {
 
         initial_partitioner* partition = NULL;
         switch(config.initial_partitioning_type) {
@@ -50,7 +61,7 @@ void initial_partitioning::perform_initial_partitioning(const PartitionConfig & 
 
         }       
 
-        quality_metrics qm;
+        KaHIP::quality_metrics qm;
         EdgeWeight best_cut;
         int* best_map = new int[G.number_of_nodes()];
         if(config.graph_allready_partitioned && !config.omit_given_partitioning) {
@@ -79,8 +90,8 @@ void initial_partitioning::perform_initial_partitioning(const PartitionConfig & 
         PRINT(std::cout << "no of nodes for partition = "              << G.number_of_nodes()            << std::endl;);
         if(!((config.graph_allready_partitioned && config.no_new_initial_partitioning) || config.omit_given_partitioning)) {
                 for(unsigned int rep = 0; rep < reps_to_do; rep++) {
-                        unsigned seed = random_functions::nextInt(0, std::numeric_limits<int>::max()); 
-                        PartitionConfig working_config = config;
+                        unsigned seed = KaHIP::random_functions::nextInt(0, std::numeric_limits<int>::max()); 
+                        KaHIP::PartitionConfig working_config = config;
                         working_config.combine = false;
                         partition->initial_partition(working_config, seed, G, partition_map);
                         
@@ -128,7 +139,7 @@ void initial_partitioning::perform_initial_partitioning(const PartitionConfig & 
         delete partition;
 }
 
-void initial_partitioning::perform_initial_partitioning_separator(const PartitionConfig & config, graph_access &  G) {
+void initial_partitioning::perform_initial_partitioning_separator(const KaHIP::PartitionConfig & config, KaHIP::graph_access &  G) {
         initial_node_separator ipns;
         ipns.compute_node_separator(config,G);
 }

@@ -4,6 +4,8 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
+/*
+
 #include "misc.h"
 #include "quality_metrics.h"
 
@@ -46,3 +48,5 @@ void misc::balance_singletons(const PartitionConfig & config, graph_access & G) 
         }
         std::cout <<  "log> balance after assigning singletons " <<  qm.balance(G)  << std::endl;
 }
+
+*/

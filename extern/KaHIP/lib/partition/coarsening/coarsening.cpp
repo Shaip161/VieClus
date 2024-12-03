@@ -7,16 +7,27 @@
 #include <limits>
 #include <sstream>
 
-#include "coarsening.h"
-#include "coarsening_configurator.h"
-#include "contraction.h"
-#include "data_structure/graph_hierarchy.h"
-#include "definitions.h"
-#include "edge_rating/edge_ratings.h"
-#include "graph_io.h"
-#include "matching/gpa/gpa_matching.h"
-#include "matching/random_matching.h"
-#include "stop_rules/stop_rules.h"
+//#include "coarsening.h"
+//#include "coarsening_configurator.h"
+//#include "contraction.h"
+//#include "data_structure/graph_hierarchy.h"
+//#include "definitions.h"
+//#include "edge_rating/edge_ratings.h"
+//#include "graph_io.h"
+//#include "matching/gpa/gpa_matching.h"
+//#include "matching/random_matching.h"
+//#include "stop_rules/stop_rules.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/coarsening.h"
+#include "extern/KaHIP/lib/partition/coarsening/coarsening_configurator.h"
+#include "extern/KaHIP/lib/partition/coarsening/contraction.h"
+#include "extern/KaHIP/lib/data_structure/graph_hierarchy.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/coarsening/edge_rating/edge_ratings.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/gpa/gpa_matching.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/random_matching.h"
+#include "extern/KaHIP/lib/partition/coarsening/stop_rules/stop_rules.h"
 
 coarsening::coarsening() {
 
@@ -26,7 +37,7 @@ coarsening::~coarsening() {
 
 }
 
-void coarsening::perform_coarsening(const PartitionConfig & partition_config, graph_access & G, graph_hierarchy & hierarchy) {
+void coarsening::perform_coarsening(const KaHIP::PartitionConfig & partition_config, KaHIP::graph_access & G, KaHIP::graph_hierarchy & hierarchy) {
 
         NodeID no_of_coarser_vertices = G.number_of_nodes();
         NodeID no_of_finer_vertices   = G.number_of_nodes();
@@ -34,10 +45,10 @@ void coarsening::perform_coarsening(const PartitionConfig & partition_config, gr
         edge_ratings rating(partition_config);
         CoarseMapping* coarse_mapping = NULL;
 
-        graph_access* finer                      = &G;
+        KaHIP::graph_access* finer                      = &G;
         matching* edge_matcher                   = NULL;
         contraction* contracter                  = new contraction();
-        PartitionConfig copy_of_partition_config = partition_config;
+        KaHIP::PartitionConfig copy_of_partition_config = partition_config;
 
         stop_rule* coarsening_stop_rule = NULL;
         if( partition_config.mode_node_separators ) {
@@ -57,7 +68,7 @@ void coarsening::perform_coarsening(const PartitionConfig & partition_config, gr
         unsigned int level    = 0;
         bool contraction_stop = false;
         do {
-                graph_access* coarser = new graph_access();
+                KaHIP::graph_access* coarser = new KaHIP::graph_access();
                 coarse_mapping        = new CoarseMapping();
                 Matching edge_matching;
                 NodePermutationMap permutation;

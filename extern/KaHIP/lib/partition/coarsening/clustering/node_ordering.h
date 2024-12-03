@@ -11,17 +11,23 @@
 
 #include <algorithm>
 
-#include "definitions.h"
-#include "partition_config.h"
-#include "data_structure/graph_access.h"
-#include "tools/random_functions.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "tools/random_functions.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+
 
 class node_ordering {
 public:
         node_ordering();
         virtual ~node_ordering();
 
-        void order_nodes(const PartitionConfig & config, graph_access & G, std::vector< NodeID > & ordered_nodes) {
+        void order_nodes(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, std::vector< NodeID > & ordered_nodes) {
                 forall_nodes(G, node) {
                         ordered_nodes[node] = node;
                 } endfor
@@ -36,11 +42,11 @@ public:
                  }
         }
 
-        void order_nodes_random(const PartitionConfig & config, graph_access & G, std::vector< NodeID > & ordered_nodes) { 
-                random_functions::permutate_vector_fast(ordered_nodes, false);
+        void order_nodes_random(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, std::vector< NodeID > & ordered_nodes) { 
+                KaHIP::random_functions::permutate_vector_fast(ordered_nodes, false);
         }
 
-        void order_nodes_degree(const PartitionConfig & config, graph_access & G, std::vector< NodeID > & ordered_nodes) { 
+        void order_nodes_degree(const KaHIP::PartitionConfig & config,KaHIP:: graph_access & G, std::vector< NodeID > & ordered_nodes) { 
                 std::sort( ordered_nodes.begin(), ordered_nodes.end(), 
                            [&]( const NodeID & lhs, const NodeID & rhs) -> bool {
                                 return (G.getNodeDegree(lhs) < G.getNodeDegree(rhs));

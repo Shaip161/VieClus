@@ -2,7 +2,10 @@
 // Author: Christian Schulz <christian.schulz@kit.edu>
 // 
 
-#include "area_bfs.h"
+//#include "area_bfs.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/separator/area_bfs.h"
+
 
 std::vector<int> area_bfs::m_deepth;
 int area_bfs::round = 0;

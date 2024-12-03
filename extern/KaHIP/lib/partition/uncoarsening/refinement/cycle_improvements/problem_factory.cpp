@@ -5,7 +5,9 @@
  *
  *****************************************************************************/
 
-#include "problem_factory.h"
+//#include "problem_factory.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/problem_factory.h"
 
 problem_factory::problem_factory() {
                 

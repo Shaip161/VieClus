@@ -4,7 +4,10 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "graph_hierarchy.h"
+//#include "graph_hierarchy.h"
+#include "extern/KaHIP/lib/data_structure/graph_hierarchy.h"
+
+namespace KaHIP {
 
 graph_hierarchy::graph_hierarchy() : m_current_coarser_graph(NULL), 
                                      m_current_coarse_mapping(NULL){
@@ -23,15 +26,15 @@ graph_hierarchy::~graph_hierarchy() {
         }
 }
 
-void graph_hierarchy::push_back(graph_access * G, CoarseMapping * coarse_mapping) {
+void graph_hierarchy::push_back(KaHIP::graph_access * G, CoarseMapping * coarse_mapping) {
         m_the_graph_hierarchy.push(G);
         m_the_mappings.push(coarse_mapping);
 	m_to_delete_mappings.push_back(coarse_mapping);
         m_coarsest_graph = G;
 }
 
-graph_access* graph_hierarchy::pop_finer_and_project() {
-        graph_access* finer = pop_coarsest();
+KaHIP::graph_access* graph_hierarchy::pop_finer_and_project() {
+        KaHIP::graph_access* finer = pop_coarsest();
 
         CoarseMapping* coarse_mapping = m_the_mappings.top(); // mapps finer to coarser nodes
         m_the_mappings.pop(); 
@@ -48,8 +51,8 @@ graph_access* graph_hierarchy::pop_finer_and_project() {
         ASSERT_EQ(m_the_graph_hierarchy.size(), m_the_mappings.size());
 
         //perform projection
-        graph_access& fRef = *finer;
-        graph_access& cRef = *m_current_coarser_graph;
+        KaHIP::graph_access& fRef = *finer;
+        KaHIP::graph_access& cRef = *m_current_coarser_graph;
         forall_nodes(fRef, n) {
                 NodeID coarser_node              = (*coarse_mapping)[n];
                 PartitionID coarser_partition_id = cRef.getPartitionIndex(coarser_node);
@@ -63,8 +66,8 @@ graph_access* graph_hierarchy::pop_finer_and_project() {
         return finer;                
 }
 
-graph_access* graph_hierarchy::pop_finer_and_project_ns( PartialBoundary & separator ) {
-        graph_access* finer = pop_coarsest();
+KaHIP::graph_access* graph_hierarchy::pop_finer_and_project_ns( PartialBoundary & separator ) {
+        KaHIP::graph_access* finer = pop_coarsest();
 
         CoarseMapping* coarse_mapping = m_the_mappings.top(); // mapps finer to coarser nodes
         m_the_mappings.pop(); 
@@ -82,8 +85,8 @@ graph_access* graph_hierarchy::pop_finer_and_project_ns( PartialBoundary & separ
 
 	separator.clear();
         //perform projection
-        graph_access& fRef = *finer;
-        graph_access& cRef = *m_current_coarser_graph;
+        KaHIP::graph_access& fRef = *finer;
+        KaHIP::graph_access& cRef = *m_current_coarser_graph;
         forall_nodes(fRef, n) {
                 NodeID coarser_node              = (*coarse_mapping)[n];
                 PartitionID coarser_partition_id = cRef.getPartitionIndex(coarser_node);
@@ -102,12 +105,12 @@ CoarseMapping * graph_hierarchy::get_mapping_of_current_finer() {
         return m_current_coarse_mapping; 
 }
 
-graph_access* graph_hierarchy::get_coarsest( ) {
+KaHIP::graph_access* graph_hierarchy::get_coarsest( ) {
         return m_coarsest_graph;                
 }
 
-graph_access* graph_hierarchy::pop_coarsest( ) {
-        graph_access* current_coarsest = m_the_graph_hierarchy.top(); 
+KaHIP::graph_access* graph_hierarchy::pop_coarsest( ) {
+        KaHIP::graph_access* current_coarsest = m_the_graph_hierarchy.top(); 
         m_the_graph_hierarchy.pop();
         return current_coarsest;                
 }
@@ -119,4 +122,6 @@ bool graph_hierarchy::isEmpty( ) {
 
 unsigned int graph_hierarchy::size() {
         return m_the_graph_hierarchy.size();        
+}
+
 }

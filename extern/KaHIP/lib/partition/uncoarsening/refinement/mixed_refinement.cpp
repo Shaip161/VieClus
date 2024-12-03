@@ -5,11 +5,17 @@
  *
  *****************************************************************************/
 
-#include "cycle_improvements/cycle_refinement.h"
-#include "kway_graph_refinement/kway_graph_refinement.h"
-#include "kway_graph_refinement/multitry_kway_fm.h"
-#include "mixed_refinement.h"
-#include "quotient_graph_refinement/quotient_graph_refinement.h"
+//#include "cycle_improvements/cycle_refinement.h"
+//#include "kway_graph_refinement/kway_graph_refinement.h"
+//#include "kway_graph_refinement/multitry_kway_fm.h"
+//#include "mixed_refinement.h"
+//#include "quotient_graph_refinement/quotient_graph_refinement.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/multitry_kway_fm.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/mixed_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_refinement.h"
 
 mixed_refinement::mixed_refinement() {
 
@@ -19,7 +25,7 @@ mixed_refinement::~mixed_refinement() {
 
 }
 
-EdgeWeight mixed_refinement::perform_refinement(PartitionConfig & config, graph_access & G, complete_boundary & boundary) {
+EdgeWeight mixed_refinement::perform_refinement(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, KaHIP::complete_boundary & boundary) {
         refinement* refine              = new quotient_graph_refinement();
         refinement* kway                = new kway_graph_refinement();
         multitry_kway_fm* multitry_kway = new multitry_kway_fm();

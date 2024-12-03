@@ -9,7 +9,10 @@
 #define SIZE_CONSTRAINT_LABEL_PROPAGATION_7SVLBKKT
 
 #include <unordered_map>
-#include "../matching/matching.h"
+
+//#include "../matching/matching.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/matching/matching.h"
 
 struct ensemble_pair {
         PartitionID n; // number of nodes in the graph
@@ -49,53 +52,53 @@ class size_constraint_label_propagation : public matching {
                 size_constraint_label_propagation();
                 virtual ~size_constraint_label_propagation();
 
-                void match(const PartitionConfig & config, 
-                                graph_access & G, 
+                void match(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Matching & _matching, 
                                 CoarseMapping & coarse_mapping, 
                                 NodeID & no_of_coarse_vertices,
                                 NodePermutationMap & permutation);
 
 
-                void ensemble_clusterings(const PartitionConfig & config, 
-                                graph_access & G, 
+                void ensemble_clusterings(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Matching & _matching, 
                                 CoarseMapping & coarse_mapping, 
                                 NodeID & no_of_coarse_vertices,
                                 NodePermutationMap & permutation);
 
-                void ensemble_two_clusterings( graph_access & G,
+                void ensemble_two_clusterings( KaHIP::graph_access & G,
                                 std::vector<NodeID> & lhs, 
                                 std::vector<NodeID> & rhs, 
                                 std::vector< NodeID > & output,
                                 NodeID & no_of_coarse_vertices);
 
-                void match_internal(const PartitionConfig & config, 
-                                graph_access & G, 
+                void match_internal(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Matching & _matching, 
                                 CoarseMapping & coarse_mapping, 
                                 NodeID & no_of_coarse_vertices,
                                 NodePermutationMap & permutation);
 
-                void remap_cluster_ids(const PartitionConfig & partition_config, 
-                                graph_access & G,
+                void remap_cluster_ids(const KaHIP::PartitionConfig & partition_config, 
+                                KaHIP::graph_access & G,
                                 std::vector<NodeID> & cluster_id, 
                                 NodeID & no_of_coarse_vertices,
                                 bool apply_to_graph = false); 
 
-                void create_coarsemapping(const PartitionConfig & partition_config, 
-                                graph_access & G,
+                void create_coarsemapping(const KaHIP::PartitionConfig & partition_config, 
+                                KaHIP::graph_access & G,
                                 std::vector<NodeID> & cluster_id, 
                                 CoarseMapping & coarse_mapping); 
 
-                void label_propagation(const PartitionConfig & partition_config, 
-                                graph_access & G,
+                void label_propagation(const KaHIP::PartitionConfig & partition_config, 
+                                KaHIP::graph_access & G,
                                 const NodeWeight & block_upperbound,
                                 std::vector<NodeID> & cluster_id, // output paramter
                                 NodeID & number_of_blocks); // output parameter
 
-                void label_propagation(const PartitionConfig & partition_config, 
-                                graph_access & G, 
+                void label_propagation(const KaHIP::PartitionConfig & partition_config, 
+                                KaHIP::graph_access & G, 
                                 std::vector<NodeWeight> & cluster_id,
                                 NodeID & number_of_blocks ); 
 

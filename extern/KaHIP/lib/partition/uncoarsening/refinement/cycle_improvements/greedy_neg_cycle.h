@@ -8,40 +8,49 @@
 #ifndef GREEDY_NEG_CYCLE_IVBKH6WD
 #define GREEDY_NEG_CYCLE_IVBKH6WD
 
-#include "algorithms/cycle_search.h"
-#include "cycle_definitions.h"
-#include "data_structure/graph_access.h"
-#include "definitions.h"
-#include "partition_config.h"
-#include "problem_factory.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+//#include "algorithms/cycle_search.h"
+//#include "cycle_definitions.h"
+//#include "data_structure/graph_access.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+//#include "problem_factory.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+
+#include "extern/KaHIP/lib/algorithms/cycle_search.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_definitions.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/problem_factory.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
 
 class greedy_neg_cycle {
 public:
         greedy_neg_cycle();
         virtual ~greedy_neg_cycle();
 
-        EdgeWeight shortest_path_rebalance(PartitionConfig & partition_config, 
-                                           graph_access & G, 
-                                           complete_boundary & boundary);
+        EdgeWeight shortest_path_rebalance(KaHIP::PartitionConfig & partition_config, 
+                                           KaHIP::graph_access & G, 
+                                           KaHIP::complete_boundary & boundary);
 
-        EdgeWeight negative_cycle_test(PartitionConfig & partition_config, 
-                                       graph_access & G, 
-                                       complete_boundary & boundary, 
+        EdgeWeight negative_cycle_test(KaHIP::PartitionConfig & partition_config, 
+                                       KaHIP::graph_access & G, 
+                                       KaHIP::complete_boundary & boundary, 
                                        bool zero_weight_cycle = false);
 
 private:
-        void init_gains( PartitionConfig & partition_config, 
-                         graph_access & G, 
-                         graph_access & G_bar, 
-                         complete_boundary & boundary, 
+        void init_gains( KaHIP::PartitionConfig & partition_config, 
+                         KaHIP::graph_access & G, 
+                         KaHIP::graph_access & G_bar, 
+                         KaHIP::complete_boundary & boundary, 
                          edge_movements & em); 
 
-        void init_gains_new( PartitionConfig & partition_config, 
-                             graph_access & G, 
-                             graph_access & G_bar, 
-                             complete_boundary & boundary, 
+        void init_gains_new( KaHIP::PartitionConfig & partition_config, 
+                             KaHIP::graph_access & G, 
+                             KaHIP::graph_access & G_bar, 
+                             KaHIP::complete_boundary & boundary, 
                              edge_movements & em); 
 
         problem_factory m_pf;
@@ -49,17 +58,17 @@ private:
 };
 
 inline
-EdgeWeight greedy_neg_cycle::shortest_path_rebalance(PartitionConfig & partition_config, 
-                                                     graph_access & G, 
-                                                     complete_boundary & boundary) {
-        graph_access G_bar;
+EdgeWeight greedy_neg_cycle::shortest_path_rebalance(KaHIP::PartitionConfig & partition_config, 
+                                                     KaHIP::graph_access & G, 
+                                                     KaHIP::complete_boundary & boundary) {
+        KaHIP::graph_access G_bar;
         boundary.getUnderlyingQuotientGraph(G_bar); 
 
         edge_movements em;
         init_gains_new(partition_config, G, G_bar, boundary, em); 
 
         NodeID s,t;
-        graph_access shortest_path_graph;
+        KaHIP::graph_access shortest_path_graph;
         m_pf.build_shortest_path_problem(partition_config, boundary, G_bar, shortest_path_graph, s,t);
 
         //now we constructed the graph where we can find all negative cycles
@@ -102,18 +111,18 @@ EdgeWeight greedy_neg_cycle::shortest_path_rebalance(PartitionConfig & partition
 
 
 inline
-EdgeWeight greedy_neg_cycle::negative_cycle_test(PartitionConfig & partition_config, 
-                                                 graph_access & G, 
-                                                 complete_boundary & boundary, 
+EdgeWeight greedy_neg_cycle::negative_cycle_test(KaHIP::PartitionConfig & partition_config, 
+                                                 KaHIP::graph_access & G, 
+                                                 KaHIP::complete_boundary & boundary, 
                                                  bool zero_weight_cycle) {
-        graph_access G_bar;
+        KaHIP::graph_access G_bar;
         boundary.getUnderlyingQuotientGraph(G_bar); 
 
         edge_movements em;
         init_gains_new(partition_config, G, G_bar, boundary, em); 
         
         NodeID s;
-        graph_access cycle_graph;
+        KaHIP::graph_access cycle_graph;
 
         if(partition_config.kaba_include_removal_of_paths) 
                 m_pf.build_cycle_problem_with_reverse(partition_config, boundary, G_bar, cycle_graph, s);
@@ -164,13 +173,13 @@ EdgeWeight greedy_neg_cycle::negative_cycle_test(PartitionConfig & partition_con
         return overall_gain;
 }
 
-inline void greedy_neg_cycle::init_gains_new( PartitionConfig & partition_config, 
-                                              graph_access & G, 
-                                              graph_access & G_bar, 
-                                              complete_boundary & boundary, 
+inline void greedy_neg_cycle::init_gains_new( KaHIP::PartitionConfig & partition_config, 
+                                              KaHIP::graph_access & G, 
+                                              KaHIP::graph_access & G_bar, 
+                                              KaHIP::complete_boundary & boundary, 
                                               edge_movements & em) {
 
-        kway_graph_refinement_commons* commons = kway_graph_refinement_commons::getInstance( partition_config );
+        KaHIP::kway_graph_refinement_commons* commons = KaHIP::kway_graph_refinement_commons::getInstance( partition_config );
         std::vector<bool>   blocked(G.number_of_nodes(), false);
         std::vector<NodeID> movements(G.number_of_edges(), 0);
 
@@ -186,7 +195,7 @@ inline void greedy_neg_cycle::init_gains_new( PartitionConfig & partition_config
                         forall_boundary_nodes(lhs_b, node) {
                                 lhs_boundary.push_back(node);
                         } endfor
-                        random_functions::permutate_vector_good(lhs_boundary, false);
+                        KaHIP::random_functions::permutate_vector_good(lhs_boundary, false);
                         for( unsigned i = 0; i < lhs_boundary.size(); i++) {
                                 NodeID node = lhs_boundary[i];
                                 ASSERT_EQ(G.getPartitionIndex(node), block);
@@ -229,13 +238,13 @@ inline void greedy_neg_cycle::init_gains_new( PartitionConfig & partition_config
 
 }
 
-inline void greedy_neg_cycle::init_gains( PartitionConfig & partition_config, 
-                                          graph_access & G, 
-                                          graph_access & G_bar, 
-                                          complete_boundary & boundary, 
+inline void greedy_neg_cycle::init_gains( KaHIP::PartitionConfig & partition_config, 
+                                          KaHIP::graph_access & G, 
+                                          KaHIP::graph_access & G_bar, 
+                                          KaHIP::complete_boundary & boundary, 
                                           edge_movements & em) {
 
-        kway_graph_refinement_commons* commons = kway_graph_refinement_commons::getInstance( partition_config );
+        KaHIP::kway_graph_refinement_commons* commons = KaHIP::kway_graph_refinement_commons::getInstance( partition_config );
         std::vector<bool>   blocked(G.number_of_nodes(), false);
         std::vector<NodeID> movements(G.number_of_edges(), 0);
         NodeID max_gainer;

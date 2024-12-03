@@ -14,14 +14,24 @@
 #include <functional>
 #include <algorithm>
 
-#include "data_structure/graph_access.h"
-#include "clustering/coarsening/coarsening.h"
-#include "partition_config.h"
-#include "timer.h"
-#include "clustering/louvainmethod.h"
-#include "configuration.h"
-#include "tools/modularitymetric.h"
-#include "tools/random_functions.h"
+//#include "data_structure/graph_access.h"
+//#include "clustering/coarsening/coarsening.h"
+//#include "partition_config.h"
+//#include "timer.h"
+//#include "clustering/louvainmethod.h"
+//#include "configuration.h"
+//#include "tools/modularitymetric.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/VieClus/lib/clustering/coarsening/coarsening.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "lib/tools/timer.h"
+#include "extern/VieClus/lib/clustering/louvainmethod.h"
+#include "extern/VieClus/app/configuration.h"
+#include "extern/VieClus/lib/tools/modularitymetric.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+
 
 struct Individuum {
         int* partition_map;
@@ -37,59 +47,59 @@ using clustering_t = std::vector<unsigned>;
 
 class population_clustering {
         public:
-                population_clustering( MPI_Comm comm, const PartitionConfig & config );
+                population_clustering( MPI_Comm comm, const KaHIP::PartitionConfig & config );
                 virtual ~population_clustering();
 
-                void createIndividuum(const PartitionConfig & config, 
-                                graph_access & G, 
+                void createIndividuum(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & ind, 
                                 bool output); 
 
-                void combine_basic_flat(const PartitionConfig & config, 
-                                graph_access & G, 
+                void combine_basic_flat(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & first_ind, 
                                 Individuum & second_ind, 
                                 Individuum & output_ind); 
 
-                void combine_improved_multilevel(const PartitionConfig & config, 
-                                graph_access & G, 
+                void combine_improved_multilevel(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & first_ind, 
                                 Individuum & second_ind, 
                                 Individuum & output_ind); 
 
-                void combine_improved_flat(const PartitionConfig & config, 
-                                graph_access & G, 
+                void combine_improved_flat(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & first_ind, 
                                 Individuum & second_ind, 
                                 Individuum & output_ind); 
 
-                void combine_improved_flat_with_sclp(const PartitionConfig & config, 
-                                graph_access & G, 
+                void combine_improved_flat_with_sclp(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & first_ind, 
                                 Individuum & output_ind); 
 
-                void combine_improved_flat_with_partitioning(const PartitionConfig & config, 
-                                graph_access & G, 
+                void combine_improved_flat_with_partitioning(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & first_ind, 
                                 Individuum & output_ind); 
 
-                void combine_cross(const PartitionConfig & partition_config, 
-                                graph_access & G, 
+                void combine_cross(const KaHIP::PartitionConfig & partition_config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & first_ind, 
                                 Individuum & output_ind);
 
-                void mutate_random(const PartitionConfig & partition_config, 
-                                graph_access & G, 
+                void mutate_random(const KaHIP::PartitionConfig & partition_config, 
+                                KaHIP::graph_access & G, 
                                 Individuum & first_ind,
                                 Individuum & output_ind);
 
-                void mutate( const PartitionConfig & partition_config, 
-                             graph_access & G, 
+                void mutate( const KaHIP::PartitionConfig & partition_config, 
+                             KaHIP::graph_access & G, 
                              Individuum & first_ind, 
                              Individuum & second_ind, 
                              Individuum & output_ind);
 
-                void insert(graph_access & G, Individuum & ind);
+                void insert(KaHIP::graph_access & G, Individuum & ind);
 
                 void set_pool_size(int size);
 
@@ -109,7 +119,7 @@ class population_clustering {
 
                 bool is_full(); 
 
-                void apply_fittest( graph_access & G, double & objective);
+                void apply_fittest( KaHIP::graph_access & G, double & objective);
 
                 unsigned size() { return m_internal_population_clustering.size(); }
 
@@ -148,24 +158,24 @@ class population_clustering {
                         return overlap;
                 }
 
-                graph_access contract_by_clustering(graph_access& G, clustering_t const& clustering) {
-                        graph_access G_;
+                KaHIP::graph_access contract_by_clustering(KaHIP::graph_access& G, clustering_t const& clustering) {
+                        KaHIP::graph_access G_;
                         G.copy(G_);
 
                         apply_clustering(G_, clustering);
 
-                        PartitionConfig config; // never read!
-                        graph_hierarchy gh;
-                        std::list<graph_access*> junk;
+                        KaHIP::PartitionConfig config; // never read!
+                        KaHIP::graph_hierarchy gh;
+                        std::list<KaHIP::graph_access*> junk;
 
-                        graph_access* G_coarse = Coarsening::performCoarsening(config, G_, gh, junk);
+                        KaHIP::graph_access* G_coarse = Coarsening::performCoarsening(config, G_, gh, junk);
                         G_coarse->copy(G_);
                         delete G_coarse;
 
                         return G_;
                 }
 
-                void apply_clustering(graph_access& G, clustering_t const& clustering) {
+                void apply_clustering(KaHIP::graph_access& G, clustering_t const& clustering) {
                         assert(G.number_of_nodes() == clustering.size());
                         forall_nodes(G, vertex) {
                                 G.setPartitionIndex(vertex, clustering[vertex]);
@@ -177,7 +187,7 @@ class population_clustering {
 
                 /* extracts the clustering stored in the partition indices of all nodes into a
                  * vector. */
-                void extract_clustering(graph_access& G, clustering_t& clustering) {
+                void extract_clustering(KaHIP::graph_access& G, clustering_t& clustering) {
                         clustering.resize(G.number_of_nodes());
                         forall_nodes(G, vertex) {
                                 clustering[vertex] = G.getPartitionIndex(vertex);
@@ -186,7 +196,7 @@ class population_clustering {
                         canonicalize(clustering);
                 }
 
-                void extract_second_clustering(graph_access& G, clustering_t& clustering) {
+                void extract_second_clustering(KaHIP::graph_access& G, clustering_t& clustering) {
                         clustering.resize(G.number_of_nodes());
                         forall_nodes(G, vertex) {
                                 clustering[vertex] = G.getSecondPartitionIndex(vertex);
@@ -211,14 +221,14 @@ class population_clustering {
 
                 /* executes the louvain algorithm on the given graph in all its multilevel
                  * glory, and returns the found clustering along with its found quality. */
-                std::pair<clustering_t, double> do_louvain(graph_access& G, clustering_t const& c = clustering_t{}) {
+                std::pair<clustering_t, double> do_louvain(KaHIP::graph_access& G, clustering_t const& c = clustering_t{}) {
                         assert((!c.size() || G.number_of_nodes() == c.size()) && "clustering <-> graph size mismatch");
 
                         //srand(rand());
-                        PartitionConfig partition_config;
-                        configuration{}.standard(partition_config);
+                        KaHIP::PartitionConfig partition_config;
+                        VieClus::configuration{}.standard(partition_config);
 
-                        partition_config.lm_number_of_label_propagation_levels = random_functions::nextInt(0,5); 
+                        partition_config.lm_number_of_label_propagation_levels = KaHIP::random_functions::nextInt(0,5); 
 
                         partition_config.upper_bound_partition = G.number_of_nodes() + 1;
                         partition_config.graph_allready_partitioned = false;
@@ -250,7 +260,7 @@ class population_clustering {
                         return coarse_clustering;
                 } 
 
-                void set_second_partition_index(graph_access& G, std::vector< NodeID > const& clustering) {
+                void set_second_partition_index(KaHIP::graph_access& G, std::vector< unsigned > const& clustering) {
                         assert(G.number_of_nodes() == clustering.size());
                         G.resizeSecondPartitionIndex(clustering.size());
 
@@ -260,7 +270,7 @@ class population_clustering {
                 }
 
                 template <class RNG>
-                        double local_search(graph_access& G, clustering_t& clustering, RNG&& gen, bool combine = false, double eps = 0.0001) {
+                        double local_search(KaHIP::graph_access& G, clustering_t& clustering, RNG&& gen, bool combine = false, double eps = 0.0001) {
                                 assert(G.number_of_nodes() == clustering.size() && "no!");
 
                                 apply_clustering(G, clustering);

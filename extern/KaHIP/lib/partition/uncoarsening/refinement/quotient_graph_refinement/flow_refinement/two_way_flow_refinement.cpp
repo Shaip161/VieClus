@@ -10,10 +10,15 @@
 #include <math.h>
 #include <sstream>
 
-#include "boundary_bfs.h"
-#include "flow_solving_kernel/cut_flow_problem_solver.h"
-#include "quality_metrics.h"
-#include "two_way_flow_refinement.h"
+//#include "boundary_bfs.h"
+//#include "flow_solving_kernel/cut_flow_problem_solver.h"
+//#include "quality_metrics.h"
+//#include "two_way_flow_refinement.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/boundary_bfs.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/flow_solving_kernel/cut_flow_problem_solver.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/two_way_flow_refinement.h"
 
 two_way_flow_refinement::two_way_flow_refinement() {
 
@@ -23,9 +28,9 @@ two_way_flow_refinement::~two_way_flow_refinement() {
 
 }
 
-EdgeWeight two_way_flow_refinement::perform_refinement(PartitionConfig & config, 
-                                                       graph_access & G, 
-                                                       complete_boundary & boundary, 
+EdgeWeight two_way_flow_refinement::perform_refinement(KaHIP::PartitionConfig & config, 
+                                                       KaHIP::graph_access & G, 
+                                                       KaHIP::complete_boundary & boundary, 
                                                        std::vector<NodeID> & lhs_pq_start_nodes, 
                                                        std::vector<NodeID> & rhs_pq_start_nodes,
                                                        boundary_pair * refinement_pair,        
@@ -45,9 +50,9 @@ EdgeWeight two_way_flow_refinement::perform_refinement(PartitionConfig & config,
 }
 
 
-EdgeWeight two_way_flow_refinement::iterativ_flow_iteration(PartitionConfig & config, 
-                                                            graph_access & G,
-                                                            complete_boundary & boundary, 
+EdgeWeight two_way_flow_refinement::iterativ_flow_iteration(KaHIP::PartitionConfig & config, 
+                                                            KaHIP::graph_access & G,
+                                                            KaHIP::complete_boundary & boundary, 
                                                             std::vector<NodeID> & lhs_pq_start_nodes, 
                                                             std::vector<NodeID> & rhs_pq_start_nodes,
                                                             boundary_pair * refinement_pair,        
@@ -224,12 +229,12 @@ EdgeWeight two_way_flow_refinement::iterativ_flow_iteration(PartitionConfig & co
 }
 
 
-void two_way_flow_refinement::apply_partition_and_update_boundary( const PartitionConfig & config, 
-                                                                   graph_access & G, 
+void two_way_flow_refinement::apply_partition_and_update_boundary( const KaHIP::PartitionConfig & config, 
+                                                                   KaHIP::graph_access & G, 
                                                                    boundary_pair * refinement_pair,
                                                                    PartitionID & lhs, 
                                                                    PartitionID & rhs,
-                                                                   complete_boundary & boundary, 
+                                                                   KaHIP::complete_boundary & boundary, 
                                                                    std::vector<NodeID> & lhs_boundary_stripe,
                                                                    std::vector<NodeID> & rhs_boundary_stripe,
                                                                    NodeWeight & lhs_stripe_weight, 

@@ -4,16 +4,27 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "data_structure/priority_queues/bucket_pq.h"
-#include "data_structure/priority_queues/maxNodeHeap.h"
-#include "macros_assertions.h"
-#include "partition_accept_rule.h"
-#include "queue_selection_strategie.h"
-#include "random_functions.h"
-#include "search_stop_rule.h"
-#include "tools/quality_metrics.h"
-#include "two_way_fm.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
+//#include "data_structure/priority_queues/bucket_pq.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "macros_assertions.h"
+//#include "partition_accept_rule.h"
+//#include "queue_selection_strategie.h"
+//#include "random_functions.h"
+//#include "search_stop_rule.h"
+//#include "tools/quality_metrics.h"
+//#include "two_way_fm.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
+
+#include "lib/data_structure/priority_queues/bucket_pq.h"
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
+#include "lib/tools/macros_assertions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/partition_accept_rule.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/queue_selection_strategie.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/search_stop_rule.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
 
 two_way_fm::two_way_fm() {
 
@@ -23,9 +34,9 @@ two_way_fm::~two_way_fm() {
 
 }
 
-EdgeWeight two_way_fm::perform_refinement(PartitionConfig & cfg, 
-                                          graph_access& G, 
-                                          complete_boundary & boundary,
+EdgeWeight two_way_fm::perform_refinement(KaHIP::PartitionConfig & cfg, 
+                                          KaHIP::graph_access& G, 
+                                          KaHIP::complete_boundary & boundary,
                                           std::vector<NodeID> & lhs_start_nodes, 
                                           std::vector<NodeID> & rhs_start_nodes, 
                                           boundary_pair * pair,        
@@ -34,10 +45,10 @@ EdgeWeight two_way_fm::perform_refinement(PartitionConfig & cfg,
                                           EdgeWeight & cut,
                                           bool & something_changed) {
 
-        PartitionConfig config = cfg;//copy it since we make changes on that 
+        KaHIP::PartitionConfig config = cfg;//copy it since we make changes on that 
         if(lhs_start_nodes.size() == 0 or rhs_start_nodes.size() == 0) return 0; // nothing to refine
 
-        quality_metrics qm;
+        KaHIP::quality_metrics qm;
         ASSERT_NEQ(pair->lhs, pair->rhs);
         ASSERT_TRUE(assert_directed_boundary_condition(G, boundary, pair->lhs, pair->rhs));
         ASSERT_EQ( cut, qm.edge_cut(G, pair->lhs, pair->rhs));
@@ -221,8 +232,8 @@ EdgeWeight two_way_fm::perform_refinement(PartitionConfig & cfg,
 }
 
 
-void two_way_fm::move_node(const PartitionConfig & config, 
-                           graph_access & G,
+void two_way_fm::move_node(const KaHIP::PartitionConfig & config, 
+                           KaHIP::graph_access & G,
                            const NodeID & node,
                            vertex_moved_hashtable & moved_idx,
                            refinement_pq * from_queue,
@@ -232,7 +243,7 @@ void two_way_fm::move_node(const PartitionConfig & config,
                            boundary_pair * pair,         
                            NodeWeight * from_part_weight,
                            NodeWeight * to_part_weight,
-                           complete_boundary & boundary) {
+                           KaHIP::complete_boundary & boundary) {
         //move node
         G.setPartitionIndex(node, to);        
         boundary.deleteNode(node, from, pair);
@@ -300,8 +311,8 @@ void two_way_fm::move_node(const PartitionConfig & config,
 }
 
 
-void two_way_fm::move_node_back(const PartitionConfig & config, 
-                                graph_access & G,
+void two_way_fm::move_node_back(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G,
                                 const NodeID & node,
                                 vertex_moved_hashtable & moved_idx,
                                 refinement_pq * from_queue,
@@ -311,7 +322,7 @@ void two_way_fm::move_node_back(const PartitionConfig & config,
                                 boundary_pair * pair,         
                                 NodeWeight * from_part_weight,
                                 NodeWeight * to_part_weight,
-                                complete_boundary & boundary) {
+                                KaHIP::complete_boundary & boundary) {
 
         ASSERT_NEQ(from, to);
         ASSERT_EQ(from, G.getPartitionIndex(node));
@@ -367,17 +378,17 @@ void two_way_fm::move_node_back(const PartitionConfig & config,
 }
 
 
-void two_way_fm::init_queue_with_boundary(const PartitionConfig & config,
-                                          graph_access & G,
+void two_way_fm::init_queue_with_boundary(const KaHIP::PartitionConfig & config,
+                                          KaHIP::graph_access & G,
                                           std::vector<NodeID> & bnd_nodes,
                                           refinement_pq * queue,                     
                                           PartitionID partition_of_boundary, 
                                           PartitionID other) {
 
         if(config.permutation_during_refinement == PERMUTATION_QUALITY_FAST) {
-                random_functions::permutate_vector_fast(bnd_nodes, false);
+                KaHIP::random_functions::permutate_vector_fast(bnd_nodes, false);
         } else if(config.permutation_during_refinement == PERMUTATION_QUALITY_GOOD) {
-                random_functions::permutate_vector_good(bnd_nodes, false);
+                KaHIP::random_functions::permutate_vector_good(bnd_nodes, false);
         }
 
 
@@ -401,7 +412,7 @@ void two_way_fm::init_queue_with_boundary(const PartitionConfig & config,
 //////////////////////////////// Assertions for this class////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef NDEBUG 
-bool two_way_fm::assert_only_boundary_nodes(graph_access & G, PartialBoundary & lhs_boundary, 
+bool two_way_fm::assert_only_boundary_nodes(KaHIP::graph_access & G, PartialBoundary & lhs_boundary, 
                                             PartitionID lhs, PartitionID rhs) {
 
         forall_boundary_nodes(lhs_boundary, cur_bnd_node) {
@@ -416,7 +427,7 @@ bool two_way_fm::assert_only_boundary_nodes(graph_access & G, PartialBoundary & 
         return true;
 }
 
-bool two_way_fm::assert_every_boundary_nodes(graph_access & G, PartialBoundary & lhs_boundary, 
+bool two_way_fm::assert_every_boundary_nodes(KaHIP::graph_access & G, PartialBoundary & lhs_boundary, 
                                              PartitionID lhs, PartitionID rhs) {
 
         forall_nodes(G, n) {
@@ -435,7 +446,7 @@ bool two_way_fm::assert_every_boundary_nodes(graph_access & G, PartialBoundary &
 }
 
 
-bool two_way_fm::assert_directed_boundary_condition(graph_access & G, complete_boundary & boundary, 
+bool two_way_fm::assert_directed_boundary_condition(KaHIP::graph_access & G, KaHIP::complete_boundary & boundary, 
                                                     PartitionID lhs, PartitionID rhs) {
         ASSERT_TRUE(assert_only_boundary_nodes(G,  boundary.getDirectedBoundary(lhs, lhs, rhs) , lhs, rhs));
         ASSERT_TRUE(assert_only_boundary_nodes(G,  boundary.getDirectedBoundary(rhs, lhs, rhs) , rhs, lhs));

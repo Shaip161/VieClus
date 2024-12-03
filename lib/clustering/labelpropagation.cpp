@@ -5,13 +5,19 @@
  *****************************************************************************/
 
 
-#include "labelpropagation.h"
-
+/*#include "labelpropagation.h"
 #include "clustering/coarsening/coarsening.h"
 #include "partition/coarsening/clustering/node_ordering.h"
 #include "partition/coarsening/contraction.h"
 #include "timer.h"
-#include "tools/modularitymetric.h"
+#include "tools/modularitymetric.h"*/
+
+#include "extern/VieClus/lib/clustering/labelpropagation.h"
+#include "extern/VieClus/lib/clustering/coarsening/coarsening.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/node_ordering.h"
+#include "extern/KaHIP/lib/partition/coarsening/contraction.h"
+#include "lib/tools/timer.h"
+#include "extern/VieClus/lib/tools/modularitymetric.h"
 
 #include <list>
 
@@ -29,15 +35,15 @@ LabelPropagation::~LabelPropagation()
 }
 
 
-PartitionID LabelPropagation::performMultiLevelLabelPropagation(const PartitionConfig &config,
-                                                                graph_access *G)
+PartitionID LabelPropagation::performMultiLevelLabelPropagation(const KaHIP::PartitionConfig &config,
+                                                                KaHIP::graph_access *G)
 {
     /// number of node moves between clusters
     NodeID numberOfMoves = 0;
     /// to store the levels of coarse graphs
-    graph_hierarchy graphHierarchy;
+    KaHIP::graph_hierarchy graphHierarchy;
     /// list of coarse graphs we can delete at the end
-    list<graph_access *> coarseGraphsToDelete;
+    list<KaHIP::graph_access *> coarseGraphsToDelete;
     /// for measuring fine times
     timer timer;
 
@@ -131,7 +137,7 @@ void LabelPropagation::initializeSingletonClusters()
 }
 
 
-NodeID LabelPropagation::performLabelPropagation(const PartitionConfig& config)
+NodeID LabelPropagation::performLabelPropagation(const KaHIP::PartitionConfig& config)
 {
     /// generates random order how we traverse the nodes in the 1. phase
     node_ordering nodesOrder;
@@ -196,7 +202,7 @@ NodeID LabelPropagation::performLabelPropagation(const PartitionConfig& config)
                 // when the current weight is equal, then
                 // we choose it by random 50%
                 if ((edgeWeightToCluster > bestWeight) ||
-                    (edgeWeightToCluster == bestWeight && random_functions::nextBool()))
+                    (edgeWeightToCluster == bestWeight && KaHIP::random_functions::nextBool()))
                 {
                     bestWeight = edgeWeightToCluster;
                     bestCluster = clusterOfNeighbor;
@@ -230,8 +236,8 @@ NodeID LabelPropagation::performLabelPropagation(const PartitionConfig& config)
 
 // static version to be used also from other classes
 // e.g. from LouvainMethod
-NodeID LabelPropagation::performLabelPropagation(const PartitionConfig& config,
-                                                 graph_access *G)
+NodeID LabelPropagation::performLabelPropagation(const KaHIP::PartitionConfig& config,
+                                                 KaHIP::graph_access *G)
 {
     LabelPropagation lp;
     // to call the member function safely we have to set the graph

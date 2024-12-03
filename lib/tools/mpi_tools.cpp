@@ -8,7 +8,9 @@
 #include <mpi.h>
 #include <unistd.h>
 
-#include "mpi_tools.h"
+//#include "mpi_tools.h"
+
+#include "extern/VieClus/lib/tools/mpi_tools.h"
 
 mpi_tools::mpi_tools() {
                 

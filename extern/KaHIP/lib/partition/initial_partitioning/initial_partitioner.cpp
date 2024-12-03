@@ -7,6 +7,8 @@
 
 #include "initial_partitioner.h"
 
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_partitioner.h"
+
 initial_partitioner::initial_partitioner() {
                 
 }

@@ -11,7 +11,9 @@
 #include <limits>
 #include <queue>
 
-#include "data_structure/matrix/normal_matrix.h"
+//#include "data_structure/matrix/normal_matrix.h"
+
+#include "extern/KaHIP/lib/data_structure/matrix/normal_matrix.h"
 
 struct TabuTimePair {
         int time;
@@ -36,7 +38,7 @@ class tabu_moves_queue  {
                 bool empty();
 
                 void insert(NodeID node, PartitionID block, int time); 
-                int minValue();
+                Gain minValue();
                 std::pair<NodeID, PartitionID> deleteMin();
 
                 bool contains(NodeID node, PartitionID block);

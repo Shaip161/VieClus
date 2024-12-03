@@ -9,14 +9,24 @@
 #include <iostream>
 #include <sstream>
 
-#include "construct_partition.h"
-#include "gal_combine.h"
-#include "graph_partitioner.h"
-#include "random_functions.h"
-#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
-#include "uncoarsening/refinement/mixed_refinement.h"
-#include "uncoarsening/refinement/refinement.h"
-#include "uncoarsening/refinement/tabu_search/tabu_search.h"
+//#include "construct_partition.h"
+//#include "gal_combine.h"
+//#include "graph_partitioner.h"
+//#include "random_functions.h"
+//#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+//#include "uncoarsening/refinement/mixed_refinement.h"
+//#include "uncoarsening/refinement/refinement.h"
+//#include "uncoarsening/refinement/tabu_search/tabu_search.h"
+
+#include "extern/KaHIP/lib/parallel_mh/galinier_combine/construct_partition.h"
+#include "extern/KaHIP/lib/parallel_mh/galinier_combine/gal_combine.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/mixed_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_search.h"
+
 
 gal_combine::gal_combine() {
                 
@@ -31,7 +41,7 @@ gal_combine::~gal_combine() {
 // compute a matching between blocks (greedily) 
 // extend to partition
 // apply our refinements and tabu search
-void gal_combine::perform_gal_combine( PartitionConfig & config, graph_access & G) {
+void gal_combine::perform_gal_combine( KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
         //first greedily compute a matching of the partitions
         std::vector< std::unordered_map<PartitionID, unsigned> > counters(config.k);
         forall_nodes(G, node) {
@@ -87,7 +97,7 @@ void gal_combine::perform_gal_combine( PartitionConfig & config, graph_access & 
 
         double real_epsilon = config.imbalance/100.0;
         double epsilon = random_functions::nextDouble(real_epsilon+0.005,real_epsilon+config.kabaE_internal_bal); 
-        PartitionConfig copy = config;
+        KaHIP::PartitionConfig copy = config;
         copy.upper_bound_partition = (1+epsilon)*ceil(config.work_load/(double)config.k);
 
         complete_boundary boundary(&G);

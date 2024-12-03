@@ -6,10 +6,15 @@
 
 #include <algorithm>
 
-#include "algorithms/strongly_connected_components.h"
-#include "cycle_search.h"
-#include "random_functions.h"
-#include "timer.h"
+//#include "algorithms/strongly_connected_components.h"
+//#include "cycle_search.h"
+//#include "random_functions.h"
+//#include "timer.h"
+
+#include "extern/KaHIP/lib/algorithms/cycle_search.h"
+#include "extern/KaHIP/lib/algorithms/strongly_connected_components.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "lib/tools/timer.h"
 
 double cycle_search::total_time = 0;
 
@@ -21,10 +26,10 @@ cycle_search::~cycle_search() {
 
 }
 
-void cycle_search::find_random_cycle(graph_access & G, std::vector<NodeID> & cycle) {
+void cycle_search::find_random_cycle(KaHIP::graph_access & G, std::vector<NodeID> & cycle) {
 	//first perform a bfs starting from a random node and build the parent array
         std::deque<NodeID>* bfsqueue = new std::deque<NodeID>;
-	NodeID v = random_functions::nextInt(0, G.number_of_nodes()-1);
+	NodeID v = KaHIP::random_functions::nextInt(0, G.number_of_nodes()-1);
 	bfsqueue->push_back(v); 
 
 	std::vector<bool>   touched(G.number_of_nodes(),false);
@@ -67,7 +72,7 @@ void cycle_search::find_random_cycle(graph_access & G, std::vector<NodeID> & cyc
 
 	//now find two random leafes 
 	NodeID v_1, v_2;
-	unsigned r_idx = random_functions::nextInt(0, G.number_of_edges()-1);
+	unsigned r_idx = KaHIP::random_functions::nextInt(0, G.number_of_edges()-1);
 	while(true) {
 		NodeID source = sources[r_idx];
 		NodeID target = targets[r_idx];
@@ -78,7 +83,7 @@ void cycle_search::find_random_cycle(graph_access & G, std::vector<NodeID> & cyc
 			break;
 		} 
 
-		r_idx = random_functions::nextInt(0, G.number_of_edges()-1);
+		r_idx = KaHIP::random_functions::nextInt(0, G.number_of_edges()-1);
 	}
 
 	// NodeID now climb up the parent array step wise left and right
@@ -147,7 +152,7 @@ void cycle_search::find_random_cycle(graph_access & G, std::vector<NodeID> & cyc
         cycle.push_back(cycle[0]);
 }
 
-bool cycle_search::find_shortest_path(graph_access & G, 
+bool cycle_search::find_shortest_path(KaHIP::graph_access & G, 
                                       NodeID & start, 
                                       NodeID & dest, 
                                       std::vector<NodeID> & cycle) {
@@ -171,7 +176,7 @@ bool cycle_search::find_shortest_path(graph_access & G,
         return negative_cycle_detected;
 }
 
-bool cycle_search::find_negative_cycle(graph_access & G, NodeID & start, std::vector<NodeID> & cycle) {
+bool cycle_search::find_negative_cycle(KaHIP::graph_access & G, NodeID & start, std::vector<NodeID> & cycle) {
 	//simplest bellman ford algorithm
 
 	std::vector<EdgeWeight> distance(G.number_of_nodes(), std::numeric_limits<EdgeWeight>::max()/2);
@@ -180,7 +185,7 @@ bool cycle_search::find_negative_cycle(graph_access & G, NodeID & start, std::ve
         return negative_cycle_detection(G, start, distance, parent, cycle);
 }
 
-int cycle_search::bellman_ford_with_subtree_disassembly_and_updates(graph_access & G, 
+int cycle_search::bellman_ford_with_subtree_disassembly_and_updates(KaHIP::graph_access & G, 
                                                                     NodeID & start, 
                                                                     std::vector<EdgeWeight> & distance, 
                                                                     std::vector<NodeID> & parent, 
@@ -298,7 +303,7 @@ int cycle_search::bellman_ford_with_subtree_disassembly_and_updates(graph_access
 
 
 
-bool cycle_search::negative_cycle_detection(graph_access & G, 
+bool cycle_search::negative_cycle_detection(KaHIP::graph_access & G, 
                                             NodeID & start, 
                                             std::vector<EdgeWeight> & distance, 
                                             std::vector<NodeID> & parent, 
@@ -346,7 +351,7 @@ bool cycle_search::negative_cycle_detection(graph_access & G,
 }
 
 //preconditition: no negative cycles 
-bool cycle_search::find_zero_weight_cycle(graph_access & G, NodeID & start, std::vector<NodeID> & cycle) {
+bool cycle_search::find_zero_weight_cycle(KaHIP::graph_access & G, NodeID & start, std::vector<NodeID> & cycle) {
 
         std::vector<EdgeWeight> distance(G.number_of_nodes(), std::numeric_limits<EdgeWeight>::max()/2);
 	std::vector<NodeID> parent(G.number_of_nodes(), std::numeric_limits<NodeID>::max());
@@ -355,7 +360,7 @@ bool cycle_search::find_zero_weight_cycle(graph_access & G, NodeID & start, std:
                //now we try to return a random directed zero weight gain cycle
                //therefore we use W(e) = d(u) + w(e) - d(v)
                //and keep edges with weight 0
-               graph_access W;
+               KaHIP::graph_access W;
                W.start_construction(G.number_of_nodes(), G.number_of_edges());
 
                forall_nodes(G, node) {
@@ -393,7 +398,7 @@ bool cycle_search::find_zero_weight_cycle(graph_access & G, NodeID & start, std:
                if(candidates.size() == 0) {return false;}
 
                //now pick a random start vertex
-               NodeID start_vertex_idx = random_functions::nextInt(0, candidates.size()-1);
+               NodeID start_vertex_idx = KaHIP::random_functions::nextInt(0, candidates.size()-1);
                NodeID start_vertex = candidates[start_vertex_idx];
                std::vector<bool> seen(W.number_of_nodes(), false);
                std::vector<NodeID> list;
@@ -412,7 +417,7 @@ bool cycle_search::find_zero_weight_cycle(graph_access & G, NodeID & start, std:
                                         same_comp_neighbors.push_back(target);
                                }
                        } endfor
-                       NodeID succ_id = random_functions::nextInt(0, same_comp_neighbors.size()-1);
+                       NodeID succ_id = KaHIP::random_functions::nextInt(0, same_comp_neighbors.size()-1);
                        
                        successor = same_comp_neighbors[succ_id];
                } while(seen[successor] == false);

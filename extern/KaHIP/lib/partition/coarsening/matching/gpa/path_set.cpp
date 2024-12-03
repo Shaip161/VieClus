@@ -5,9 +5,11 @@
  *
  *****************************************************************************/
 
-#include "path_set.h"
+//#include "path_set.h"
 
-path_set::path_set( graph_access * G_, const PartitionConfig * config_ ): pG(G_), config(config_),
+#include "extern/KaHIP/lib/partition/coarsening/matching/gpa/path_set.h"
+
+path_set::path_set( KaHIP::graph_access * G_, const KaHIP::PartitionConfig * config_ ): pG(G_), config(config_),
                                          m_no_of_paths(pG->number_of_nodes()), 
                                          m_vertex_to_path(m_no_of_paths),
                                          m_paths(m_no_of_paths),
@@ -16,7 +18,7 @@ path_set::path_set( graph_access * G_, const PartitionConfig * config_ ): pG(G_)
                                          m_next_edge(m_no_of_paths, UNDEFINED_EDGE),
                                          m_prev_edge(m_no_of_paths, UNDEFINED_EDGE) {
        
-       graph_access & G = *pG;        
+       KaHIP::graph_access & G = *pG;        
        forall_nodes(G, node) {
                m_paths[node].init(node);
                m_vertex_to_path[node] = node;

@@ -5,21 +5,30 @@
  *
  *****************************************************************************/
 
-
 #include <unordered_map>
-
 #include <sstream>
-#include "../edge_rating/edge_ratings.h"
-#include "../matching/gpa/gpa_matching.h"
-#include "data_structure/union_find.h"
-#include "node_ordering.h"
-#include "partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
-#include "partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
-#include "tools/quality_metrics.h"
-#include "tools/random_functions.h"
-#include "io/graph_io.h"
 
-#include "size_constraint_label_propagation.h"
+//#include "../edge_rating/edge_ratings.h"
+//#include "../matching/gpa/gpa_matching.h"
+//#include "data_structure/union_find.h"
+//#include "node_ordering.h"
+//#include "partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+//#include "partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+//#include "tools/quality_metrics.h"
+//#include "tools/random_functions.h"
+//#include "io/graph_io.h"
+//#include "size_constraint_label_propagation.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/edge_rating/edge_ratings.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/gpa/gpa_matching.h"
+#include "lib/data_structure/union_find.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/node_ordering.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/size_constraint_label_propagation.h"
 
 size_constraint_label_propagation::size_constraint_label_propagation() {
 
@@ -29,8 +38,8 @@ size_constraint_label_propagation::~size_constraint_label_propagation() {
 
 }
 
-void size_constraint_label_propagation::match(const PartitionConfig & partition_config,
-                                              graph_access & G,
+void size_constraint_label_propagation::match(const KaHIP::PartitionConfig & partition_config,
+                                              KaHIP::graph_access & G,
                                               Matching & _matching,
                                               CoarseMapping & coarse_mapping,
                                               NodeID & no_of_coarse_vertices,
@@ -46,8 +55,8 @@ void size_constraint_label_propagation::match(const PartitionConfig & partition_
         }
 }
 
-void size_constraint_label_propagation::match_internal(const PartitionConfig & partition_config,
-                                              graph_access & G,
+void size_constraint_label_propagation::match_internal(const KaHIP::PartitionConfig & partition_config,
+                                              KaHIP::graph_access & G,
                                               Matching & _matching,
                                               CoarseMapping & coarse_mapping,
                                               NodeID & no_of_coarse_vertices,
@@ -60,7 +69,7 @@ void size_constraint_label_propagation::match_internal(const PartitionConfig & p
         create_coarsemapping( partition_config, G, cluster_id, coarse_mapping);
 }
 
-void size_constraint_label_propagation::ensemble_two_clusterings( graph_access & G,
+void size_constraint_label_propagation::ensemble_two_clusterings( KaHIP::graph_access & G,
                                                                   std::vector<NodeID> & lhs,
                                                                   std::vector<NodeID> & rhs,
                                                                   std::vector< NodeID > & output,
@@ -87,8 +96,8 @@ void size_constraint_label_propagation::ensemble_two_clusterings( graph_access &
 }
 
 
-void size_constraint_label_propagation::ensemble_clusterings(const PartitionConfig & partition_config,
-                                                             graph_access & G,
+void size_constraint_label_propagation::ensemble_clusterings(const KaHIP::PartitionConfig & partition_config,
+                                                             KaHIP::graph_access & G,
                                                              Matching & _matching,
                                                              CoarseMapping & coarse_mapping,
                                                              NodeID & no_of_coarse_vertices,
@@ -99,7 +108,7 @@ void size_constraint_label_propagation::ensemble_clusterings(const PartitionConf
 
         int new_cf = partition_config.cluster_coarsening_factor;
         for( int i = 0; i < runs; i++) {
-                PartitionConfig config = partition_config;
+                KaHIP::PartitionConfig config = partition_config;
                 config.cluster_coarsening_factor = new_cf;
 
                 NodeID cur_no_blocks = 0;
@@ -114,7 +123,7 @@ void size_constraint_label_propagation::ensemble_clusterings(const PartitionConf
 
                         no_of_coarse_vertices = cur_no_blocks;
                 }
-                new_cf = random_functions::nextInt(10, 30);
+                new_cf = KaHIP::random_functions::nextInt(10, 30);
         }
 
         create_coarsemapping( partition_config, G, ensemble_cluster, coarse_mapping);
@@ -122,8 +131,8 @@ void size_constraint_label_propagation::ensemble_clusterings(const PartitionConf
 
 }
 
-void size_constraint_label_propagation::label_propagation(const PartitionConfig & partition_config,
-                                                         graph_access & G,
+void size_constraint_label_propagation::label_propagation(const KaHIP::PartitionConfig & partition_config,
+                                                         KaHIP::graph_access & G,
                                                          std::vector<NodeWeight> & cluster_id,
                                                          NodeID & no_of_blocks ) {
         NodeWeight block_upperbound = ceil(partition_config.upper_bound_partition/(double)partition_config.cluster_coarsening_factor);
@@ -131,8 +140,8 @@ void size_constraint_label_propagation::label_propagation(const PartitionConfig 
         label_propagation( partition_config, G, block_upperbound, cluster_id, no_of_blocks);
 }
 
-void size_constraint_label_propagation::label_propagation(const PartitionConfig & partition_config,
-                                                         graph_access & G,
+void size_constraint_label_propagation::label_propagation(const KaHIP::PartitionConfig & partition_config,
+                                                         KaHIP::graph_access & G,
                                                          const NodeWeight & block_upperbound,
                                                          std::vector<NodeWeight> & cluster_id,
                                                          NodeID & no_of_blocks) {
@@ -171,7 +180,7 @@ void size_constraint_label_propagation::label_propagation(const PartitionConfig 
                                 NodeID target             = G.getEdgeTarget(e);
                                 PartitionID cur_block     = cluster_id[target];
                                 PartitionID cur_value     = hash_map[cur_block];
-                                if((cur_value > max_value  || (cur_value == max_value && random_functions::nextBool()))
+                                if((cur_value > max_value  || (cur_value == max_value && KaHIP::random_functions::nextBool()))
                                 && (cluster_sizes[cur_block] + G.getNodeWeight(node) < block_upperbound || cur_block == my_block)
                                 // for clustering (with Louvain) we do not need this further checks
                                 /*&& (!partition_config.graph_allready_partitioned || G.getPartitionIndex(node) == G.getPartitionIndex(target))
@@ -196,8 +205,8 @@ void size_constraint_label_propagation::label_propagation(const PartitionConfig 
 
 
 
-void size_constraint_label_propagation::create_coarsemapping(const PartitionConfig & partition_config,
-                                                             graph_access & G,
+void size_constraint_label_propagation::create_coarsemapping(const KaHIP::PartitionConfig & partition_config,
+                                                             KaHIP::graph_access & G,
                                                              std::vector<NodeWeight> & cluster_id,
                                                              CoarseMapping & coarse_mapping) {
         forall_nodes(G, node) {
@@ -205,8 +214,8 @@ void size_constraint_label_propagation::create_coarsemapping(const PartitionConf
         } endfor
 }
 
-void size_constraint_label_propagation::remap_cluster_ids(const PartitionConfig & partition_config,
-                                                          graph_access & G,
+void size_constraint_label_propagation::remap_cluster_ids(const KaHIP::PartitionConfig & partition_config,
+                                                          KaHIP::graph_access & G,
                                                           std::vector<NodeWeight> & cluster_id,
                                                           NodeID & no_of_coarse_vertices, bool apply_to_graph) {
 

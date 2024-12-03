@@ -8,15 +8,22 @@
 #ifndef PATH_SET_80E9CQT1
 #define PATH_SET_80E9CQT1
 
-#include "data_structure/graph_access.h"
-#include "macros_assertions.h"
-#include "partition_config.h"
-#include "path.h"
+//#include "data_structure/graph_access.h"
+//#include "macros_assertions.h"
+//#include "partition_config.h"
+//#include "path.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/gpa/path.h"
+#include "lib/tools/macros_assertions.h"
+
+
 
 class path_set {
         public:
 
-                path_set( graph_access * G, const PartitionConfig * config );
+                path_set( KaHIP::graph_access * G, const KaHIP::PartitionConfig * config );
                 virtual ~path_set();
 
                 //returns the path that v lies on iff v is an endpoint
@@ -45,9 +52,9 @@ class path_set {
                 //returns the id of the edge to the previous vertex on the path
                 EdgeID edge_to_prev(const NodeID & v) const;
         private:
-                graph_access * pG;
+                KaHIP::graph_access * pG;
 
-                const PartitionConfig * config;
+                const KaHIP::PartitionConfig * config;
 
 
                 // Number of Paths
@@ -111,7 +118,7 @@ inline EdgeID path_set::edge_to_prev(const NodeID & v) const {
 }
 
 inline bool path_set::add_if_applicable(const NodeID & source, const EdgeID & e) {
-        graph_access & G = *pG;
+        KaHIP::graph_access & G = *pG;
 
         NodeID target = G.getEdgeTarget(e);
 

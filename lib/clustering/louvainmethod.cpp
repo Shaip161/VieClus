@@ -5,8 +5,7 @@
  *****************************************************************************/
 
 
-#include "louvainmethod.h"
-
+/*#include "louvainmethod.h"
 #include "clustering/coarsening/coarsening.h"
 #include "clustering/labelpropagation.h"
 #include "clustering/neighborhood.h"
@@ -15,7 +14,18 @@
 #include "partition/coarsening/contraction.h"
 #include "timer.h"
 #include "tools/modularitymetric.h"
-#include "tools/random_functions.h"
+#include "tools/random_functions.h"*/
+
+#include "extern/VieClus/lib/clustering/louvainmethod.h"
+#include "extern/VieClus/lib/clustering/coarsening/coarsening.h"
+#include "extern/VieClus/lib/clustering/labelpropagation.h"
+#include "extern/VieClus/lib/clustering/neighborhood.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/size_constraint_label_propagation.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/node_ordering.h"
+#include "extern/KaHIP/lib/partition/coarsening/contraction.h"
+#include "lib/tools/timer.h"
+#include "extern/VieClus/lib/tools/modularitymetric.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 #include <iomanip>      // setprecision()
 #include <limits>       // numeric_limits<>
@@ -37,7 +47,7 @@ LouvainMethod::~LouvainMethod()
 }
 
 
-PartitionID LouvainMethod::performClustering(PartitionConfig &config, graph_access *G, bool start_w_singletons)
+PartitionID LouvainMethod::performClustering(KaHIP::PartitionConfig &config, KaHIP::graph_access *G, bool start_w_singletons)
 {
     // to avoid code duplication we just call the extensive function
     // without doing label propagation
@@ -48,16 +58,16 @@ PartitionID LouvainMethod::performClustering(PartitionConfig &config, graph_acce
 }
 
 
-PartitionID LouvainMethod::performClusteringWithLPP(const PartitionConfig& config,
-                                                    graph_access* G, bool start_w_singletons)
+PartitionID LouvainMethod::performClusteringWithLPP(const KaHIP::PartitionConfig& config,
+                                                    KaHIP::graph_access* G, bool start_w_singletons)
 {
     /// number of node moves between clusters
     NodeID numberOfMoves = 0;
     unsigned coarsenings = 0;
     /// to store the levels of coarse graphs
-    graph_hierarchy graphHierarchy;
+    KaHIP::graph_hierarchy graphHierarchy;
     /// list of coarse graphs we can delete at the end
-    list<graph_access *> coarseGraphsToDelete;
+    list<KaHIP::graph_access *> coarseGraphsToDelete;
     /// for measuring fine times
     timer timer;
 
@@ -208,7 +218,7 @@ void LouvainMethod::initializeSingletonClusters()
 }
 
 
-NodeID LouvainMethod::performNodeMoves(const PartitionConfig &config)
+NodeID LouvainMethod::performNodeMoves(const KaHIP::PartitionConfig &config)
 {
     /// normally modularity should be in the range [-1,1]
     double currentQuality = -2.0;
@@ -241,7 +251,7 @@ NodeID LouvainMethod::performNodeMoves(const PartitionConfig &config)
     // in the outer loop and not every time in the inner one
     // nodesOrder.order_nodes(config, *m_G, permutation);
 
-    random_functions::permutate_vector_good( permutation, true);
+    KaHIP::random_functions::permutate_vector_good( permutation, true);
     //std::iota(permutation.begin(), permutation.end(), 0);
     //for(size_t i = 0; i < permutation.size(); ++i) {
         //size_t pos = rand() % (permutation.size() - i) + i;

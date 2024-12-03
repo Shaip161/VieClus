@@ -7,15 +7,26 @@
 
 #include <algorithm>
 
-#include "algorithms/cycle_search.h"
-#include "augmented_Qgraph_fabric.h"
-#include "data_structure/priority_queues/bucket_pq.h"
-#include "partition_snapshooter.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+//#include "algorithms/cycle_search.h"
+//#include "augmented_Qgraph_fabric.h"
+//#include "data_structure/priority_queues/bucket_pq.h"
+//#include "partition_snapshooter.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+
+#include "extern/KaHIP/lib/algorithms/cycle_search.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/augmented_Qgraph_fabric.h"
+#include "lib/data_structure/priority_queues/bucket_pq.h"
+#include "extern/KaHIP/lib/tools/partition_snapshooter.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+
 
 augmented_Qgraph_fabric::augmented_Qgraph_fabric() {
 }
@@ -31,13 +42,13 @@ void augmented_Qgraph_fabric::cleanup_eligible() {
         m_tomake_eligible.clear();
  }
 
-bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & config, 
-                                                              graph_access & G, 
-                                                              complete_boundary & boundary, 
+bool augmented_Qgraph_fabric::build_augmented_quotient_graph( KaHIP::PartitionConfig & config, 
+                                                              KaHIP::graph_access & G, 
+                                                              KaHIP::complete_boundary & boundary, 
                                                               augmented_Qgraph & aqg, 
                                                               unsigned & s, bool rebalance, bool plus) {
 
-        graph_access G_bar;
+        KaHIP::graph_access G_bar;
         boundary.getUnderlyingQuotientGraph(G_bar); 
         if(m_eligible.size() != G.number_of_nodes()) {
                 m_eligible.resize(G.number_of_nodes());
@@ -63,7 +74,7 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
 
 
                 for( unsigned j = 0; j < config.kaba_packing_iterations; j++) {
-                        random_functions::permutate_vector_good_small(vec_bpd);
+                        KaHIP::random_functions::permutate_vector_good_small(vec_bpd);
                         bool variant_to_use = plus;
                         for( unsigned i = 0; i < vec_bpd.size(); i++) {
                                 boundary_pair bp;
@@ -73,7 +84,7 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
 
                                 if( plus && config.kaba_flip_packings) {
                                         //best of both worlds
-                                        variant_to_use = random_functions::nextBool();
+                                        variant_to_use = KaHIP::random_functions::nextBool();
                                 }
 
                                 local_search( config, variant_to_use, G, boundary, aqg, bp, s);
@@ -124,7 +135,7 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
                                 }
                         } endfor
 
-                        random_functions::permutate_vector_good_small(start_vertices);
+                        KaHIP::random_functions::permutate_vector_good_small(start_vertices);
                         for( unsigned i = 0; i < start_vertices.size(); i++) {
                                 bfsqueue->push_back(start_vertices[i]);
                                 parent[start_vertices[i]] = start_vertices[i];
@@ -156,7 +167,7 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
                                         candiate_set_was_empty = true;
                                         break;
                                 }
-                                unsigned int r_idx = random_functions::nextInt(0, candidates.size()-1);
+                                unsigned int r_idx = KaHIP::random_functions::nextInt(0, candidates.size()-1);
                                 cur_block          = candidates[r_idx];
                                 std::swap(candidates[r_idx], candidates[candidates.size()-1]);
                                 candidates.pop_back(); 
@@ -166,11 +177,11 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
                         //special case for more connected components, 
                         //move a random node from an overloaded block to cur_block (which is a connected component)
                         if(candiate_set_was_empty) {
-                                unsigned int r_idx    = random_functions::nextInt(0, tmp_candidates.size()-1);
+                                unsigned int r_idx    = KaHIP::random_functions::nextInt(0, tmp_candidates.size()-1);
                                 PartitionID cur_block = tmp_candidates[r_idx];
 
                                 do {
-                                        unsigned int node       = random_functions::nextInt(0, G.number_of_nodes()-1);
+                                        NodeID node       = KaHIP::random_functions::nextInt(0, G.number_of_nodes()-1);
                                         PartitionID nodes_block = G.getPartitionIndex(node);
                                         if( nodes_block != cur_block 
                                          && boundary.getBlockWeight(nodes_block) > config.upper_bound_partition) {
@@ -202,7 +213,7 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
                                 allready_performed_local_search[config.k*bp.lhs+bp.rhs] = true;
                         } 
                         for( unsigned j = 0; j < config.kaba_packing_iterations; j++) {
-                                random_functions::permutate_vector_good_small(vec_bpd);
+                                KaHIP::random_functions::permutate_vector_good_small(vec_bpd);
 
                                 for( unsigned i = 0; i < vec_bpd.size(); i++) {
                                         boundary_pair bp;
@@ -215,7 +226,7 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
                         }
                 } else {
                         for( unsigned j = 0; j < config.kaba_packing_iterations; j++) {
-                                random_functions::permutate_vector_good_small(vec_bpd);
+                                KaHIP::random_functions::permutate_vector_good_small(vec_bpd);
 
                                 for( unsigned i = 0; i < vec_bpd.size(); i++) {
                                         boundary_pair bp;
@@ -233,8 +244,8 @@ bool augmented_Qgraph_fabric::build_augmented_quotient_graph( PartitionConfig & 
         return false;
 }
 
-bool augmented_Qgraph_fabric::construct_local_searches_on_qgraph_edge( PartitionConfig & config, graph_access & G, 
-                                                                       complete_boundary & boundary, augmented_Qgraph & aqg, 
+bool augmented_Qgraph_fabric::construct_local_searches_on_qgraph_edge( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                                                       KaHIP::complete_boundary & boundary, augmented_Qgraph & aqg, 
                                                                        boundary_pair & pair, 
                                                                        unsigned s,
                                                                        bool plus) {
@@ -255,7 +266,7 @@ bool augmented_Qgraph_fabric::construct_local_searches_on_qgraph_edge( Partition
                 return false; 
         }
 
-        commons = kway_graph_refinement_commons::getInstance(config);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
         for( unsigned i = 0; i < 1; i++) {
 
                 if(lhs_boundary.size() == 0) return false;
@@ -287,12 +298,12 @@ bool augmented_Qgraph_fabric::construct_local_searches_on_qgraph_edge( Partition
 
 //this method performes a directed localized local search and UNDOs them
 //these searches are for the augmented qgraph structure for balanced graph partitioning
-void augmented_Qgraph_fabric::directed_more_locallized_search(PartitionConfig & config, graph_access & G, 
-                                                   complete_boundary & boundary,  
+void augmented_Qgraph_fabric::directed_more_locallized_search(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                                   KaHIP::complete_boundary & boundary,  
                                                    PartitionID & lhs, PartitionID & rhs,
                                                    NodeID start_node, unsigned & number_of_swaps, pairwise_local_search & pls) {
 
-        commons = kway_graph_refinement_commons::getInstance(config);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
         EdgeWeight max_degree = G.getMaxDegree();
         refinement_pq* queue  = new bucket_pq(max_degree);
 
@@ -365,12 +376,12 @@ void augmented_Qgraph_fabric::directed_more_locallized_search(PartitionConfig & 
 
 //this method performes a directed localized local search and UNDOs them
 //these searches are for the augmented qgraph structure for balanced graph partitioning
-void augmented_Qgraph_fabric::more_locallized_search(PartitionConfig & config, graph_access & G, 
-                                                   complete_boundary & boundary,
+void augmented_Qgraph_fabric::more_locallized_search(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                                   KaHIP::complete_boundary & boundary,
                                                    PartitionID & lhs, PartitionID & rhs,
                                                    NodeID start_node, unsigned & number_of_swaps, pairwise_local_search & pls) {
 
-        commons = kway_graph_refinement_commons::getInstance(config);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
         refinement_pq* queue_lhs = NULL;
         refinement_pq* queue_rhs = NULL;
         EdgeWeight max_degree = G.getMaxDegree();
@@ -439,7 +450,7 @@ void augmented_Qgraph_fabric::more_locallized_search(PartitionConfig & config, g
                 bool coin = false;
                 switch(config.kaba_lsearch_p) {
                 case COIN_DIFFTIE:
-                        coin = random_functions::nextBool();
+                        coin = KaHIP::random_functions::nextBool();
                         if(coin) {
                                 if( gain_rhs > gain_lhs ) {
                                         queue = queue_rhs;
@@ -454,14 +465,14 @@ void augmented_Qgraph_fabric::more_locallized_search(PartitionConfig & config, g
                         break;
 
                 case COIN_RNDTIE:
-                        coin = random_functions::nextBool();
+                        coin = KaHIP::random_functions::nextBool();
                         if(coin) {
                                 if( gain_rhs > gain_lhs ) {
                                         queue = queue_rhs;
                                 } else if ( gain_rhs < gain_lhs ) {
                                         queue = queue_lhs;
                                 } else {
-                                        coin = random_functions::nextBool();
+                                        coin = KaHIP::random_functions::nextBool();
                                         if(coin) {
                                                 queue = queue_rhs;
                                         } else {
@@ -488,7 +499,7 @@ void augmented_Qgraph_fabric::more_locallized_search(PartitionConfig & config, g
                         } else if ( gain_rhs < gain_lhs ) {
                                 queue = queue_lhs;
                         } else {
-                                coin = random_functions::nextBool();
+                                coin = KaHIP::random_functions::nextBool();
                                 if(coin) {
                                         queue = queue_rhs;
                                 } else {

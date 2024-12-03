@@ -7,11 +7,17 @@
 #ifndef LOCAL_SEARCH_MAPPING_CCR5FJN
 #define LOCAL_SEARCH_MAPPING_CCR5FJN
 
-#include "partition_config.h"
-#include "data_structure/graph_access.h"
-#include "data_structure/matrix/matrix.h"
-#include "tools/timer.h"
-#include "tools/quality_metrics.h"
+//#include "partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "data_structure/matrix/matrix.h"
+//#include "tools/timer.h"
+//#include "tools/quality_metrics.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/data_structure/matrix/matrix.h"
+#include "lib/tools/timer.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
 
 class local_search_mapping {
 public:
@@ -19,11 +25,11 @@ public:
         virtual ~local_search_mapping();
            
         template < typename search_space > 
-        void perform_local_search( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank);
+        void perform_local_search( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank);
 
 private:
-        bool perform_single_swap(graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs);
-        void update_node_contribution( graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs);
+        bool perform_single_swap(KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs);
+        void update_node_contribution( KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank, NodeID swap_lhs, NodeID swap_rhs);
 
         // Data Members
         std::vector< NodeID > node_contribution;
@@ -34,7 +40,7 @@ private:
 // input a valid initial mapping
 // output a valid hopefully better mapping
 template < typename search_space > 
-void local_search_mapping::perform_local_search( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void local_search_mapping::perform_local_search( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         timer t; t.restart();
 
         //compute total metric

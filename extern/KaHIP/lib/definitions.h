@@ -4,17 +4,19 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *
  *****************************************************************************/
-
+/*
 #ifndef DEFINITIONS_H_CHR
 #define DEFINITIONS_H_CHR
 
 #include <limits>
 #include <queue>
 #include <vector>
-
 #include "limits.h"
-#include "macros_assertions.h"
 #include "stdio.h"
+
+//#include "macros_assertions.h"
+
+#include "lib/tools/macros_assertions.h"
 
 // allows us to disable most of the output during partitioning
 #ifdef KAFFPAOUTPUT
@@ -23,10 +25,13 @@
         #define PRINT(x) do {} while (false);
 #endif
 
+*/
+
 /**********************************************
  * Constants
  * ********************************************/
 //Types needed for the graph ds
+/*
 typedef unsigned int 	NodeID;
 typedef double 		EdgeRatingType;
 typedef unsigned int 	EdgeID;
@@ -184,4 +189,6 @@ typedef enum {
 
 
 #endif
+
+*/
 

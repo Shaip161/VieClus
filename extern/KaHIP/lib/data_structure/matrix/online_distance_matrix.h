@@ -10,7 +10,9 @@
 
 #include <vector>
 #include <iostream>
-#include "matrix.h"
+//#include "matrix.h"
+
+#include "extern/KaHIP/lib/data_structure/matrix/matrix.h"
 
 class online_distance_matrix : public matrix {
 public:
@@ -18,7 +20,7 @@ public:
                                                                          m_dim_y (dim_y) {
         };
         
-        void setPartitionConfig( PartitionConfig & config ) {
+        void setPartitionConfig( KaHIP::PartitionConfig & config ) {
                 this->config = config;
                 interval_sizes.resize(config.group_sizes.size());
                 interval_sizes[0] = config.group_sizes[0]; 
@@ -62,7 +64,7 @@ public:
         }
 
 private:
-        PartitionConfig config;
+        KaHIP::PartitionConfig config;
         unsigned int m_dim_x, m_dim_y;
         std::vector< int > interval_sizes;
 

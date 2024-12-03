@@ -5,7 +5,9 @@
  * 
  *****************************************************************************/
 
-#include "push_relabel.h"
+//#include "push_relabel.h"
+
+#include "extern/KaHIP/lib/algorithms/push_relabel.h"
 
 push_relabel::push_relabel( ) {
                 

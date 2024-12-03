@@ -12,9 +12,13 @@
 #include <unordered_map>
 #include <vector>
 
-#include "definitions.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
+//#include "definitions.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
 
 struct pairwise_local_search { // a single two way local search
         std::vector<Gain>        gains;
@@ -61,7 +65,7 @@ public:
         virtual ~augmented_Qgraph();
 
         //prepare data structures
-        void prepare( PartitionConfig & config, graph_access & G, graph_access & G_bar, unsigned & steps);
+        void prepare( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, KaHIP::graph_access & G_bar, unsigned & steps);
 
         // get information on gains coresponding to vertex differences
         bool exists_vmovements_of_diff( boundary_pair & bp, unsigned  & diff); 
@@ -75,7 +79,7 @@ public:
         void commit_pairwise_local_search( boundary_pair & pair, pairwise_local_search & pls);
 
         //query wether to local searches are conflicted
-        bool check_conflict( const  PartitionConfig & config, 
+        bool check_conflict( const  KaHIP::PartitionConfig & config, 
                              PartitionID & lhs, PartitionID & rhs, 
                              unsigned forward_load_diff, unsigned backward_load_diff);
 
@@ -133,7 +137,7 @@ Gain augmented_Qgraph::get_gain_of_vmovements( boundary_pair & bp, unsigned & di
 }
 
 inline 
-void augmented_Qgraph::prepare( PartitionConfig & config, graph_access & G, graph_access & G_bar, unsigned & steps) {
+void augmented_Qgraph::prepare( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, KaHIP::graph_access & G_bar, unsigned & steps) {
         m_max_vertex_weight_difference = 0;
         forall_nodes(G_bar, lhs) {
                 forall_out_edges(G_bar, e, lhs) {
@@ -211,7 +215,7 @@ void augmented_Qgraph::commit_pairwise_local_search( boundary_pair & pair, pairw
 }
 
 inline
-bool augmented_Qgraph::check_conflict( const  PartitionConfig & config, 
+bool augmented_Qgraph::check_conflict( const  KaHIP::PartitionConfig & config, 
                                        PartitionID & lhs, PartitionID & rhs, 
                                        unsigned forward_load_diff, unsigned backward_load_diff) {
         // look at the first vertices to be moved of the 

@@ -9,24 +9,29 @@
 
 #include <mpi.h>
 
-#include "data_structure/graph_access.h"
+/*#include "data_structure/graph_access.h"
 #include "parallel_mh_clustering/population_clustering.h"
 #include "partition_config.h"
-#include "tools/quality_metrics.h"
+#include "tools/quality_metrics.h"*/
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/VieClus/lib/parallel_mh_clustering/population_clustering.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
 
 class exchanger_clustering {
 public:
         exchanger_clustering( MPI_Comm communicator );
         virtual ~exchanger_clustering();
 
-        void diversify_population_clustering( PartitionConfig & config, graph_access & G, population_clustering & island, bool replace );
-        void quick_start( PartitionConfig & config,  graph_access & G, population_clustering & island );
-        void push_best( PartitionConfig & config,  graph_access & G, population_clustering & island );
-        void recv_incoming( PartitionConfig & config,  graph_access & G, population_clustering & island );
+        void diversify_population_clustering( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, population_clustering & island, bool replace );
+        void quick_start( KaHIP::PartitionConfig & config,  KaHIP::graph_access & G, population_clustering & island );
+        void push_best( KaHIP::PartitionConfig & config,  KaHIP::graph_access & G, population_clustering & island );
+        void recv_incoming( KaHIP::PartitionConfig & config,  KaHIP::graph_access & G, population_clustering & island );
 
 private:
-        void exchange_individum(const PartitionConfig & config, 
-                                graph_access & G, 
+        void exchange_individum(const KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
                                 int & from, 
                                 int & rank, 
                                 int & to, 
@@ -42,7 +47,7 @@ private:
 
         MPI_Comm m_communicator;
 
-        quality_metrics m_qm;
+        KaHIP::quality_metrics m_qm;
 };
 
 

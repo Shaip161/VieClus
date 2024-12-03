@@ -8,7 +8,9 @@
 #ifndef PATH_X5LQS3DT
 #define PATH_X5LQS3DT
 
-#include "definitions.h"
+//#include "definitions.h"
+
+#include "lib/definitions.h"
 
 class path {
         public:

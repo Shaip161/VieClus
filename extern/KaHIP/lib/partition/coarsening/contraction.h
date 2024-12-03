@@ -8,10 +8,14 @@
 #ifndef CONTRACTION_VIXZ9K0F
 #define CONTRACTION_VIXZ9K0F
 
+//#include "data_structure/graph_access.h"
+//#include "matching/matching.h"
+//#include "partition_config.h"
 
-#include "data_structure/graph_access.h"
-#include "matching/matching.h"
-#include "partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/matching.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+
 
 typedef NodeID Regions;
 
@@ -20,26 +24,26 @@ class contraction {
                 contraction();
                 virtual ~contraction();
 
-                void contract(const PartitionConfig & partition_config, 
-                              graph_access & finer, 
-                              graph_access & coarser, 
+                void contract(const KaHIP::PartitionConfig & partition_config, 
+                              KaHIP::graph_access & finer, 
+                              KaHIP::graph_access & coarser, 
                               const Matching & edge_matching,
                               const CoarseMapping & coarse_mapping,
                               const NodeID & no_of_coarse_vertices,
                               const NodePermutationMap & permutation) const;
 
-                void contract_clustering(const PartitionConfig & partition_config, 
-                              graph_access & finer, 
-                              graph_access & coarser, 
+                void contract_clustering(const KaHIP::PartitionConfig & partition_config, 
+                              KaHIP::graph_access & finer, 
+                              KaHIP::graph_access & coarser, 
                               const Matching & edge_matching,
                               const CoarseMapping & coarse_mapping,
                               const NodeID & no_of_coarse_vertices,
                               const NodePermutationMap & permutation) const;
 
 
-                 void contract_partitioned(const PartitionConfig & partition_config, 
-                                           graph_access & G, 
-                                           graph_access & coarser, 
+                 void contract_partitioned(const KaHIP::PartitionConfig & partition_config, 
+                                           KaHIP::graph_access & G, 
+                                           KaHIP::graph_access & coarser, 
                                            const Matching & edge_matching,
                                            const CoarseMapping & coarse_mapping,
                                            const NodeID & no_of_coarse_vertices,
@@ -47,8 +51,8 @@ class contraction {
 
         private:
                 // visits an edge in G (and auxillary graph) and updates/creates and edge in coarser graph 
-                void visit_edge(graph_access & G, 
-                                graph_access & coarser,
+                void visit_edge(KaHIP::graph_access & G, 
+                                KaHIP::graph_access & coarser,
                                 std::vector<NodeID> & edge_positions,
                                 const NodeID coarseNode,
                                 const EdgeID e,
@@ -57,8 +61,8 @@ class contraction {
 
 };
 
-inline void contraction::visit_edge(graph_access & G, 
-                graph_access & coarser,
+inline void contraction::visit_edge(KaHIP::graph_access & G, 
+                KaHIP::graph_access & coarser,
                 std::vector<NodeID> & edge_positions,
                 const NodeID coarseNode,
                 const EdgeID e,

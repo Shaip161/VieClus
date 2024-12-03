@@ -10,7 +10,7 @@
 
 class queue_selection_strategy {
         public:
-		queue_selection_strategy(PartitionConfig & config) : m_config ( config ) {};
+		queue_selection_strategy(KaHIP::PartitionConfig & config) : m_config ( config ) {};
 		virtual ~queue_selection_strategy()  {};
                 virtual void selectQueue(int lhs_part_weight, int rhs_part_weight, 
                                 PartitionID lhs, PartitionID rhs, 
@@ -18,14 +18,14 @@ class queue_selection_strategy {
                                 refinement_pq * lhs_queue, refinement_pq * rhs_queue, 
                                 refinement_pq** from_queue, refinement_pq** to_queue) = 0;
 	protected:
-		PartitionConfig m_config;
+		KaHIP::PartitionConfig m_config;
 
 };
 
 
 class queue_selection_diffusion : public queue_selection_strategy {
         public:
-		queue_selection_diffusion(PartitionConfig & config) : queue_selection_strategy(config) {};
+		queue_selection_diffusion(KaHIP::PartitionConfig & config) : queue_selection_strategy(config) {};
                 inline void selectQueue(int lhs_part_weight, int rhs_part_weight, 
                                 PartitionID lhs, PartitionID rhs, 
                                 PartitionID & from, PartitionID & to,
@@ -47,7 +47,7 @@ class queue_selection_diffusion : public queue_selection_strategy {
 
 class queue_selection_topgain : public queue_selection_strategy {
         public:
-		queue_selection_topgain(PartitionConfig & config) : queue_selection_strategy(config) {};
+		queue_selection_topgain(KaHIP::PartitionConfig & config) : queue_selection_strategy(config) {};
                 inline void selectQueue(int lhs_part_weight, int rhs_part_weight, 
                                 PartitionID lhs, PartitionID rhs, 
                                 PartitionID & from, PartitionID & to,
@@ -88,7 +88,7 @@ class queue_selection_topgain : public queue_selection_strategy {
 
 class queue_selection_topgain_diffusion : public queue_selection_strategy {
         public:
-	  queue_selection_topgain_diffusion(PartitionConfig & config) : queue_selection_strategy(config) {  
+	  queue_selection_topgain_diffusion(KaHIP::PartitionConfig & config) : queue_selection_strategy(config) {  
                   qdiff = new queue_selection_diffusion(m_config);
           };
 
@@ -148,7 +148,7 @@ class queue_selection_topgain_diffusion : public queue_selection_strategy {
 
 class queue_selection_diffusion_block_targets : public queue_selection_strategy {
         public:
-		queue_selection_diffusion_block_targets(PartitionConfig & config) : queue_selection_strategy(config) {
+		queue_selection_diffusion_block_targets(KaHIP::PartitionConfig & config) : queue_selection_strategy(config) {
                         qdiff = new queue_selection_topgain_diffusion(config);
                 };
 

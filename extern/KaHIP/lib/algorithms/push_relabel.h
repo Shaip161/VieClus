@@ -9,10 +9,15 @@
 #define MAX_FLOW_MIN_CUT_Q5EJKHNS
 
 #include <iostream>
-#include "definitions.h"
-#include "data_structure/graph_access.h"
-#include "data_structure/flow_graph.h"
-#include "tools/timer.h"
+//#include "definitions.h"
+//#include "data_structure/graph_access.h"
+//#include "data_structure/flow_graph.h"
+//#include "tools/timer.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/data_structure/flow_graph.h"
+#include "extern/KaHIP/lib/tools/timer.h"
 
 const int    WORK_OP_RELABEL    = 9;
 const double GLOBAL_UPDATE_FRQ  = 0.51;

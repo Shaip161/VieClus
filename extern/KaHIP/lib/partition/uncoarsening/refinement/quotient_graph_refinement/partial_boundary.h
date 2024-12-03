@@ -9,7 +9,10 @@
 #define PARTIAL_BOUNDARY_963CRO9F_
 
 #include <unordered_map>
-#include "definitions.h"
+
+//#include "definitions.h"
+
+#include "lib/definitions.h"
 
 struct compare_nodes_contains {
         bool operator()(const NodeID lhs, const NodeID rhs) const {

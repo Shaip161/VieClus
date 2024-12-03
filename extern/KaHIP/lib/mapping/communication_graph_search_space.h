@@ -9,9 +9,13 @@
 
 #include <utility>
 #include <unordered_map>
-#include "data_structure/graph_access.h"
-#include "tools/random_functions.h"
-#include "partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "tools/random_functions.h"
+//#include "partition_config.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 extern int global_num_nodes;
 
@@ -30,10 +34,10 @@ namespace std {
 
 class communication_graph_search_space {
         public:
-                communication_graph_search_space(PartitionConfig & config, NodeID number_of_nodes);
+                communication_graph_search_space(KaHIP::PartitionConfig & config, NodeID number_of_nodes);
                 virtual ~communication_graph_search_space(); 
 
-		void set_graph_ref( graph_access * C);
+		void set_graph_ref( KaHIP::graph_access * C);
 
                 bool done() {
                         return m_unsucc_tries >= (NodeID) m_limit || m_have_to_break;
@@ -122,8 +126,8 @@ class communication_graph_search_space {
                 bool m_have_to_break;
                 NodeID m_unsucc_tries;
 
-		PartitionConfig config;
-                graph_access * C;
+		KaHIP::PartitionConfig config;
+                KaHIP::graph_access * C;
 };
 
 

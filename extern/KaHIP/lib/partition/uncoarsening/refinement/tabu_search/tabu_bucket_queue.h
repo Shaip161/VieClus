@@ -12,13 +12,17 @@
 
 //this PQ is specalized for Tabu Search, it only contains non-tabu moves
 //there is a second PQ that contains tabu moves
-#include "data_structure/matrix/normal_matrix.h"
-#include "data_structure/priority_queues/priority_queue_interface.h"
-#include "random_functions.h"
+//#include "data_structure/matrix/normal_matrix.h"
+//#include "data_structure/priority_queues/priority_queue_interface.h"
+//#include "random_functions.h"
+
+#include "extern/KaHIP/lib/data_structure/matrix/normal_matrix.h"
+#include "lib/data_structure/priority_queues/priority_queue_interface.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 class tabu_bucket_queue  {
         public:
-                tabu_bucket_queue( PartitionConfig & config, const EdgeWeight & gain_span, NodeID number_of_nodes ); 
+                tabu_bucket_queue( KaHIP::PartitionConfig & config, const EdgeWeight & gain_span, NodeID number_of_nodes ); 
 
                 virtual ~tabu_bucket_queue() { delete m_queue_index; delete m_gains;};
 
@@ -48,7 +52,7 @@ class tabu_bucket_queue  {
                 std::vector< std::vector< std::pair<NodeID, PartitionID> > > m_buckets;
 };
 
-inline tabu_bucket_queue::tabu_bucket_queue( PartitionConfig & config, 
+inline tabu_bucket_queue::tabu_bucket_queue( KaHIP::PartitionConfig & config, 
                                              const EdgeWeight & gain_span_input, 
                                              NodeID number_of_nodes ) {
         m_elements    = 0;
@@ -93,7 +97,7 @@ inline std::pair<NodeID, PartitionID> tabu_bucket_queue::maxElement( ) {
 }
 
 inline std::pair<NodeID, PartitionID> tabu_bucket_queue::deleteMax() {
-       unsigned rnd_idx = random_functions::nextInt(0, m_buckets[m_max_idx].size()-1);
+       unsigned rnd_idx = KaHIP::random_functions::nextInt(0, m_buckets[m_max_idx].size()-1);
        swap(m_buckets[m_max_idx][rnd_idx], m_buckets[m_max_idx].back());
        m_queue_index->set_xy(m_buckets[m_max_idx][rnd_idx].first, m_buckets[m_max_idx][rnd_idx].second, rnd_idx); 
 

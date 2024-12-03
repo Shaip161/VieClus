@@ -11,28 +11,35 @@
 #include <unordered_map>
 #include <vector>
 
-#include "data_structure/priority_queues/priority_queue_interface.h"
-#include "definitions.h"
-#include "kway_graph_refinement_commons.h"
-#include "tools/random_functions.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
-#include "uncoarsening/refinement/refinement.h"
+//#include "data_structure/priority_queues/priority_queue_interface.h"
+//#include "definitions.h"
+//#include "kway_graph_refinement_commons.h"
+//#include "tools/random_functions.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+//#include "uncoarsening/refinement/refinement.h"
+
+#include "lib/data_structure/priority_queues/priority_queue_interface.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
 
 class kway_graph_refinement_core  {
         public:
                 kway_graph_refinement_core( );
                 virtual ~kway_graph_refinement_core();
 
-                EdgeWeight single_kway_refinement_round(PartitionConfig & config, 
-                                                        graph_access & G, 
-                                                        complete_boundary & boundary, 
+                EdgeWeight single_kway_refinement_round(KaHIP::PartitionConfig & config, 
+                                                        KaHIP::graph_access & G, 
+                                                        KaHIP::complete_boundary & boundary, 
                                                         boundary_starting_nodes & start_nodes, 
                                                         int step_limit, 
                                                         vertex_moved_hashtable & moved_idx );
 
-                EdgeWeight single_kway_refinement_round(PartitionConfig & config, 
-                                                        graph_access & G, 
-                                                        complete_boundary & boundary, 
+                EdgeWeight single_kway_refinement_round(KaHIP::PartitionConfig & config, 
+                                                        KaHIP::graph_access & G, 
+                                                        KaHIP::complete_boundary & boundary, 
                                                         boundary_starting_nodes & start_nodes, 
                                                         int step_limit, 
                                                         vertex_moved_hashtable & moved_idx,
@@ -40,9 +47,9 @@ class kway_graph_refinement_core  {
 
 
          private:
-               EdgeWeight single_kway_refinement_round_internal(PartitionConfig & config, 
-                                                                graph_access & G, 
-                                                                complete_boundary & boundary, 
+               EdgeWeight single_kway_refinement_round_internal(KaHIP::PartitionConfig & config, 
+                                                                KaHIP::graph_access & G, 
+                                                                KaHIP::complete_boundary & boundary, 
                                                                 boundary_starting_nodes & start_nodes, 
                                                                 int step_limit,
                                                                 vertex_moved_hashtable & moved_idx,
@@ -50,40 +57,40 @@ class kway_graph_refinement_core  {
                                                                 std::unordered_map<PartitionID, PartitionID> &  touched_blocks); 
 
 
-                void init_queue_with_boundary(const PartitionConfig & config, 
-                                              graph_access & G, 
+                void init_queue_with_boundary(const KaHIP::PartitionConfig & config, 
+                                              KaHIP::graph_access & G, 
                                               std::vector<NodeID> & bnd_nodes, 
                                               refinement_pq * queue, 
                                               vertex_moved_hashtable & moved_idx);
 
-                inline bool move_node(PartitionConfig & config, 
-                                      graph_access & G, 
+                inline bool move_node(KaHIP::PartitionConfig & config, 
+                                      KaHIP::graph_access & G, 
                                       NodeID & node, 
                                       vertex_moved_hashtable & moved_idx, 
                                       refinement_pq * queue, 
-                                      complete_boundary & boundary);
+                                      KaHIP::complete_boundary & boundary);
 
-                inline void move_node_back(PartitionConfig & config, 
-                                           graph_access & G, 
+                inline void move_node_back(KaHIP::PartitionConfig & config, 
+                                           KaHIP::graph_access & G, 
                                            NodeID & node,
                                            PartitionID & to, 
                                            vertex_moved_hashtable & moved_idx, 
                                            refinement_pq * queue, 
-                                           complete_boundary & boundary);
+                                           KaHIP::complete_boundary & boundary);
 
-                void initialize_partition_moves_array(PartitionConfig & config, 
-                                                      complete_boundary & boundary, 
+                void initialize_partition_moves_array(KaHIP::PartitionConfig & config, 
+                                                      KaHIP::complete_boundary & boundary, 
                                                       std::vector<bool> & partition_move_valid); 
                 
-                kway_graph_refinement_commons* commons;
+                KaHIP::kway_graph_refinement_commons* commons;
 };
 
-inline bool kway_graph_refinement_core::move_node(PartitionConfig & config, 
-                graph_access & G, 
+inline bool kway_graph_refinement_core::move_node(KaHIP::PartitionConfig & config, 
+                KaHIP::graph_access & G, 
                 NodeID & node, 
                 vertex_moved_hashtable & moved_idx, 
                 refinement_pq * queue, 
-                complete_boundary & boundary) {
+                KaHIP::complete_boundary & boundary) {
 
         ASSERT_TRUE(boundary.assert_bnodes_in_boundaries());
         ASSERT_TRUE(boundary.assert_boundaries_are_bnodes());

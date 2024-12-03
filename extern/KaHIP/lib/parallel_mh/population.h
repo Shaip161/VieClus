@@ -11,9 +11,13 @@
 #include <sstream>
 #include <mpi.h>
 
-#include "data_structure/graph_access.h"
-#include "partition_config.h"
-#include "timer.h"
+//#include "data_structure/graph_access.h"
+//#include "partition_config.h"
+//#include "timer.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "lib/tools/timer.h"
 
 struct Individuum {
         int* partition_map;
@@ -27,30 +31,30 @@ struct ENC {
 
 class population {
         public:
-                population( MPI_Comm comm, const PartitionConfig & config );
+                population( MPI_Comm comm, const KaHIP::PartitionConfig & config );
                 virtual ~population();
 
-                void createIndividuum(const PartitionConfig & config, 
-                                      graph_access & G, 
+                void createIndividuum(const KaHIP::PartitionConfig & config, 
+                                      KaHIP::graph_access & G, 
 				      Individuum & ind, 
 				      bool output); 
 
-                void combine(const PartitionConfig & config, 
-                             graph_access & G, 
+                void combine(const KaHIP::PartitionConfig & config, 
+                             KaHIP::graph_access & G, 
                              Individuum & first_ind, 
                              Individuum & second_ind, 
                              Individuum & output_ind); 
 
-                void combine_cross(const PartitionConfig & partition_config, 
-				   graph_access & G, 
+                void combine_cross(const KaHIP::PartitionConfig & partition_config, 
+				   KaHIP::graph_access & G, 
 				   Individuum & first_ind, 
 				   Individuum & output_ind);
 
-                void mutate_random(const PartitionConfig & partition_config, 
-                                   graph_access & G, 
+                void mutate_random(const KaHIP::PartitionConfig & partition_config, 
+                                   KaHIP::graph_access & G, 
                                    Individuum & first_ind);
 
-                void insert(graph_access & G, Individuum & ind);
+                void insert(KaHIP::graph_access & G, Individuum & ind);
 
                 void set_pool_size(int size);
 
@@ -70,7 +74,7 @@ class population {
 
                 bool is_full(); 
 
-                void apply_fittest( graph_access & G, EdgeWeight & objective);
+                void apply_fittest( KaHIP::graph_access & G, EdgeWeight & objective);
 
                 unsigned size() { return m_internal_population.size(); }
                 

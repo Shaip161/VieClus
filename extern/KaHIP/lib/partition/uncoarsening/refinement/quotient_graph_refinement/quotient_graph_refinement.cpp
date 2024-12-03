@@ -6,15 +6,25 @@
 
 #include <unordered_map>
 
-#include "2way_fm_refinement/two_way_fm.h"
-#include "complete_boundary.h"
-#include "flow_refinement/two_way_flow_refinement.h"
-#include "quality_metrics.h"
-#include "quotient_graph_refinement.h"
-#include "quotient_graph_scheduling/active_block_quotient_graph_scheduler.h"
-#include "quotient_graph_scheduling/simple_quotient_graph_scheduler.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
-#include "uncoarsening/refinement/kway_graph_refinement/multitry_kway_fm.h"
+//#include "2way_fm_refinement/two_way_fm.h"
+//#include "complete_boundary.h"
+//#include "flow_refinement/two_way_flow_refinement.h"
+//#include "quality_metrics.h"
+//#include "quotient_graph_refinement.h"
+//#include "quotient_graph_scheduling/active_block_quotient_graph_scheduler.h"
+//#include "quotient_graph_scheduling/simple_quotient_graph_scheduler.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/multitry_kway_fm.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/two_way_flow_refinement.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_scheduling/active_block_quotient_graph_scheduler.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_scheduling/simple_quotient_graph_scheduler.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/multitry_kway_fm.h"
 
 quotient_graph_refinement::quotient_graph_refinement() {
 
@@ -24,10 +34,10 @@ quotient_graph_refinement::~quotient_graph_refinement() {
 
 }
 
-void quotient_graph_refinement::setup_start_nodes(graph_access & G, 
+void quotient_graph_refinement::setup_start_nodes(KaHIP::graph_access & G, 
                 PartitionID partition, 
                 boundary_pair & bp, 
-                complete_boundary & boundary,  
+                KaHIP::complete_boundary & boundary,  
                 boundary_starting_nodes & start_nodes) {
 
         start_nodes.resize(boundary.size(partition, &bp));
@@ -44,7 +54,7 @@ void quotient_graph_refinement::setup_start_nodes(graph_access & G,
 }
 
 
-EdgeWeight quotient_graph_refinement::perform_refinement(PartitionConfig & config, graph_access & G, complete_boundary & boundary) {
+EdgeWeight quotient_graph_refinement::perform_refinement(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, KaHIP::complete_boundary & boundary) {
 
         ASSERT_TRUE(boundary.assert_bnodes_in_boundaries());
         ASSERT_TRUE(boundary.assert_boundaries_are_bnodes());
@@ -68,7 +78,7 @@ EdgeWeight quotient_graph_refinement::perform_refinement(PartitionConfig & confi
 
         EdgeWeight overall_improvement                = 0;
         unsigned int no_of_pairwise_improvement_steps = 0;
-        quality_metrics qm;
+        KaHIP::quality_metrics qm;
 
         do {
                 no_of_pairwise_improvement_steps++;
@@ -95,7 +105,7 @@ EdgeWeight quotient_graph_refinement::perform_refinement(PartitionConfig & confi
                 EdgeWeight oldcut = initial_cut_value;
 #endif
 
-                PartitionConfig cfg    = config;
+                KaHIP::PartitionConfig cfg    = config;
                 EdgeWeight improvement = perform_a_two_way_refinement(cfg, G, boundary, bp, 
                                                                       lhs, rhs, 
                                                                       lhs_part_weight, rhs_part_weight, 
@@ -136,9 +146,9 @@ EdgeWeight quotient_graph_refinement::perform_refinement(PartitionConfig & confi
         return overall_improvement;
 }
 
-EdgeWeight quotient_graph_refinement::perform_a_two_way_refinement(PartitionConfig & config, 
-                                                                   graph_access & G,
-                                                                   complete_boundary & boundary,
+EdgeWeight quotient_graph_refinement::perform_a_two_way_refinement(KaHIP::PartitionConfig & config, 
+                                                                   KaHIP::graph_access & G,
+                                                                   KaHIP::complete_boundary & boundary,
                                                                    boundary_pair & bp,
                                                                    PartitionID & lhs, 
                                                                    PartitionID & rhs,
@@ -159,7 +169,7 @@ EdgeWeight quotient_graph_refinement::perform_a_two_way_refinement(PartitionConf
         something_changed      = false;
         EdgeWeight improvement = 0;
 
-        quality_metrics qm;
+        KaHIP::quality_metrics qm;
         if(config.refinement_type == REFINEMENT_TYPE_FM_FLOW || config.refinement_type == REFINEMENT_TYPE_FM) {
                 improvement = pair_wise_refinement.perform_refinement(config, 
                                                                       G,
@@ -205,7 +215,7 @@ EdgeWeight quotient_graph_refinement::perform_a_two_way_refinement(PartitionConf
 
         if(only_one_block_is_overloaded) {
 
-                PartitionConfig cfg = config;
+                KaHIP::PartitionConfig cfg = config;
                 cfg.softrebalance   = true;
                 cfg.rebalance       = false;
 

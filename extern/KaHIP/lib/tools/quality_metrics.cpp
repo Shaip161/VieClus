@@ -6,12 +6,16 @@
 
 #include <algorithm>
 #include <cmath>
-
-#include "quality_metrics.h"
-#include "data_structure/union_find.h"
-
 #include <unordered_map>
 #include <numeric>
+
+//#include "quality_metrics.h"
+//#include "data_structure/union_find.h"
+
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "lib/data_structure/union_find.h"
+
+namespace KaHIP {
 
 quality_metrics::quality_metrics() {
 }
@@ -19,7 +23,7 @@ quality_metrics::quality_metrics() {
 quality_metrics::~quality_metrics () {
 }
 
-EdgeWeight quality_metrics::edge_cut(graph_access & G) {
+EdgeWeight quality_metrics::edge_cut(KaHIP::graph_access & G) {
         EdgeWeight edgeCut = 0;
         forall_nodes(G, n) { 
                 PartitionID partitionIDSource = G.getPartitionIndex(n);
@@ -35,7 +39,7 @@ EdgeWeight quality_metrics::edge_cut(graph_access & G) {
         return edgeCut/2;
 }
 
-EdgeWeight quality_metrics::edge_cut(graph_access & G, int * partition_map) {
+EdgeWeight quality_metrics::edge_cut(KaHIP::graph_access & G, int * partition_map) {
         EdgeWeight edgeCut = 0;
         forall_nodes(G, n) { 
                 PartitionID partitionIDSource = partition_map[n];
@@ -51,7 +55,7 @@ EdgeWeight quality_metrics::edge_cut(graph_access & G, int * partition_map) {
         return edgeCut/2;
 }
 
-EdgeWeight quality_metrics::edge_cut(graph_access & G, PartitionID lhs, PartitionID rhs) {
+EdgeWeight quality_metrics::edge_cut(KaHIP::graph_access & G, PartitionID lhs, PartitionID rhs) {
         EdgeWeight edgeCut = 0;
         forall_nodes(G, n) { 
                 PartitionID partitionIDSource = G.getPartitionIndex(n);
@@ -68,7 +72,7 @@ EdgeWeight quality_metrics::edge_cut(graph_access & G, PartitionID lhs, Partitio
         return edgeCut;
 }
 
-EdgeWeight quality_metrics::edge_cut_connected(graph_access & G, int * partition_map) {
+EdgeWeight quality_metrics::edge_cut_connected(KaHIP::graph_access & G, int * partition_map) {
         EdgeWeight edgeCut = 0;
         EdgeWeight sumEW = 0;
         forall_nodes(G, n) { 
@@ -109,7 +113,7 @@ EdgeWeight quality_metrics::edge_cut_connected(graph_access & G, int * partition
 }
 
 
-EdgeWeight quality_metrics::max_communication_volume(graph_access & G, int * partition_map) {
+EdgeWeight quality_metrics::max_communication_volume(KaHIP::graph_access & G, int * partition_map) {
     std::vector<EdgeWeight> block_volume(G.get_partition_count(),0);
     forall_nodes(G, node) {
         PartitionID block = partition_map[node];
@@ -133,7 +137,7 @@ EdgeWeight quality_metrics::max_communication_volume(graph_access & G, int * par
     return max_comm_volume;
 }
 
-EdgeWeight quality_metrics::min_communication_volume(graph_access & G) {
+EdgeWeight quality_metrics::min_communication_volume(KaHIP::graph_access & G) {
     std::vector<EdgeWeight> block_volume(G.get_partition_count(),0);
     forall_nodes(G, node) {
         PartitionID block = G.getPartitionIndex(node);
@@ -156,7 +160,7 @@ EdgeWeight quality_metrics::min_communication_volume(graph_access & G) {
     return min_comm_volume;
 }
 
-EdgeWeight quality_metrics::max_communication_volume(graph_access & G) {
+EdgeWeight quality_metrics::max_communication_volume(KaHIP::graph_access & G) {
     std::vector<EdgeWeight> block_volume(G.get_partition_count(),0);
     forall_nodes(G, node) {
         PartitionID block = G.getPartitionIndex(node);
@@ -179,7 +183,7 @@ EdgeWeight quality_metrics::max_communication_volume(graph_access & G) {
     return max_comm_volume;
 }
 
-EdgeWeight quality_metrics::total_communication_volume(graph_access & G) {
+EdgeWeight quality_metrics::total_communication_volume(KaHIP::graph_access & G) {
     std::vector<EdgeWeight> block_volume(G.get_partition_count(),0);
     forall_nodes(G, node) {
         PartitionID block = G.getPartitionIndex(node);
@@ -204,7 +208,7 @@ EdgeWeight quality_metrics::total_communication_volume(graph_access & G) {
 
 
 
-int quality_metrics::boundary_nodes(graph_access& G) {
+int quality_metrics::boundary_nodes(KaHIP::graph_access& G) {
         int no_of_boundary_nodes = 0;
         forall_nodes(G, n) { 
                 PartitionID partitionIDSource = G.getPartitionIndex(n);
@@ -222,7 +226,7 @@ int quality_metrics::boundary_nodes(graph_access& G) {
         return no_of_boundary_nodes;
 }
 
-double quality_metrics::balance_separator(graph_access& G) {
+double quality_metrics::balance_separator(KaHIP::graph_access& G) {
         std::vector<PartitionID> part_weights(G.get_partition_count(), 0);
 
         double overallWeight = 0;
@@ -249,7 +253,7 @@ double quality_metrics::balance_separator(graph_access& G) {
         return percentage;
 }
 
-NodeWeight quality_metrics::separator_weight(graph_access& G) {
+NodeWeight quality_metrics::separator_weight(KaHIP::graph_access& G) {
         NodeWeight separator_size = 0;
         PartitionID separator_ID = G.getSeparatorBlock();
         forall_nodes(G, node) {
@@ -261,7 +265,7 @@ NodeWeight quality_metrics::separator_weight(graph_access& G) {
         return separator_size;
 }
 
-double quality_metrics::balance(graph_access& G) {
+double quality_metrics::balance(KaHIP::graph_access& G) {
         std::vector<PartitionID> part_weights(G.get_partition_count(), 0);
 
         double overallWeight = 0;
@@ -286,7 +290,7 @@ double quality_metrics::balance(graph_access& G) {
         return percentage;
 }
 
-double quality_metrics::balance_edges(graph_access& G) {
+double quality_metrics::balance_edges(KaHIP::graph_access& G) {
         std::vector<PartitionID> part_weights(G.get_partition_count(), 0);
 
         double overallWeight = 0;
@@ -311,7 +315,7 @@ double quality_metrics::balance_edges(graph_access& G) {
         return percentage;
 }
 
-EdgeWeight quality_metrics::objective(const PartitionConfig & config, graph_access & G, int* partition_map) {
+EdgeWeight quality_metrics::objective(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G, int* partition_map) {
         if(config.mh_optimize_communication_volume) {
                 return max_communication_volume(G, partition_map);
         } else if(config.mh_penalty_for_unconnected) {
@@ -321,7 +325,7 @@ EdgeWeight quality_metrics::objective(const PartitionConfig & config, graph_acce
         }
 }
 
-NodeWeight quality_metrics::total_qap(graph_access & C, matrix & D, std::vector< NodeID > & rank_assign) {
+NodeWeight quality_metrics::total_qap(KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & rank_assign) {
         NodeWeight total_volume = 0;
         forall_nodes(C, node) {
                 forall_out_edges(C, e, node) {
@@ -347,4 +351,4 @@ NodeWeight quality_metrics::total_qap(matrix & C, matrix & D, std::vector< NodeI
         }
         return total_volume;
 }
-
+}

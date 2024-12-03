@@ -6,10 +6,15 @@
 
 #include <mpi.h>
 
-#include "exchanger_clustering.h"
-#include "tools/quality_metrics.h"
-#include "tools/random_functions.h"
-#include "tools/modularitymetric.h"
+//#include "exchanger_clustering.h"
+//#include "tools/quality_metrics.h"
+//#include "tools/random_functions.h"
+//#include "tools/modularitymetric.h"
+
+#include "extern/KaHIP/lib/parallel_mh_clustering/exchange/exchanger_clustering.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/VieClus/lib/tools/modularitymetric.h"
 
 exchanger_clustering::exchanger_clustering(MPI_Comm communicator) {
         m_prev_best_objective = -1;
@@ -69,7 +74,7 @@ exchanger_clustering::~exchanger_clustering() {
                 
 }
 
-void exchanger_clustering::diversify_population_clustering( PartitionConfig & config, graph_access & G,  population_clustering & island, bool replace ) {
+void exchanger_clustering::diversify_population_clustering( KaHIP::PartitionConfig & config, KaHIP::graph_access & G,  population_clustering & island, bool replace ) {
        
         int rank, comm_size;
         MPI_Comm_rank( m_communicator, &rank);
@@ -110,7 +115,7 @@ void exchanger_clustering::diversify_population_clustering( PartitionConfig & co
 
 }
 
-void exchanger_clustering::quick_start( PartitionConfig & config, graph_access & G, population_clustering & island ) {
+void exchanger_clustering::quick_start( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, population_clustering & island ) {
         int comm_size;
         MPI_Comm_size( m_communicator, &comm_size);
         
@@ -119,7 +124,7 @@ void exchanger_clustering::quick_start( PartitionConfig & config, graph_access &
         std::cout <<  "creating " <<  no_of_individuals << std::endl;
 
         for(unsigned i = 0; i < no_of_individuals; i++) {
-                PartitionConfig copy            = config;
+                KaHIP::PartitionConfig copy            = config;
                 copy.combine                    = false;
                 copy.graph_allready_partitioned = false;
 
@@ -131,7 +136,7 @@ void exchanger_clustering::quick_start( PartitionConfig & config, graph_access &
         int reps = config.mh_pool_size - no_of_individuals;
         if(reps < 0) reps = 0;
 
-        PartitionConfig div_config   = config;
+        KaHIP::PartitionConfig div_config   = config;
         div_config.mh_diversify_best = false;
         for( unsigned i = 0; i < (unsigned) reps; i++) {
                 diversify_population_clustering( div_config , G, island, false); 
@@ -139,7 +144,7 @@ void exchanger_clustering::quick_start( PartitionConfig & config, graph_access &
 }
 
 
-void exchanger_clustering::exchange_individum( const PartitionConfig & config,  graph_access & G, 
+void exchanger_clustering::exchange_individum( const KaHIP::PartitionConfig & config,  KaHIP::graph_access & G, 
                                     int & from, int & rank, int & to, 
                                     Individuum & in, Individuum & out) {
         //recv. edge cut, partition_map, cut_edges from "from"
@@ -171,7 +176,7 @@ void exchanger_clustering::exchange_individum( const PartitionConfig & config,  
 
 
 //extended push protocol -- see paper for details
-void exchanger_clustering::push_best( PartitionConfig & config, graph_access & G, population_clustering & island ) {
+void exchanger_clustering::push_best( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, population_clustering & island ) {
         int rank, size;
         MPI_Comm_rank( m_communicator, &rank);
         MPI_Comm_size( m_communicator, &size);
@@ -244,7 +249,7 @@ void exchanger_clustering::push_best( PartitionConfig & config, graph_access & G
         }
 }
 
-void exchanger_clustering::recv_incoming( PartitionConfig & config, graph_access & G, population_clustering & island ) {
+void exchanger_clustering::recv_incoming( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, population_clustering & island ) {
         int rank;
         MPI_Comm_rank( m_communicator, &rank);
         

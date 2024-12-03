@@ -5,14 +5,23 @@
  *
  *****************************************************************************/
 
-#include "data_structure/priority_queues/bucket_pq.h"
-#include "quality_metrics.h"
-#include "tabu_bucket_queue.h"
-#include "tabu_moves_queue.h"
-#include "tabu_search.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+//#include "data_structure/priority_queues/bucket_pq.h"
+//#include "quality_metrics.h"
+//#include "tabu_bucket_queue.h"
+//#include "tabu_moves_queue.h"
+//#include "tabu_search.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+
+#include "lib/data_structure/priority_queues/bucket_pq.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_bucket_queue.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_moves_queue.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_search.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
 
 tabu_search::tabu_search() {
                 
@@ -22,8 +31,8 @@ tabu_search::~tabu_search() {
                 
 }
 
-EdgeWeight tabu_search::perform_refinement(PartitionConfig & config, graph_access & G, complete_boundary & boundary) {
-        quality_metrics qm;
+EdgeWeight tabu_search::perform_refinement(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, KaHIP::complete_boundary & boundary) {
+        KaHIP::quality_metrics qm;
         EdgeWeight input_cut = qm.edge_cut(G);
         EdgeWeight cur_cut   = input_cut;
         EdgeWeight best_cut  = input_cut;
@@ -71,7 +80,7 @@ EdgeWeight tabu_search::perform_refinement(PartitionConfig & config, graph_acces
         } endfor
         
         unsigned no_impro_iterations = 0;
-        config.maxT                  = random_functions::nextInt(50, 3000);
+        config.maxT                  = KaHIP::random_functions::nextInt(50, 3000);
         unsigned iteration_limit     = std::min((int)(2*G.number_of_nodes()), 40000);
 
         std::vector< std::pair<NodeID, PartitionID > > undo_buffer;
@@ -148,7 +157,7 @@ EdgeWeight tabu_search::perform_refinement(PartitionConfig & config, graph_acces
 
                         unsigned tenure = config.maxT;//random_functions::nextInt( config.maxT, 2*config.maxT); 
                         tenure = compute_tenure(iteration, tenure);
-                        unsigned small_offset = random_functions::nextInt(1,3);
+                        unsigned small_offset = KaHIP::random_functions::nextInt(1,3);
                         T->set_xy(node, block, iteration + tenure + small_offset);
                         tabu_moves->insert(node, block, iteration + tenure + small_offset);
                         if( T->get_xy( node, from) < (int)iteration ) {

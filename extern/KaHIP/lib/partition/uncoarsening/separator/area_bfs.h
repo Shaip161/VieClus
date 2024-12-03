@@ -6,17 +6,22 @@
 #define AREA_BFS_OD13WIZM
 
 #include <algorithm>
-#include "partition_config.h"
-#include "data_structure/graph_access.h"
-#include "tools/random_functions.h"
+
+//#include "partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 class area_bfs {
 	public:
 		area_bfs();
 		virtual ~area_bfs();
 
-		void perform_bfs(const PartitionConfig & config, 
-				graph_access & G, 
+		void perform_bfs(const KaHIP::PartitionConfig & config, 
+				KaHIP::graph_access & G, 
 				std::vector< NodeID > & input_separator, 
 				PartitionID block, 
 				std::vector< NodeWeight > & block_weights,
@@ -33,7 +38,7 @@ class area_bfs {
 
 			round++; std::queue<NodeID> node_queue;
 
-			random_functions::permutate_vector_good(input_separator, false);
+			KaHIP::random_functions::permutate_vector_good(input_separator, false);
 
 			/***************************
 			 * Initialize the Queue

@@ -5,15 +5,22 @@
  *
  *****************************************************************************/
 
-#include "construct_partition.h"
-#include "graph_partitioner.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "random_functions.h"
-#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
-#include "uncoarsening/refinement/mixed_refinement.h"
-#include "uncoarsening/refinement/refinement.h"
-#include "uncoarsening/refinement/tabu_search/tabu_search.h"
+//#include "construct_partition.h"
+//#include "graph_partitioner.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+//#include "uncoarsening/refinement/mixed_refinement.h"
+//#include "uncoarsening/refinement/refinement.h"
+//#include "uncoarsening/refinement/tabu_search/tabu_search.h"
+
+#include "extern/KaHIP/lib/parallel_mh/galinier_combine/construct_partition.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/mixed_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_search.h"
 
 
 construct_partition::construct_partition() {
@@ -24,7 +31,7 @@ construct_partition::~construct_partition() {
                 
 }
 
-void construct_partition::construct_starting_from_partition( PartitionConfig & config, graph_access & G) {
+void construct_partition::construct_starting_from_partition( KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
 	std::vector< std::queue< NodeID > >     queues(config.k);
 	std::vector< NodeID >                   unassigned_vertices;
 	std::vector< std::vector< NodeID > >    blocks(config.k);
@@ -105,7 +112,7 @@ void construct_partition::construct_starting_from_partition( PartitionConfig & c
 	}
 }
 
-void construct_partition::createIndividuum( PartitionConfig & config, graph_access & G, Individuum & ind, bool output) {
+void construct_partition::createIndividuum( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, Individuum & ind, bool output) {
         std::cout <<  "creating individuum "  << std::endl;
         forall_nodes(G, node) {
                 G.setPartitionIndex(node, config.k);
@@ -126,7 +133,7 @@ void construct_partition::createIndividuum( PartitionConfig & config, graph_acce
 	boundary.build();
 
 	tabu_search ts;
-	PartitionConfig copy = config;
+	KaHIP::PartitionConfig copy = config;
 	copy.maxIter         = G.number_of_nodes();
 
 	ts.perform_refinement( copy, G, boundary);

@@ -6,10 +6,14 @@
 
 #include <cstdio>
 
-#include "construct_mapping.h"
-#include "tools/random_functions.h"
-#include "fast_construct_mapping.h"
+//#include "construct_mapping.h"
+//#include "tools/random_functions.h"
+//#include "fast_construct_mapping.h"
 #include "data_structure/priority_queues/maxNodeHeap.h"
+
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/mapping/construct_mapping.h"
+#include "extern/KaHIP/lib/mapping/fast_construct_mapping.h"
 
 
 construct_mapping::construct_mapping() {
@@ -20,7 +24,7 @@ construct_mapping::~construct_mapping() {
 
 }
 
-void construct_mapping::construct_initial_mapping( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_initial_mapping( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         switch( config.construction_algorithm ) {
                 case MAP_CONST_IDENTITY:
                         PRINT(std::cout <<  "running identity mapping"  << std::endl;)
@@ -52,7 +56,7 @@ void construct_mapping::construct_initial_mapping( PartitionConfig & config, gra
         }
 }
 
-void construct_mapping::construct_old_growing_matrix( PartitionConfig & config, matrix & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_old_growing_matrix( KaHIP::PartitionConfig & config, matrix & C, matrix & D, std::vector< NodeID > & perm_rank) {
         std::cout <<  "constructing initial mapping matrix version of growing"  << std::endl;
 
         //initialze perm rank
@@ -174,7 +178,7 @@ void construct_mapping::construct_old_growing_matrix( PartitionConfig & config, 
         } 
 }
 
-void construct_mapping::construct_old_growing( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_old_growing( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         std::cout <<  "constructing initial mapping"  << std::endl;
 
         std::vector< NodeWeight > total_dist( C.number_of_nodes(), 0);
@@ -256,7 +260,7 @@ void construct_mapping::construct_old_growing( PartitionConfig & config, graph_a
         }
 }
 
-void construct_mapping::construct_old_growing_faster( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_old_growing_faster( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         std::cout <<  "constructing initial mapping with faster growing"  << std::endl;
 
         //initialze perm rank
@@ -367,23 +371,23 @@ void construct_mapping::construct_old_growing_faster( PartitionConfig & config, 
         } 
 }
 
-void construct_mapping::construct_identity( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_identity( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         for( unsigned int i = 0; i < perm_rank.size(); i++) {
                 perm_rank[i] = i;
         }
 }
 
-void construct_mapping::construct_random( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_random( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         construct_identity( config, C, D, perm_rank);
         random_functions::permutate_vector_good( perm_rank, false);
 }
 
-void construct_mapping::construct_fast_hierarchy_bottomup( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_fast_hierarchy_bottomup( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         fast_construct_mapping fcm;
         fcm.construct_initial_mapping_bottomup( config, C, D, perm_rank);
 }
 
-void construct_mapping::construct_fast_hierarchy_topdown( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void construct_mapping::construct_fast_hierarchy_topdown( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         fast_construct_mapping fcm;
         fcm.construct_initial_mapping_topdown( config, C, D, perm_rank);
 }

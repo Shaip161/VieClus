@@ -7,15 +7,18 @@
 #ifndef BALANCE_CONFIGURATION_JCQB9ZGV
 #define BALANCE_CONFIGURATION_JCQB9ZGV
 
-#include "data_structure/graph_access.h"
-#include "partition/partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "partition/partition_config.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 class balance_configuration {
 public:
         balance_configuration() {};
         virtual ~balance_configuration() {};
 
-        void configurate_balance( PartitionConfig & partition_config, graph_access & G ) {
+        void configurate_balance( KaHIP::PartitionConfig & partition_config, KaHIP::graph_access & G ) {
                 NodeWeight largest_graph_weight = 0;
                 forall_nodes(G, node) {
                         largest_graph_weight += G.getNodeWeight(node);

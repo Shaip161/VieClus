@@ -10,7 +10,9 @@
 
 #include <unordered_map>
 
-#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
 
 struct undo_struct {
         NodeID node;

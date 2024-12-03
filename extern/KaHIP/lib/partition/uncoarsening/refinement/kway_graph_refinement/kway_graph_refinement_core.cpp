@@ -7,12 +7,19 @@
 
 #include <algorithm>
 
-#include "data_structure/priority_queues/bucket_pq.h"
-#include "data_structure/priority_queues/maxNodeHeap.h"
-#include "kway_graph_refinement_core.h"
-#include "kway_stop_rule.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
+//#include "data_structure/priority_queues/bucket_pq.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "kway_graph_refinement_core.h"
+//#include "kway_stop_rule.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+
+#include "lib/data_structure/priority_queues/bucket_pq.h"
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 kway_graph_refinement_core::kway_graph_refinement_core() {
 }
@@ -20,9 +27,9 @@ kway_graph_refinement_core::kway_graph_refinement_core() {
 kway_graph_refinement_core::~kway_graph_refinement_core() {
 
 }
-EdgeWeight kway_graph_refinement_core::single_kway_refinement_round(PartitionConfig & config, 
-                                                                    graph_access & G, 
-                                                                    complete_boundary & boundary, 
+EdgeWeight kway_graph_refinement_core::single_kway_refinement_round(KaHIP::PartitionConfig & config, 
+                                                                    KaHIP::graph_access & G, 
+                                                                    KaHIP::complete_boundary & boundary, 
                                                                     boundary_starting_nodes & start_nodes, 
                                                                     int step_limit, 
                                                                     vertex_moved_hashtable & moved_idx) {
@@ -31,9 +38,9 @@ EdgeWeight kway_graph_refinement_core::single_kway_refinement_round(PartitionCon
                                                      step_limit, moved_idx, false, touched_blocks);
 }
 
-EdgeWeight kway_graph_refinement_core::single_kway_refinement_round(PartitionConfig & config, 
-                                                                    graph_access & G, 
-                                                                    complete_boundary & boundary, 
+EdgeWeight kway_graph_refinement_core::single_kway_refinement_round(KaHIP::PartitionConfig & config, 
+                                                                    KaHIP::graph_access & G, 
+                                                                    KaHIP::complete_boundary & boundary, 
                                                                     boundary_starting_nodes & start_nodes, 
                                                                     int step_limit, 
                                                                     vertex_moved_hashtable & moved_idx,
@@ -44,16 +51,16 @@ EdgeWeight kway_graph_refinement_core::single_kway_refinement_round(PartitionCon
 }
 
 
-EdgeWeight kway_graph_refinement_core::single_kway_refinement_round_internal(PartitionConfig & config, 
-                                                                    graph_access & G, 
-                                                                    complete_boundary & boundary, 
+EdgeWeight kway_graph_refinement_core::single_kway_refinement_round_internal(KaHIP::PartitionConfig & config, 
+                                                                    KaHIP::graph_access & G, 
+                                                                    KaHIP::complete_boundary & boundary, 
                                                                     boundary_starting_nodes & start_nodes, 
                                                                     int step_limit,
                                                                     vertex_moved_hashtable & moved_idx,
                                                                     bool compute_touched_partitions,
                                                                     std::unordered_map<PartitionID, PartitionID> &  touched_blocks) {
 
-        commons = kway_graph_refinement_commons::getInstance(config);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
         refinement_pq* queue = NULL;
         if(config.use_bucket_queues) {
                 EdgeWeight max_degree = G.getMaxDegree();
@@ -114,7 +121,7 @@ EdgeWeight kway_graph_refinement_core::single_kway_refinement_round_internal(Par
                         cut -= gain;
                         stopping_rule->push_statistics(gain);
 
-                        bool accept_equal = random_functions::nextBool();
+                        bool accept_equal = KaHIP::random_functions::nextBool();
                         if( cut < best_cut || ( cut == best_cut && accept_equal )) {
                                 best_cut = cut;
                                 min_cut_index = number_of_swaps;
@@ -169,15 +176,15 @@ EdgeWeight kway_graph_refinement_core::single_kway_refinement_round_internal(Par
         return initial_cut - best_cut; 
 }
 
-void kway_graph_refinement_core::init_queue_with_boundary(const PartitionConfig & config,
-                graph_access & G,
+void kway_graph_refinement_core::init_queue_with_boundary(const KaHIP::PartitionConfig & config,
+                KaHIP::graph_access & G,
                 std::vector<NodeID> & bnd_nodes,
                 refinement_pq * queue, vertex_moved_hashtable & moved_idx) {
 
         if(config.permutation_during_refinement == PERMUTATION_QUALITY_FAST) {
-                random_functions::permutate_vector_fast(bnd_nodes, false);
+                KaHIP::random_functions::permutate_vector_fast(bnd_nodes, false);
         } else if(config.permutation_during_refinement == PERMUTATION_QUALITY_GOOD) {
-                random_functions::permutate_vector_good(bnd_nodes, false);
+                KaHIP::random_functions::permutate_vector_good(bnd_nodes, false);
         }
 
         for( unsigned int i = 0; i < bnd_nodes.size(); i++) {
@@ -195,13 +202,13 @@ void kway_graph_refinement_core::init_queue_with_boundary(const PartitionConfig 
 }
 
 
-void kway_graph_refinement_core::move_node_back(PartitionConfig & config, 
-                graph_access & G, 
+void kway_graph_refinement_core::move_node_back(KaHIP::PartitionConfig & config, 
+                KaHIP::graph_access & G, 
                 NodeID & node,
                 PartitionID & to, 
                 vertex_moved_hashtable & moved_idx, 
                 refinement_pq * queue, 
-                complete_boundary & boundary) {
+                KaHIP::complete_boundary & boundary) {
 
         PartitionID from = G.getPartitionIndex(node);
         G.setPartitionIndex(node, to);        

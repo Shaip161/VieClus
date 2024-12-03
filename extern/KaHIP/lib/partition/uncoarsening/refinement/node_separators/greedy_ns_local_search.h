@@ -5,28 +5,33 @@
 #ifndef GREEDY_NS_LOCAL_SEARCH_P9KLE4NH
 #define GREEDY_NS_LOCAL_SEARCH_P9KLE4NH
 
-#include "definitions.h"
-#include "partition_config.h"
-#include "data_structure/graph_access.h"
-#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+//#include "data_structure/graph_access.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
 
 class greedy_ns_local_search {
 public:
         greedy_ns_local_search();
         virtual ~greedy_ns_local_search();
 
-        EdgeWeight perform_refinement(const PartitionConfig & config, graph_access & G);
+        EdgeWeight perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G);
 
 private: 
-        void compute_gain( graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS);
-        void move_node( graph_access & G,  NodeID & node, PartitionID & to_block, PartitionID & other_block, 
+        void compute_gain( KaHIP::graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS);
+        void move_node( KaHIP::graph_access & G,  NodeID & node, PartitionID & to_block, PartitionID & other_block, 
                         std::vector< NodeWeight > & block_weights,
                         std::vector< bool > & moved_out_of_S,
                         std::vector< maxNodeHeap > & heaps);
 };
 
 inline
-void greedy_ns_local_search::compute_gain( graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS) {
+void greedy_ns_local_search::compute_gain( KaHIP::graph_access & G, NodeID node, Gain & toLHS, Gain & toRHS) {
         toLHS = G.getNodeWeight(node);
         toRHS = G.getNodeWeight(node);
 
@@ -42,7 +47,7 @@ void greedy_ns_local_search::compute_gain( graph_access & G, NodeID node, Gain &
 }
 
 inline
-void greedy_ns_local_search::move_node( graph_access & G, NodeID & node, PartitionID & to_block, PartitionID & other_block, 
+void greedy_ns_local_search::move_node( KaHIP::graph_access & G, NodeID & node, PartitionID & to_block, PartitionID & other_block, 
                                     std::vector< NodeWeight > & block_weights,
                                     std::vector< bool > & moved_out_of_S, 
                                     std::vector< maxNodeHeap > & queues) {

@@ -4,11 +4,15 @@
 
 #include <math.h>
 
-#include "edge_ratings.h"
-#include "partition_config.h"       
-#include "random_functions.h"
+//#include "edge_ratings.h"
+//#include "partition_config.h"       
+//#include "random_functions.h"
 
-edge_ratings::edge_ratings(const PartitionConfig & _partition_config) : partition_config(_partition_config){
+#include "extern/KaHIP/lib/partition/coarsening/edge_rating/edge_ratings.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+
+edge_ratings::edge_ratings(const KaHIP::PartitionConfig & _partition_config) : partition_config(_partition_config){
 
 }
 
@@ -16,7 +20,7 @@ edge_ratings::~edge_ratings() {
 
 }
 
-void edge_ratings::rate(graph_access & G, unsigned level) {
+void edge_ratings::rate(KaHIP::graph_access & G, unsigned level) {
         //rate the edges
         if(level == 0 && partition_config.first_level_random_matching) {
                 return;
@@ -96,11 +100,11 @@ void edge_ratings::rate(graph_access & G, unsigned level) {
 }
 
 //simd implementation is possible
-void edge_ratings::compute_algdist(graph_access & G, std::vector<float> & dist) {
+void edge_ratings::compute_algdist(KaHIP::graph_access & G, std::vector<float> & dist) {
         for( unsigned R = 0; R < 3; R++) {
                 std::vector<float> prev(G.number_of_nodes(), 0);
                 forall_nodes(G, node) {
-                        prev[node] = random_functions::nextDouble(-0.5,0.5); 
+                        prev[node] = KaHIP::random_functions::nextDouble(-0.5,0.5); 
                 } endfor
 
                 std::vector<float> next(G.number_of_nodes(), 0);
@@ -146,7 +150,7 @@ void edge_ratings::compute_algdist(graph_access & G, std::vector<float> & dist) 
 }
 
 
-void edge_ratings::rate_expansion_star_2_algdist(graph_access & G) {
+void edge_ratings::rate_expansion_star_2_algdist(KaHIP::graph_access & G) {
 
         std::vector<float> dist(G.number_of_edges(), 0);
         compute_algdist(G, dist);
@@ -165,7 +169,7 @@ void edge_ratings::rate_expansion_star_2_algdist(graph_access & G) {
 }
 
 
-void edge_ratings::rate_expansion_star_2(graph_access & G) {
+void edge_ratings::rate_expansion_star_2(KaHIP::graph_access & G) {
         forall_nodes(G,n) {
                 NodeWeight sourceWeight = G.getNodeWeight(n);
                 forall_out_edges(G, e, n) {
@@ -179,7 +183,7 @@ void edge_ratings::rate_expansion_star_2(graph_access & G) {
         } endfor
 }
 
-void edge_ratings::rate_inner_outer(graph_access & G) {
+void edge_ratings::rate_inner_outer(KaHIP::graph_access & G) {
         forall_nodes(G,n) {
 #ifndef WALSHAWMH
                 EdgeWeight sourceDegree = G.getWeightedNodeDegree(n);
@@ -202,7 +206,7 @@ void edge_ratings::rate_inner_outer(graph_access & G) {
         } endfor
 }
 
-void edge_ratings::rate_expansion_star(graph_access & G) {
+void edge_ratings::rate_expansion_star(KaHIP::graph_access & G) {
         forall_nodes(G,n) {
                 NodeWeight sourceWeight = G.getNodeWeight(n);
                 forall_out_edges(G, e, n) {
@@ -216,21 +220,21 @@ void edge_ratings::rate_expansion_star(graph_access & G) {
         } endfor
 }
 
-void edge_ratings::rate_pseudogeom(graph_access & G) {
+void edge_ratings::rate_pseudogeom(KaHIP::graph_access & G) {
         forall_nodes(G,n) {
                 NodeWeight sourceWeight = G.getNodeWeight(n);
                 forall_out_edges(G, e, n) {
                         NodeID targetNode       = G.getEdgeTarget(e);
                         NodeWeight targetWeight = G.getNodeWeight(targetNode);
                         EdgeWeight edgeWeight   = G.getEdgeWeight(e);
-                        double random_term      = random_functions::nextDouble(0.6,1.0);
+                        double random_term      = KaHIP::random_functions::nextDouble(0.6,1.0);
                         EdgeRatingType rating   = random_term * edgeWeight * (1.0/(double)sqrt((double)targetWeight) + 1.0/(double)sqrt((double)sourceWeight));
                         G.setEdgeRating(e, rating);
                 } endfor
         } endfor
 }
 
-void edge_ratings::rate_separator_addx(graph_access & G) {
+void edge_ratings::rate_separator_addx(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -242,7 +246,7 @@ void edge_ratings::rate_separator_addx(graph_access & G) {
 
 }
 
-void edge_ratings::rate_separator_multx(graph_access & G) {
+void edge_ratings::rate_separator_multx(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -254,7 +258,7 @@ void edge_ratings::rate_separator_multx(graph_access & G) {
 
 }
 
-void edge_ratings::rate_separator_max(graph_access & G) {
+void edge_ratings::rate_separator_max(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -265,7 +269,7 @@ void edge_ratings::rate_separator_max(graph_access & G) {
         } endfor
 }
 
-void edge_ratings::rate_separator_log(graph_access & G) {
+void edge_ratings::rate_separator_log(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -277,7 +281,7 @@ void edge_ratings::rate_separator_log(graph_access & G) {
 }
 
 
-void edge_ratings::rate_separator_r1(graph_access & G) {
+void edge_ratings::rate_separator_r1(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -288,7 +292,7 @@ void edge_ratings::rate_separator_r1(graph_access & G) {
         } endfor
 }
 
-void edge_ratings::rate_separator_r2(graph_access & G) {
+void edge_ratings::rate_separator_r2(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -299,7 +303,7 @@ void edge_ratings::rate_separator_r2(graph_access & G) {
         } endfor
 }
 
-void edge_ratings::rate_separator_r3(graph_access & G) {
+void edge_ratings::rate_separator_r3(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -311,7 +315,7 @@ void edge_ratings::rate_separator_r3(graph_access & G) {
 
 }
 
-void edge_ratings::rate_separator_r4(graph_access & G) {
+void edge_ratings::rate_separator_r4(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -323,7 +327,7 @@ void edge_ratings::rate_separator_r4(graph_access & G) {
 
 }
 
-void edge_ratings::rate_separator_r5(graph_access & G) {
+void edge_ratings::rate_separator_r5(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -336,7 +340,7 @@ void edge_ratings::rate_separator_r5(graph_access & G) {
 
 }
 
-void edge_ratings::rate_separator_r6(graph_access & G) {
+void edge_ratings::rate_separator_r6(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -348,7 +352,7 @@ void edge_ratings::rate_separator_r6(graph_access & G) {
 
 }
 
-void edge_ratings::rate_separator_r7(graph_access & G) {
+void edge_ratings::rate_separator_r7(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);
@@ -359,7 +363,7 @@ void edge_ratings::rate_separator_r7(graph_access & G) {
         } endfor
 }
 
-void edge_ratings::rate_realweight(graph_access & G) {
+void edge_ratings::rate_realweight(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         EdgeRatingType rating =  G.getEdgeWeight(e);
@@ -367,7 +371,7 @@ void edge_ratings::rate_realweight(graph_access & G) {
                 } endfor
         } endfor
 }
-void edge_ratings::rate_separator_r8(graph_access & G) {
+void edge_ratings::rate_separator_r8(KaHIP::graph_access & G) {
         forall_nodes(G,node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);

@@ -6,9 +6,13 @@
  *****************************************************************************/
 
 
-#include "label_propagation_refinement.h"
-#include "partition/coarsening/clustering/node_ordering.h"
-#include "tools/random_functions.h"
+//#include "label_propagation_refinement.h"
+//#include "partition/coarsening/clustering/node_ordering.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/label_propagation_refinement/label_propagation_refinement.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/node_ordering.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 label_propagation_refinement::label_propagation_refinement() {
                 
@@ -18,9 +22,9 @@ label_propagation_refinement::~label_propagation_refinement() {
                 
 }
 
-EdgeWeight label_propagation_refinement::perform_refinement(PartitionConfig & partition_config, 
-                                                            graph_access & G, 
-                                                            complete_boundary & boundary) {
+EdgeWeight label_propagation_refinement::perform_refinement(KaHIP::PartitionConfig & partition_config, 
+                                                            KaHIP::graph_access & G, 
+                                                            KaHIP::complete_boundary & boundary) {
         NodeWeight block_upperbound = partition_config.upper_bound_partition;
 
         // in this case the _matching paramter is not used 
@@ -64,7 +68,7 @@ EdgeWeight label_propagation_refinement::perform_refinement(PartitionConfig & pa
                                 NodeID target             = G.getEdgeTarget(e);
                                 PartitionID cur_block     = G.getPartitionIndex(target);
                                 PartitionID cur_value     = hash_map[cur_block];
-                                if((cur_value > max_value  || (cur_value == max_value && random_functions::nextBool())) 
+                                if((cur_value > max_value  || (cur_value == max_value && KaHIP::random_functions::nextBool())) 
                                 && (cluster_sizes[cur_block] + G.getNodeWeight(node) < block_upperbound || (cur_block == my_block && cluster_sizes[my_block] <= partition_config.upper_bound_partition)))
                                 {
                                         max_value = cur_value;

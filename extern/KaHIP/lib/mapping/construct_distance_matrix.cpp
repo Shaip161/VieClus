@@ -5,7 +5,9 @@
  *****************************************************************************/
 
 
-#include "construct_distance_matrix.h"
+//#include "construct_distance_matrix.h"
+
+#include "extern/KaHIP/lib/mapping/construct_distance_matrix.h"
 
 construct_distance_matrix::construct_distance_matrix() {
                 

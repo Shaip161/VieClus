@@ -6,16 +6,30 @@
 
 #include <algorithm>
 
-#include "advanced_models.h"
-#include "algorithms/cycle_search.h"
-#include "data_structure/priority_queues/bucket_pq.h"
-#include "graph_io.h"
-#include "partition_snapshooter.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+//#include "advanced_models.h"
+//#include "algorithms/cycle_search.h"
+//#include "data_structure/priority_queues/bucket_pq.h"
+//#include "graph_io.h"
+//#include "partition_snapshooter.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/advanced_models.h"
+#include "extern/KaHIP/lib/algorithms/cycle_search.h"
+#include "lib/data_structure/priority_queues/bucket_pq.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
+#include "extern/KaHIP/lib/tools/partition_snapshooter.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+
+
+
 
 unsigned long advanced_models::conflicts = 0;
 
@@ -28,14 +42,14 @@ advanced_models::~advanced_models() {
 
 }
 
-bool advanced_models::compute_vertex_movements_rebalance_ultra( PartitionConfig & config, 
-                                                                graph_access & G, 
-                                                                complete_boundary & boundary, 
+bool advanced_models::compute_vertex_movements_rebalance_ultra( KaHIP::PartitionConfig & config, 
+                                                                KaHIP::graph_access & G, 
+                                                                KaHIP::complete_boundary & boundary, 
                                                                 augmented_Qgraph & aqg, 
                                                                 unsigned & steps) {
 
 
-        graph_access G_bar; 
+        KaHIP::graph_access G_bar; 
         boundary.getUnderlyingQuotientGraph(G_bar); 
 
         aqg.prepare(config, G, G_bar, steps);
@@ -44,7 +58,7 @@ bool advanced_models::compute_vertex_movements_rebalance_ultra( PartitionConfig 
         std::vector<NodeID> id_mapping;
         NodeID s; NodeID t; // start vertex 
         do {
-                graph_access cycle_problem;
+                KaHIP::graph_access cycle_problem;
                 build_rebalance_model( config, G, G_bar, boundary, aqg, 
                                        feasable_edge, steps, cycle_problem, s, t, id_mapping);
 
@@ -70,14 +84,14 @@ bool advanced_models::compute_vertex_movements_rebalance_ultra( PartitionConfig 
         return false;
 }
 
-bool advanced_models::compute_vertex_movements_rebalance( PartitionConfig & config, 
-                graph_access & G, 
-                complete_boundary & boundary, 
+bool advanced_models::compute_vertex_movements_rebalance( KaHIP::PartitionConfig & config, 
+                KaHIP::graph_access & G, 
+                KaHIP::complete_boundary & boundary, 
                 augmented_Qgraph & aqg, 
                 unsigned & steps) {
 
-        graph_access cycle_problem;
-        graph_access G_bar; 
+        KaHIP::graph_access cycle_problem;
+        KaHIP::graph_access G_bar; 
         boundary.getUnderlyingQuotientGraph(G_bar); 
 
         aqg.prepare(config, G, G_bar, steps);
@@ -156,12 +170,12 @@ bool advanced_models::compute_vertex_movements_rebalance( PartitionConfig & conf
         return true;
 }
 
-bool advanced_models::compute_vertex_movements_ultra_model( PartitionConfig & config, 
-                                                            graph_access & G, 
-                                                            complete_boundary & boundary, 
+bool advanced_models::compute_vertex_movements_ultra_model( KaHIP::PartitionConfig & config, 
+                                                            KaHIP::graph_access & G, 
+                                                            KaHIP::complete_boundary & boundary, 
                                                             augmented_Qgraph & aqg,
                                                             unsigned & steps, bool zero_weight_cycle) { 
-        graph_access G_bar; 
+        KaHIP::graph_access G_bar; 
         boundary.getUnderlyingQuotientGraph(G_bar); 
 
         if(!zero_weight_cycle) {
@@ -173,7 +187,7 @@ bool advanced_models::compute_vertex_movements_ultra_model( PartitionConfig & co
         std::vector<NodeID> id_mapping;
         NodeID s; // start vertex 
         do {
-                graph_access cycle_problem;
+                KaHIP::graph_access cycle_problem;
                 build_ultra_model( config, G, G_bar, boundary, aqg, feasable_edge, steps, cycle_problem, s, id_mapping);
 
                 //********************************************************************

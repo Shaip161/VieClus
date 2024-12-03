@@ -16,8 +16,12 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "definitions.h"
-#include "data_structure/graph_access.h"
+//#include "definitions.h"
+//#include "data_structure/graph_access.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+
 
 class graph_io {
         public:
@@ -25,23 +29,23 @@ class graph_io {
                 virtual ~graph_io () ;
 
                 static
-                int readGraphWeighted(graph_access & G, std::string filename);
+                int readGraphWeighted(KaHIP::graph_access & G, std::string filename);
 
                 // from Alexander Noe
                 static int naive(const std::string& str, size_t & line_ptr);
-                static int readGraphWeightedFast(graph_access & G, std::string filename);
+                static int readGraphWeightedFast(KaHIP::graph_access & G, std::string filename);
 
                 static
-                int writeGraphWeighted(graph_access & G, std::string filename);
+                int writeGraphWeighted(KaHIP::graph_access & G, std::string filename);
 
                 static
-                int writeGraph(graph_access & G, std::string filename);
+                int writeGraph(KaHIP::graph_access & G, std::string filename);
 
                 static
-                int readPartition(graph_access& G, std::string filename);
+                int readPartition(KaHIP::graph_access& G, std::string filename);
 
                 static
-                void writePartition(graph_access& G, std::string filename);
+                void writePartition(KaHIP::graph_access& G, std::string filename, long overall_graph_RSS);
 
                 template<typename vectortype>
                 static void writeVector(std::vector<vectortype> & vec, std::string filename);

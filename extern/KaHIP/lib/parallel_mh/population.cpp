@@ -12,16 +12,25 @@
 #include <mpi.h>
 #include <sstream>
 
-#include "diversifyer.h"
-#include "galinier_combine/gal_combine.h"
-#include "graph_partitioner.h"
-#include "population.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "timer.h"
-#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+//#include "diversifyer.h"
+//#include "galinier_combine/gal_combine.h"
+//#include "graph_partitioner.h"
+//#include "population.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "timer.h"
+//#include "uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
 
-population::population( MPI_Comm communicator, const PartitionConfig & partition_config ) {
+#include "extern/KaHIP/lib/parallel_mh/diversifyer.h"
+#include "extern/KaHIP/lib/parallel_mh/galinier_combine/gal_combine.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/parallel_mh/population.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "lib/tools/timer.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+
+population::population( MPI_Comm communicator, const KaHIP::PartitionConfig & partition_config ) {
         m_population_size    = partition_config.mh_pool_size;
         m_no_partition_calls = 0;
         m_num_NCs            = partition_config.mh_num_ncs_to_compute;
@@ -43,11 +52,11 @@ void population::set_pool_size(int size) {
         m_population_size = size;
 }
 
-void population::createIndividuum(const PartitionConfig & config, 
-                                  graph_access & G, 
+void population::createIndividuum(const KaHIP::PartitionConfig & config, 
+                                  KaHIP::graph_access & G, 
 			          Individuum & ind, bool output) {
 
-        PartitionConfig copy = config;
+        KaHIP::PartitionConfig copy = config;
         graph_partitioner partitioner;
         quality_metrics qm;
 
@@ -117,7 +126,7 @@ void population::createIndividuum(const PartitionConfig & config,
         }
 }
 
-void population::insert(graph_access & G, Individuum & ind) {
+void population::insert(KaHIP::graph_access & G, Individuum & ind) {
 
         m_no_partition_calls++;
         if(m_internal_population.size() < m_population_size) {
@@ -186,13 +195,13 @@ void population::replace(Individuum & in, Individuum & out) {
         }
 }
 
-void population::combine(const PartitionConfig & partition_config, 
-                         graph_access & G, 
+void population::combine(const KaHIP::PartitionConfig & partition_config, 
+                         KaHIP::graph_access & G, 
                          Individuum & first_ind, 
                          Individuum & second_ind, 
                          Individuum & output_ind) {
 
-        PartitionConfig config = partition_config;
+        KaHIP::PartitionConfig config = partition_config;
         G.resizeSecondPartitionIndex(G.number_of_nodes());
         if( first_ind.objective < second_ind.objective ) {
                 forall_nodes(G, node) {
@@ -244,12 +253,12 @@ void population::combine(const PartitionConfig & partition_config,
         std::cout <<  "objective mh " <<  output_ind.objective << std::endl;
 }
 
-void population::combine_cross(const PartitionConfig & partition_config, 
-                graph_access & G, 
+void population::combine_cross(const KaHIP::PartitionConfig & partition_config, 
+                KaHIP::graph_access & G, 
                 Individuum & first_ind, 
                 Individuum & output_ind) {
 
-        PartitionConfig config = partition_config;
+        KaHIP::PartitionConfig config = partition_config;
         G.resizeSecondPartitionIndex(G.number_of_nodes());
 
         int lowerbound = config.k / 4;
@@ -264,7 +273,7 @@ void population::combine_cross(const PartitionConfig & partition_config,
         double epsilon = larger_imbalance/100.0;
 
         
-        PartitionConfig cross_config                      = config;
+        KaHIP::PartitionConfig cross_config                      = config;
         cross_config.k                                    = kfactor;
         cross_config.kaffpa_perfectly_balanced_refinement = false;
         cross_config.upper_bound_partition                = (1+epsilon)*ceil(partition_config.largest_graph_weight/(double)partition_config.k);
@@ -300,10 +309,10 @@ void population::combine_cross(const PartitionConfig & partition_config,
 
 }
 
-void population::mutate_random( const PartitionConfig & partition_config, graph_access & G, Individuum & first_ind) {
+void population::mutate_random( const KaHIP::PartitionConfig & partition_config, KaHIP::graph_access & G, Individuum & first_ind) {
         int number = random_functions::nextInt(0,5);
 
-        PartitionConfig config            = partition_config;
+        KaHIP::PartitionConfig config            = partition_config;
         config.combine                    = false;
         config.graph_allready_partitioned = true;
         get_random_individuum(first_ind);
@@ -390,7 +399,7 @@ bool population::is_full() {
         return m_internal_population.size() == m_population_size;
 }
 
-void population::apply_fittest( graph_access & G, EdgeWeight & objective ) {
+void population::apply_fittest( KaHIP::graph_access & G, EdgeWeight & objective ) {
         EdgeWeight min_objective = std::numeric_limits<EdgeWeight>::max();
 	double best_balance      = std::numeric_limits<EdgeWeight>::max();
         unsigned idx             = 0;

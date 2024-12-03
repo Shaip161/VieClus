@@ -7,12 +7,23 @@
 
 #include <fstream>
 
-#include "balance_configuration.h"
-#include "graph_partitioner.h"
-#include "configuration.h"
-#include "partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
-#include "fast_construct_mapping.h"
-#include "tools/graph_extractor.h"
+//#include "balance_configuration.h"
+//#include "graph_partitioner.h"
+//#include "configuration.h"
+//#include "partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+//#include "fast_construct_mapping.h"
+//#include "tools/graph_extractor.h"
+
+#include "extern/KaHIP/app/balance_configuration.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/VieClus/app/configuration.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refinement.h"
+#include "extern/KaHIP/lib/mapping/fast_construct_mapping.h"
+#include "extern/KaHIP/lib/tools/graph_extractor.h"
+
+//#include "extern/KaHIP/lib/data_structure/graph_access.h"
+//#include "extern/KaHIP/lib/tools/random_functions.h"
+//#include "extern/KaHIP/lib/partition/partition_config.h"
 
 fast_construct_mapping::fast_construct_mapping() {
 
@@ -22,12 +33,12 @@ fast_construct_mapping::~fast_construct_mapping() {
 
 }
 
-void fast_construct_mapping::construct_initial_mapping_bottomup( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void fast_construct_mapping::construct_initial_mapping_bottomup( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
         m_tmp_num_nodes = C.number_of_nodes();
         construct_initial_mapping_bottomup_internal( config, C, D, 0, perm_rank);
 }
 
-void fast_construct_mapping::construct_initial_mapping_bottomup_internal( PartitionConfig & config, graph_access & C, matrix & D, int idx,  std::vector< NodeID > & perm_rank) {
+void fast_construct_mapping::construct_initial_mapping_bottomup_internal( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, int idx,  std::vector< NodeID > & perm_rank) {
 
         PartitionID num_parts = C.number_of_nodes()/config.group_sizes[idx];
         partition_C_perfectly_balanced( config, C, num_parts);
@@ -41,7 +52,7 @@ void fast_construct_mapping::construct_initial_mapping_bottomup_internal( Partit
                 }
         } else {
                 //contract partitioned graph
-                graph_access Q; complete_boundary bnd(&C);
+                KaHIP::graph_access Q; complete_boundary bnd(&C);
                 bnd.build();
                 bnd.getUnderlyingQuotientGraph(Q);
                
@@ -57,7 +68,7 @@ void fast_construct_mapping::construct_initial_mapping_bottomup_internal( Partit
         }
 }
 
-void fast_construct_mapping::construct_initial_mapping_topdown( PartitionConfig & config, graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
+void fast_construct_mapping::construct_initial_mapping_topdown( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, matrix & D, std::vector< NodeID > & perm_rank) {
 
         std::vector< NodeID > m_mapping(C.number_of_nodes());
         forall_nodes(C, node) {
@@ -67,8 +78,8 @@ void fast_construct_mapping::construct_initial_mapping_topdown( PartitionConfig 
         construct_initial_mapping_topdown_internal( config, C, config.group_sizes, 0, m_mapping, perm_rank);
 }
 
-void fast_construct_mapping::construct_initial_mapping_topdown_internal( PartitionConfig & config, 
-                graph_access & C, 
+void fast_construct_mapping::construct_initial_mapping_topdown_internal( KaHIP::PartitionConfig & config, 
+                KaHIP::graph_access & C, 
                 std::vector< int > group_sizes, 
                 int start_id, 
                 std::vector< NodeID > & map_to_original, 
@@ -100,7 +111,7 @@ void fast_construct_mapping::construct_initial_mapping_topdown_internal( Partiti
                 // extract subgraphs and recurse on them
                 group_sizes.pop_back();
                 for( PartitionID block = 0; block < num_parts; block++) {
-                        graph_extractor ge; graph_access Q;
+                        graph_extractor ge; KaHIP::graph_access Q;
                         std::vector<NodeID> mapping;
                         ge.extract_block( C, Q, block, mapping);
 
@@ -113,13 +124,13 @@ void fast_construct_mapping::construct_initial_mapping_topdown_internal( Partiti
         }
 }
 
-void fast_construct_mapping::partition_C_perfectly_balanced( PartitionConfig & config, graph_access & C, PartitionID blocks) {
+void fast_construct_mapping::partition_C_perfectly_balanced( KaHIP::PartitionConfig & config, KaHIP::graph_access & C, PartitionID blocks) {
         std::streambuf* backup = std::cout.rdbuf();
         std::ofstream ofs;
         ofs.open("/dev/null");
         std::cout.rdbuf(ofs.rdbuf()); 
 
-        PartitionConfig partition_config = config;
+        KaHIP::PartitionConfig partition_config = config;
         configuration cfg; 
         switch(partition_config.preconfiguration_mapping) {
                 case PRE_CONFIG_MAPPING_FAST:

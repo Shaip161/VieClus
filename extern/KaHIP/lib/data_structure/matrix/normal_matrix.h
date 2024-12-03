@@ -10,7 +10,9 @@
 
 #include <vector>
 #include <iostream>
-#include "matrix.h"
+//#include "matrix.h"
+
+#include "extern/KaHIP/lib/data_structure/matrix/matrix.h"
 
 class normal_matrix : public matrix {
 public:

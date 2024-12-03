@@ -8,14 +8,16 @@
 #ifndef GRAPH_COMMUNICATION_J5Q2P80G
 #define GRAPH_COMMUNICATION_J5Q2P80G
 
-#include "data_structure/graph_access.h"
+//#include "data_structure/graph_access.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
 
 class graph_communication {
 public:
         graph_communication();
         virtual ~graph_communication();
 
-        void broadcast_graph( graph_access & G, unsigned root);
+        void broadcast_graph( KaHIP::graph_access & G, unsigned root);
 
 };
 

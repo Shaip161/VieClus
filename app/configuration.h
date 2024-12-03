@@ -6,30 +6,33 @@
  *****************************************************************************/
 
 
-#ifndef CONFIGURATION_3APG5V7Z
-#define CONFIGURATION_3APG5V7Z
+#ifndef CONFIGURATION_3APG5V7Z_2
+#define CONFIGURATION_3APG5V7Z_2
 
-#include "partition/partition_config.h"
+//#include "partition/partition_config.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
+namespace VieClus {
 
 class configuration {
         public:
                 configuration() {} ;
                 virtual ~configuration() {};
 
-                void strong( PartitionConfig & config );
-                void eco( PartitionConfig & config );
-                void fast( PartitionConfig & config );
+                void strong( KaHIP::PartitionConfig & config );
+                void eco( KaHIP::PartitionConfig & config );
+                void fast( KaHIP::PartitionConfig & config );
 
-                void strong_separator( PartitionConfig & config );
-                void eco_separator( PartitionConfig & config );
-                void fast_separator( PartitionConfig & config );
+                void strong_separator( KaHIP::PartitionConfig & config );
+                void eco_separator( KaHIP::PartitionConfig & config );
+                void fast_separator( KaHIP::PartitionConfig & config );
 
-                void standard( PartitionConfig & config );
-                void standardsnw( PartitionConfig & config );
+                void standard( KaHIP::PartitionConfig & config );
+                void standardsnw( KaHIP::PartitionConfig & config );
 
-                void fastsocial( PartitionConfig & config );
-                void ecosocial( PartitionConfig & config );
-                void strongsocial( PartitionConfig & config ); 
+                void fastsocial( KaHIP::PartitionConfig & config );
+                void ecosocial( KaHIP::PartitionConfig & config );
+                void strongsocial( KaHIP::PartitionConfig & config ); 
 
                 //void fastsocial_separator( PartitionConfig & config );
                 //void ecosocial_separator( PartitionConfig & config );
@@ -37,7 +40,7 @@ class configuration {
 
 };
 
-inline void configuration::strong( PartitionConfig & partition_config ) {
+inline void configuration::strong( KaHIP::PartitionConfig & partition_config ) {
         standard(partition_config);
         partition_config.matching_type                          = MATCHING_GPA;
         partition_config.permutation_quality                    = PERMUTATION_QUALITY_GOOD;
@@ -80,7 +83,7 @@ inline void configuration::strong( PartitionConfig & partition_config ) {
 
 }
 
-inline void configuration::eco( PartitionConfig & partition_config ) {
+inline void configuration::eco( KaHIP::PartitionConfig & partition_config ) {
         standard(partition_config);
         partition_config.eco                      = true;
         partition_config.aggressive_random_levels = std::max(2, (int)(7 - log2(partition_config.k)));
@@ -105,7 +108,7 @@ inline void configuration::eco( PartitionConfig & partition_config ) {
         partition_config.initial_partitioning_repetitions       = 16;
 }
 
-inline void configuration::fast( PartitionConfig & partition_config ) {
+inline void configuration::fast( KaHIP::PartitionConfig & partition_config ) {
         standard(partition_config);
 
         partition_config.fast = true;
@@ -133,7 +136,7 @@ inline void configuration::fast( PartitionConfig & partition_config ) {
 
 }
 
-inline void configuration::strong_separator( PartitionConfig & partition_config ) {
+inline void configuration::strong_separator( KaHIP::PartitionConfig & partition_config ) {
         standard(partition_config);
         partition_config.matching_type                          = MATCHING_GPA;
         partition_config.permutation_quality                    = PERMUTATION_QUALITY_GOOD;
@@ -185,7 +188,7 @@ inline void configuration::strong_separator( PartitionConfig & partition_config 
 
 }
 
-inline void configuration::eco_separator( PartitionConfig & partition_config ) {
+inline void configuration::eco_separator( KaHIP::PartitionConfig & partition_config ) {
         standard(partition_config);
         partition_config.eco                      = true;
         partition_config.aggressive_random_levels = std::max(2, (int)(7 - log2(partition_config.k)));
@@ -222,7 +225,7 @@ inline void configuration::eco_separator( PartitionConfig & partition_config ) {
 
 }
 
-inline void configuration::fast_separator( PartitionConfig & partition_config ) {
+inline void configuration::fast_separator( KaHIP::PartitionConfig & partition_config ) {
         standard(partition_config);
 
         partition_config.fast = true;
@@ -261,7 +264,7 @@ inline void configuration::fast_separator( PartitionConfig & partition_config ) 
 
 
 
-inline void configuration::standard( PartitionConfig & partition_config ) {
+inline void configuration::standard( KaHIP::PartitionConfig & partition_config ) {
         // clustering parameters
         //
         partition_config.do_additional_ls = true;
@@ -489,7 +492,7 @@ inline void configuration::standard( PartitionConfig & partition_config ) {
 
 }
 
-inline void configuration::standardsnw( PartitionConfig & partition_config ) {
+inline void configuration::standardsnw( KaHIP::PartitionConfig & partition_config ) {
         partition_config.matching_type        = CLUSTER_COARSENING;
         partition_config.stop_rule            = STOP_RULE_MULTIPLE_K;
         partition_config.num_vert_stop_factor = 5000;
@@ -561,7 +564,7 @@ inline void configuration::standardsnw( PartitionConfig & partition_config ) {
 //}
 
 
-inline void configuration::fastsocial( PartitionConfig & partition_config ) {
+inline void configuration::fastsocial( KaHIP::PartitionConfig & partition_config ) {
         eco(partition_config);
         standardsnw(partition_config);
         partition_config.label_propagation_refinement = true;
@@ -569,7 +572,7 @@ inline void configuration::fastsocial( PartitionConfig & partition_config ) {
         partition_config.balance_factor               = 0;
 }
 
-inline void configuration::ecosocial( PartitionConfig & partition_config ) {
+inline void configuration::ecosocial( KaHIP::PartitionConfig & partition_config ) {
         eco(partition_config);
         standardsnw(partition_config);
         partition_config.label_propagation_refinement = false;
@@ -580,7 +583,7 @@ inline void configuration::ecosocial( PartitionConfig & partition_config ) {
         partition_config.cluster_coarsening_during_ip = true;
 }
 
-inline void configuration::strongsocial( PartitionConfig & partition_config ) {
+inline void configuration::strongsocial( KaHIP::PartitionConfig & partition_config ) {
         strong(partition_config);
         standardsnw(partition_config);
 
@@ -588,6 +591,7 @@ inline void configuration::strongsocial( PartitionConfig & partition_config ) {
         partition_config.cluster_coarsening_during_ip = true;
         partition_config.ensemble_clusterings         = true;
 
+}
 }
 
 #endif /* end of include guard: CONFIGURATION_3APG5V7Z */

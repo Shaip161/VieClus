@@ -8,7 +8,11 @@
 #ifndef MODULARITYMETRIC_H
 #define MODULARITYMETRIC_H
 
-#include "data_structure/graph_access.h"
+//#include "data_structure/graph_access.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/definitions.h"
+
 #include <vector>
 
 
@@ -23,7 +27,7 @@
 class ModularityMetric
 {
     public:
-        ModularityMetric(graph_access &G);
+        ModularityMetric(KaHIP::graph_access &G);
         virtual ~ModularityMetric();
 
         /**
@@ -117,9 +121,9 @@ class ModularityMetric
          *  "Finding community structure in very large networks",
          *  Formula 7
          */
-        static double computeModularity(graph_access &G);
-        static double computeModularityBound(graph_access &G);
-        static double computeModularity(graph_access &G, int * partition_map);
+        static double computeModularity(KaHIP::graph_access &G);
+        static double computeModularityBound(KaHIP::graph_access &G);
+        static double computeModularity(KaHIP::graph_access &G, int * partition_map);
 
 
         /**
@@ -136,7 +140,7 @@ class ModularityMetric
          *  "Finding community structure in very large networks",
          *  Formula 4
          */
-        static double computeModularitySlow(graph_access &G);
+        static double computeModularitySlow(KaHIP::graph_access &G);
 
 
         /**
@@ -147,7 +151,7 @@ class ModularityMetric
          *  Considers also the self loops, if any.
          *  May cause an integer overflow, so be careful when the graph has large weights.
          */
-        static EdgeWeight computeSumOfAllEdgeWeights(graph_access &G);
+        static EdgeWeight computeSumOfAllEdgeWeights(KaHIP::graph_access &G);
 
     protected:
         /**
@@ -167,7 +171,7 @@ class ModularityMetric
          *
          *  Considers also the self loops, if any.
          */
-        static void computeEdgeWeightsPerCluster(graph_access &G,
+        static void computeEdgeWeightsPerCluster(KaHIP::graph_access &G,
                                                  std::vector<EdgeWeight> &edgeWeightsPerCluster,
                                                  std::vector<EdgeWeight> &weightedEdgeEndsPerCluster);
 
@@ -176,12 +180,12 @@ class ModularityMetric
          *  \brief Returns self loop if v and w are the same, else returns out edge
          *  weight from v to w, if node v has an outgoing edge to w, otherwise 0.
          */
-        static EdgeWeight getWeightedOutEdgeToOtherNode(graph_access &G, NodeID v, NodeID w);
+        static EdgeWeight getWeightedOutEdgeToOtherNode(KaHIP::graph_access &G, NodeID v, NodeID w);
 
 
         // maybe make with this members an own class
         /// Graph of which we keep internally the modularity to answer modularity gains fast.
-        graph_access &m_G;
+        KaHIP::graph_access &m_G;
         /// Weight of edges inside/per cluster c. Source and target node are in the same cluster c. Size equal to cluster count.
         std::vector<EdgeWeight> m_edgeWeightsPerCluster;
         /// Weight of edge end points inside/per cluster c. Source node is in cluster c. Size equal to cluster count.

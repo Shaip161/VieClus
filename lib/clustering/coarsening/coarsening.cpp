@@ -5,11 +5,16 @@
  *****************************************************************************/
 
 
-#include "coarsening.h"
-
+/*#include "coarsening.h"
 #include "clustering/coarsening/contractor.h"
 #include "partition/coarsening/contraction.h"
-#include "tools/modularitymetric.h"
+#include "tools/modularitymetric.h"*/
+
+#include "extern/VieClus/lib/clustering/coarsening/coarsening.h"
+#include "extern/VieClus/lib/clustering/coarsening/contractor.h"
+#include "extern/KaHIP/lib/partition/coarsening/contraction.h"
+#include "extern/VieClus/lib/tools/modularitymetric.h"
+#include "lib/definitions.h"
 
 using namespace std;
 
@@ -24,7 +29,7 @@ Coarsening::~Coarsening()
 }
 
 
-void Coarsening::buildClusterIDLookUpTable(graph_access &G,
+void Coarsening::buildClusterIDLookUpTable(KaHIP::graph_access &G,
                                            unordered_map<PartitionID, PartitionID>& clusterIDLookUp)
 {
     PartitionID clusterIDCounter = 0;
@@ -47,7 +52,7 @@ void Coarsening::buildClusterIDLookUpTable(graph_access &G,
 }
 
 
-void Coarsening::buildCoarseMapping(graph_access &G,
+void Coarsening::buildCoarseMapping(KaHIP::graph_access &G,
                                     const std::unordered_map<PartitionID, PartitionID>& clusterIDLookUp,
                                     CoarseMapping &coarseMapping,
                                     std::vector<std::vector<NodeID> > &reverseCoarseMapping)
@@ -77,13 +82,13 @@ void Coarsening::buildCoarseMapping(graph_access &G,
 }
 
 
-graph_access * Coarsening::performCoarsening(const PartitionConfig &config,
-                                             graph_access &G,
-                                             graph_hierarchy& graphHierarchy,
-                                             std::list<graph_access*>& coarseGraphsToDelete)
+KaHIP::graph_access * Coarsening::performCoarsening(const KaHIP::PartitionConfig &config,
+                                             KaHIP::graph_access &G,
+                                             KaHIP::graph_hierarchy& graphHierarchy,
+                                             std::list<KaHIP::graph_access*>& coarseGraphsToDelete)
 {
     /// current coarse graph in a turn
-    graph_access *coarseGraph = 0;
+    KaHIP::graph_access *coarseGraph = 0;
     /// current mapping of the nodes in the fine graph
     /// to the cluster/nodes in the coarse graph
     CoarseMapping *coarseMapping = 0;
@@ -100,7 +105,7 @@ graph_access * Coarsening::performCoarsening(const PartitionConfig &config,
     /// outer vector represents clusters
     vector<vector<NodeID> > reverseCoarseMapping;
 
-    coarseGraph = new graph_access();
+    coarseGraph = new KaHIP::graph_access();
     coarseGraphsToDelete.push_back(coarseGraph);
     coarseMapping = new CoarseMapping();
 

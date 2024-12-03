@@ -8,8 +8,12 @@
 #ifndef QUOTIENT_GRAPH_SCHEDULING_NEFT9H3J
 #define QUOTIENT_GRAPH_SCHEDULING_NEFT9H3J
 
-#include "definitions.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+//#include "definitions.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+
 
 struct qgraph_edge_statistics {
 

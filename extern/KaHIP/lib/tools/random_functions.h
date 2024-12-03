@@ -5,15 +5,20 @@
  *
  *****************************************************************************/
 
-#ifndef RANDOM_FUNCTIONS_RMEPKWYT
-#define RANDOM_FUNCTIONS_RMEPKWYT
+#ifndef RANDOM_FUNCTIONS_RMEPKWYT_2
+#define RANDOM_FUNCTIONS_RMEPKWYT_2
 
 #include <iostream>
 #include <random>
 #include <vector>
 
-#include "definitions.h"
-#include "partition_config.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+
+namespace KaHIP {
 
 typedef std::mt19937 MersenneTwister;
 
@@ -132,7 +137,7 @@ class random_functions {
                         }
 
                 template<typename sometype>
-                        static void permutate_entries(const PartitionConfig & partition_config, 
+                        static void permutate_entries(const KaHIP::PartitionConfig & partition_config, 
                                                       std::vector<sometype> & vec, 
                                                       bool init) {
                                 if(init) {
@@ -180,5 +185,6 @@ class random_functions {
                 static int m_seed;
                 static MersenneTwister m_mt;
 };
+}
 
 #endif /* end of include guard: RANDOM_FUNCTIONS_RMEPKWYT */

@@ -10,23 +10,31 @@
 
 #include <vector>
 
-#include "data_structure/graph_access.h"
-#include "data_structure/priority_queues/priority_queue_interface.h"
-#include "definitions.h"
-#include "partition_config.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/two_way_refinement.h"
-#include "vertex_moved_hashtable.h"
+//#include "data_structure/graph_access.h"
+//#include "data_structure/priority_queues/priority_queue_interface.h"
+//#include "definitions.h"
+//#include "partition_config.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/two_way_refinement.h"
+//#include "vertex_moved_hashtable.h"
 
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/data_structure/priority_queues/priority_queue_interface.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/complete_boundary.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/two_way_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
 
 class two_way_fm : public two_way_refinement {
         public:
                 two_way_fm( );
                 virtual ~two_way_fm();
-                EdgeWeight perform_refinement(PartitionConfig & config, 
-                                graph_access & G, 
-                                complete_boundary & boundary, 
+                EdgeWeight perform_refinement(KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary, 
                                 std::vector<NodeID> & lhs_pq_start_nodes, 
                                 std::vector<NodeID> & rhs_pq_start_nodes,
                                 boundary_pair * refinement_pair,        
@@ -35,7 +43,7 @@ class two_way_fm : public two_way_refinement {
                                 EdgeWeight & cut,
                                 bool & something_changed);
 
-                inline bool int_ext_degree(graph_access & G, 
+                inline bool int_ext_degree(KaHIP::graph_access & G, 
                                 const NodeID & node,
                                 const PartitionID lhs,
                                 const PartitionID rhs,
@@ -44,16 +52,16 @@ class two_way_fm : public two_way_refinement {
 
 
         private:
-                void init_queue_with_boundary(const PartitionConfig & config,
-                                graph_access & G,
+                void init_queue_with_boundary(const KaHIP::PartitionConfig & config,
+                                KaHIP::graph_access & G,
                                 std::vector<NodeID> &bnd_nodes,
                                 refinement_pq * queue,                     
                                 PartitionID partition_of_boundary, 
                                 PartitionID other); 
 
 
-                void move_node(const PartitionConfig & config, 
-                               graph_access & G,
+                void move_node(const KaHIP::PartitionConfig & config, 
+                               KaHIP::graph_access & G,
                                const NodeID & node,
                                vertex_moved_hashtable & moved_idx,
                                refinement_pq * from_queue,
@@ -63,10 +71,10 @@ class two_way_fm : public two_way_refinement {
                                boundary_pair * pair,
                                NodeWeight * from_part_weight,
                                NodeWeight * to_part_weight,
-                               complete_boundary & boundary);
+                               KaHIP::complete_boundary & boundary);
 
-                void move_node_back(const PartitionConfig & config, 
-                                    graph_access & G,
+                void move_node_back(const KaHIP::PartitionConfig & config, 
+                                    KaHIP::graph_access & G,
                                     const NodeID & node,
                                     vertex_moved_hashtable & moved_idx,
                                     refinement_pq * from_queue,
@@ -76,7 +84,7 @@ class two_way_fm : public two_way_refinement {
                                     boundary_pair * pair,
                                     NodeWeight * from_part_weight,
                                     NodeWeight * to_part_weight,
-                                    complete_boundary & boundary); 
+                                    KaHIP::complete_boundary & boundary); 
 
 
                 ///////////////////////////////////////////////////////////////////////////
@@ -84,27 +92,27 @@ class two_way_fm : public two_way_refinement {
                 ///////////////////////////////////////////////////////////////////////////
 #ifndef NDEBUG
                 //assert that every node in the lhs boundary has external degree > 0
-                bool assert_only_boundary_nodes(graph_access & G, 
+                bool assert_only_boundary_nodes(KaHIP::graph_access & G, 
                                                 PartialBoundary & lhs_boundary, 
                                                 PartitionID lhs, 
                                                 PartitionID rhs);
 
                 //assert that every node with ext degree > 0 is lhs boundary 
-                bool assert_every_boundary_nodes(graph_access & G, 
+                bool assert_every_boundary_nodes(KaHIP::graph_access & G, 
                                                  PartialBoundary & lhs_boundary, 
                                                  PartitionID lhs, 
                                                  PartitionID rhs);
 
                 //check all of the possible compinations of the two assertions above
-                bool assert_directed_boundary_condition(graph_access & G, 
-                                                        complete_boundary & boundary, 
+                bool assert_directed_boundary_condition(KaHIP::graph_access & G, 
+                                                        KaHIP::complete_boundary & boundary, 
                                                         PartitionID lhs, 
                                                         PartitionID rhs);
 #endif
 
 };
 
-inline bool two_way_fm::int_ext_degree( graph_access & G, 
+inline bool two_way_fm::int_ext_degree( KaHIP::graph_access & G, 
                 const NodeID & node,
                 const PartitionID lhs,
                 const PartitionID rhs,

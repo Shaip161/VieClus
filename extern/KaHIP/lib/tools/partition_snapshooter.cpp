@@ -4,6 +4,7 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *
  *****************************************************************************/
+/*
 
 #include <sstream>
 
@@ -79,4 +80,5 @@ void partition_snapshooter::flush_buffer() {
 void partition_snapshooter::set_buffer_size( unsigned int new_buffer_size ) {
         m_buffer_size = new_buffer_size;
 }
+*/
 

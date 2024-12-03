@@ -10,39 +10,47 @@
 
 #include <vector>
 
-#include "augmented_Qgraph_fabric.h"
-#include "definitions.h"
-#include "quality_metrics.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
-#include "uncoarsening/refinement/refinement.h"
+//#include "augmented_Qgraph_fabric.h"
+//#include "definitions.h"
+//#include "quality_metrics.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
+//#include "uncoarsening/refinement/refinement.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/augmented_Qgraph_fabric.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
+
 
 class advanced_models {
         public:
                 advanced_models();
                 virtual ~advanced_models();
 
-                bool compute_vertex_movements_rebalance( PartitionConfig & config, 
-                                graph_access & G, 
-                                complete_boundary & boundary, 
+                bool compute_vertex_movements_rebalance( KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary, 
                                 augmented_Qgraph & aqg, 
                                 unsigned & s);
 
-                bool compute_vertex_movements_rebalance_ultra( PartitionConfig & config, 
-                                graph_access & G, 
-                                complete_boundary & boundary, 
+                bool compute_vertex_movements_rebalance_ultra( KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary, 
                                 augmented_Qgraph & aqg, 
                                 unsigned & s);
 
-                bool compute_vertex_movements_ultra_model( PartitionConfig & config, 
-                                graph_access & G, 
-                                complete_boundary & boundary, 
+                bool compute_vertex_movements_ultra_model( KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary, 
                                 augmented_Qgraph & aqg, 
                                 unsigned & s, bool zero_weight_cycle);
 
-                void perform_augmented_move( PartitionConfig & config, 
-                                graph_access & G, 
-                                complete_boundary & boundary, 
+                void perform_augmented_move( KaHIP::PartitionConfig & config, 
+                                KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary, 
                                 std::vector<NodeID> & cycle, 
                                 NodeID & s, NodeID & t, 
                                 augmented_Qgraph & aqg);
@@ -50,40 +58,40 @@ class advanced_models {
                 static unsigned long conflicts;
         private:
                 inline
-                        bool build_ultra_model( PartitionConfig & config, 
-                                        graph_access & G, 
-                                        graph_access & G_bar,
-                                        complete_boundary & boundary, 
+                        bool build_ultra_model( KaHIP::PartitionConfig & config, 
+                                        KaHIP::graph_access & G, 
+                                        KaHIP::graph_access & G_bar,
+                                        KaHIP::complete_boundary & boundary, 
                                         augmented_Qgraph & aqg, 
                                         std::vector<bool> & feasable_edge,
                                         unsigned & steps,
-                                        graph_access & cycle_problem, NodeID & s,
+                                        KaHIP::graph_access & cycle_problem, NodeID & s,
                                         std::vector<NodeID> & id_mapping);
 
                 inline
-                        bool build_rebalance_model( PartitionConfig & config, 
-                                        graph_access & G, 
-                                        graph_access & G_bar,
-                                        complete_boundary & boundary, 
+                        bool build_rebalance_model( KaHIP::PartitionConfig & config, 
+                                        KaHIP::graph_access & G, 
+                                        KaHIP::graph_access & G_bar,
+                                        KaHIP::complete_boundary & boundary, 
                                         augmented_Qgraph & aqg, 
                                         std::vector<bool> & feasable_edge,
                                         unsigned & steps,
-                                        graph_access & cycle_problem, NodeID & s, NodeID & t,
+                                        KaHIP::graph_access & cycle_problem, NodeID & s, NodeID & t,
                                         std::vector<NodeID> & id_mapping);
 
 
                 inline 
-                        bool handle_ultra_model_conflicts( PartitionConfig & config, 
-                                        graph_access & cycle_problem, 
-                                        complete_boundary & boundary,
+                        bool handle_ultra_model_conflicts( KaHIP::PartitionConfig & config, 
+                                        KaHIP::graph_access & cycle_problem, 
+                                        KaHIP::complete_boundary & boundary,
                                         std::vector<NodeID> & id_mapping, 
                                         std::vector<bool> & feasable_edge, 
                                         std::vector< NodeID > & cycle, 
                                         NodeID & s, augmented_Qgraph & aqg, bool remove_only_between_layers = false);
 
                 inline 
-                        bool cycleorpath_has_conflicts( PartitionConfig & config, 
-                                        complete_boundary & boundary,
+                        bool cycleorpath_has_conflicts( KaHIP::PartitionConfig & config, 
+                                        KaHIP::complete_boundary & boundary,
                                         std::vector< NodeID > & cycleorpath, 
                                         NodeID & s, augmented_Qgraph & aqg);
 
@@ -92,8 +100,8 @@ class advanced_models {
 };
 
 inline 
-bool advanced_models::cycleorpath_has_conflicts( PartitionConfig & config, 
-                complete_boundary & boundary,
+bool advanced_models::cycleorpath_has_conflicts( KaHIP::PartitionConfig & config, 
+                KaHIP::complete_boundary & boundary,
                 std::vector< NodeID > & cycleorpath, 
                 NodeID & s, augmented_Qgraph & aqg) {
         //check_block_overload
@@ -252,9 +260,9 @@ bool advanced_models::cycleorpath_has_conflicts( PartitionConfig & config,
 
 }
 inline
-bool advanced_models::handle_ultra_model_conflicts( PartitionConfig & config, 
-                                                    graph_access & cycle_problem, 
-                                                    complete_boundary & boundary,
+bool advanced_models::handle_ultra_model_conflicts( KaHIP::PartitionConfig & config, 
+                                                    KaHIP::graph_access & cycle_problem, 
+                                                    KaHIP::complete_boundary & boundary,
                                                     std::vector<NodeID> & id_mapping, 
                                                     std::vector<bool> & feasable_edge, 
                                                     std::vector< NodeID > & cycle, 
@@ -276,9 +284,9 @@ bool advanced_models::handle_ultra_model_conflicts( PartitionConfig & config,
                                         }
                                 }
                         }
-                        blocked_edge  = random_functions::nextInt(0, eligible_idx.size() - 2);
+                        blocked_edge  = KaHIP::random_functions::nextInt(0, eligible_idx.size() - 2);
                 } else {
-                        blocked_edge  = random_functions::nextInt(0, cycle.size() - 2);
+                        blocked_edge  = KaHIP::random_functions::nextInt(0, cycle.size() - 2);
                 }
 
                 forall_nodes(cycle_problem, node) {
@@ -299,8 +307,8 @@ bool advanced_models::handle_ultra_model_conflicts( PartitionConfig & config,
 }
 
 inline 
-void advanced_models::perform_augmented_move( PartitionConfig & config, graph_access & G, 
-                                              complete_boundary & boundary, 
+void advanced_models::perform_augmented_move( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                              KaHIP::complete_boundary & boundary, 
                                               std::vector<NodeID> & cycleorpath, 
                                               NodeID & s, NodeID & t, 
                                               augmented_Qgraph & aqg) {
@@ -351,14 +359,14 @@ void advanced_models::perform_augmented_move( PartitionConfig & config, graph_ac
                 }
         }
 }
-bool advanced_models::build_rebalance_model( PartitionConfig & config, 
-                graph_access & G, 
-                graph_access & G_bar,
-                complete_boundary & boundary, 
+bool advanced_models::build_rebalance_model( KaHIP::PartitionConfig & config, 
+                KaHIP::graph_access & G, 
+                KaHIP::graph_access & G_bar,
+                KaHIP::complete_boundary & boundary, 
                 augmented_Qgraph & aqg, 
                 std::vector<bool> & feasable_edge,
                 unsigned & steps,
-                graph_access & cycle_problem,
+                KaHIP::graph_access & cycle_problem,
                 NodeID & s,
                 NodeID & t,
                 std::vector<NodeID> & id_mapping) {
@@ -484,14 +492,14 @@ bool advanced_models::build_rebalance_model( PartitionConfig & config,
 
 
 //build ultra model ( removing deleted edges )
-bool advanced_models::build_ultra_model( PartitionConfig & config, 
-                                         graph_access & G, 
-                                         graph_access & G_bar,
-                                         complete_boundary & boundary, 
+bool advanced_models::build_ultra_model( KaHIP::PartitionConfig & config, 
+                                         KaHIP::graph_access & G, 
+                                         KaHIP::graph_access & G_bar,
+                                         KaHIP::complete_boundary & boundary, 
                                          augmented_Qgraph & aqg, 
                                          std::vector<bool> & feasable_edge,
                                          unsigned & steps,
-                                         graph_access & cycle_problem,
+                                         KaHIP::graph_access & cycle_problem,
                                          NodeID & s,
                                          std::vector<NodeID> & id_mapping) {
 

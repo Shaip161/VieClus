@@ -5,6 +5,8 @@
  *
  *****************************************************************************/
 
+/*
+
 #ifndef TIMER_9KPDEP
 #define TIMER_9KPDEP
 
@@ -29,13 +31,13 @@ class timer {
         private:
 
                 /** Returns a timestamp ('now') in seconds (incl. a fractional part). */
-                inline double timestamp() {
+                /*inline double timestamp() {
                         struct timeval tp;
                         gettimeofday(&tp, NULL);
                         return double(tp.tv_sec) + tp.tv_usec / 1000000.;
                 }
 
                 double m_start;
-}; 
+};
 
 #endif /* end of include guard: TIMER_9KPDEP */

@@ -3,7 +3,7 @@
  *
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
-
+/*
 #include <mpi.h>
 #include <unistd.h>
 
@@ -43,4 +43,5 @@ mpi_tools::~mpi_tools() {
                 //MPI::COMM_WORLD.Recv(&wakeup, 1, MPI::BOOL, MASTER, 0);
         //}
 //}
+*/
 

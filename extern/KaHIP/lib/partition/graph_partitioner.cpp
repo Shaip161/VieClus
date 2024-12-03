@@ -5,7 +5,7 @@
  *
  *****************************************************************************/
 
-#include "coarsening/coarsening.h"
+/*#include "coarsening/coarsening.h"
 #include "graph_extractor.h"
 #include "graph_partitioner.h"
 #include "initial_partitioning/initial_partitioning.h"
@@ -13,7 +13,17 @@
 #include "tools/random_functions.h"
 #include "uncoarsening/uncoarsening.h"
 #include "uncoarsening/refinement/mixed_refinement.h"
-#include "w_cycles/wcycle_partitioner.h"
+#include "w_cycles/wcycle_partitioner.h"*/
+
+#include "extern/KaHIP/lib/partition/coarsening/coarsening.h"
+#include "extern/KaHIP/lib/tools/graph_extractor.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/partition/initial_partitioning/initial_partitioning.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/uncoarsening.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/mixed_refinement.h"
+#include "extern/KaHIP/lib/partition/w_cycles/wcycle_partitioner.h"
 
 graph_partitioner::graph_partitioner() {
 
@@ -23,15 +33,15 @@ graph_partitioner::~graph_partitioner() {
 
 }
 
-void graph_partitioner::perform_recursive_partitioning(PartitionConfig & config, graph_access & G) {
+void graph_partitioner::perform_recursive_partitioning(KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
         m_global_k = config.k;
         m_global_upper_bound = config.upper_bound_partition;
-        m_rnd_bal = random_functions::nextDouble(1,2);
+        m_rnd_bal = KaHIP::random_functions::nextDouble(1,2);
         perform_recursive_partitioning_internal(config, G, 0, config.k-1);
 }
 
-void graph_partitioner::perform_recursive_partitioning_internal(PartitionConfig & config, 
-                                                                graph_access & G, 
+void graph_partitioner::perform_recursive_partitioning_internal(KaHIP::PartitionConfig & config, 
+                                                                KaHIP::graph_access & G, 
                                                                 PartitionID lb, 
                                                                 PartitionID ub) {
 
@@ -40,7 +50,7 @@ void graph_partitioner::perform_recursive_partitioning_internal(PartitionConfig 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // configuration of bipartitioning
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        PartitionConfig bipart_config      = config;
+        KaHIP::PartitionConfig bipart_config      = config;
         bipart_config.k                    = 2;
         bipart_config.stop_rule            = STOP_RULE_MULTIPLE_K;
         bipart_config.num_vert_stop_factor = 100;
@@ -94,10 +104,10 @@ void graph_partitioner::perform_recursive_partitioning_internal(PartitionConfig 
         perform_partitioning(bipart_config, G);        
 
         if( config.k > 2 ) {
-               graph_extractor extractor;
+               KaHIP::graph_extractor extractor;
  
-               graph_access extracted_block_lhs;
-               graph_access extracted_block_rhs;
+               KaHIP::graph_access extracted_block_lhs;
+               KaHIP::graph_access extracted_block_rhs;
                std::vector<NodeID> mapping_extracted_to_G_lhs; // map the new nodes to the nodes in the old graph G
                std::vector<NodeID> mapping_extracted_to_G_rhs; // map the new nodes to the nodes in the old graph G
 
@@ -110,7 +120,7 @@ void graph_partitioner::perform_recursive_partitioning_internal(PartitionConfig 
                                                mapping_extracted_to_G_rhs, 
                                                weight_lhs_block, weight_rhs_block);
 
-               PartitionConfig rec_config = config;
+               KaHIP::PartitionConfig rec_config = config;
                if(num_blocks_lhs > 1) {
                        rec_config.k = num_blocks_lhs;
 
@@ -160,7 +170,7 @@ void graph_partitioner::perform_recursive_partitioning_internal(PartitionConfig 
         G.set_partition_count(config.k);
 }
 
-void graph_partitioner::single_run( PartitionConfig & config, graph_access & G) {
+void graph_partitioner::single_run( KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
 
         for( unsigned i = 1; i <= config.global_cycle_iterations; i++) {
                 PRINT(std::cout <<  "vcycle " << i << " of " << config.global_cycle_iterations  << std::endl;)
@@ -172,10 +182,10 @@ void graph_partitioner::single_run( PartitionConfig & config, graph_access & G) 
                                 initial_partitioning init_part;
                                 uncoarsening uncoarsen;
 
-                                graph_hierarchy hierarchy;
+                                KaHIP::graph_hierarchy hierarchy;
 
                                 if( config.mode_node_separators ) {
-                                        int rnd = random_functions::nextInt(0,3);
+                                        int rnd = KaHIP::random_functions::nextInt(0,3);
                                         if( rnd == 0 ) {
                                                 config.edge_rating = SEPARATOR_MULTX;
                                         } else if ( rnd  == 1 ) {
@@ -190,7 +200,7 @@ void graph_partitioner::single_run( PartitionConfig & config, graph_access & G) 
                                 init_part.perform_initial_partitioning(config, hierarchy);
                                 uncoarsen.perform_uncoarsening(config, hierarchy);
                                 if( config.mode_node_separators ) {
-                                        quality_metrics qm;
+                                        KaHIP::quality_metrics qm;
                                         std::cout <<  "vcycle result " << qm.separator_weight(G)  << std::endl;
                                 }
                         }
@@ -199,7 +209,7 @@ void graph_partitioner::single_run( PartitionConfig & config, graph_access & G) 
         }
 }
 
-void graph_partitioner::perform_partitioning( PartitionConfig & config, graph_access & G) {
+void graph_partitioner::perform_partitioning( KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
         if(config.only_first_level) {
                 if( !config.graph_allready_partitioned) {
                         initial_partitioning init_part;
@@ -207,7 +217,7 @@ void graph_partitioner::perform_partitioning( PartitionConfig & config, graph_ac
                 }
                 
                 if( !config.mh_no_mh ) {
-                        complete_boundary boundary(&G);
+                        KaHIP::complete_boundary boundary(&G);
                         boundary.build();
                         refinement* refine      = new mixed_refinement();
                         refine->perform_refinement(config, G, boundary);
@@ -220,7 +230,7 @@ void graph_partitioner::perform_partitioning( PartitionConfig & config, graph_ac
         if( config.repetitions == 1 ) {
                 single_run(config,G);
         } else {
-                quality_metrics qm;
+                KaHIP::quality_metrics qm;
                 // currently only for ecosocial
                 EdgeWeight best_cut = std::numeric_limits< EdgeWeight >::max();
                 std::vector< PartitionID > best_map = std::vector< PartitionID >(G.number_of_nodes());
@@ -228,7 +238,7 @@ void graph_partitioner::perform_partitioning( PartitionConfig & config, graph_ac
                         forall_nodes(G, node) {
                                 G.setPartitionIndex(node,0);
                         } endfor
-                        PartitionConfig working_config = config;
+                        KaHIP::PartitionConfig working_config = config;
                         single_run(working_config, G);
 
                         EdgeWeight cur_cut = qm.edge_cut(G);

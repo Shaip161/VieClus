@@ -7,12 +7,19 @@
 #include <algorithm>
 #include <unordered_map>
 
-#include "kway_graph_refinement_core.h"
-#include "kway_stop_rule.h"
-#include "multitry_kway_fm.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+//#include "kway_graph_refinement_core.h"
+//#include "kway_stop_rule.h"
+//#include "multitry_kway_fm.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_core.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_stop_rule.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/multitry_kway_fm.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
 
 multitry_kway_fm::multitry_kway_fm() {
 }
@@ -21,11 +28,11 @@ multitry_kway_fm::~multitry_kway_fm() {
 
 }
 
-int multitry_kway_fm::perform_refinement(PartitionConfig & config, graph_access & G, 
-                                         complete_boundary & boundary, unsigned rounds, 
+int multitry_kway_fm::perform_refinement(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                         KaHIP::complete_boundary & boundary, unsigned rounds, 
                                          bool init_neighbors, unsigned alpha) {
         
-        commons = kway_graph_refinement_commons::getInstance(config);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
         
         unsigned tmp_alpha                = config.kway_adaptive_limits_alpha;
         KWayStopRule tmp_stop             = config.kway_stop_rule;
@@ -65,12 +72,12 @@ int multitry_kway_fm::perform_refinement(PartitionConfig & config, graph_access 
         
 }
 
-int multitry_kway_fm::perform_refinement_around_parts(PartitionConfig & config, graph_access & G, 
-                                                      complete_boundary & boundary, bool init_neighbors, 
+int multitry_kway_fm::perform_refinement_around_parts(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                                      KaHIP::complete_boundary & boundary, bool init_neighbors, 
                                                       unsigned alpha, 
                                                       PartitionID & lhs, PartitionID & rhs, 
                                                       std::unordered_map<PartitionID, PartitionID> & touched_blocks) {
-        commons = kway_graph_refinement_commons::getInstance(config);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
 
         unsigned tmp_alpha                = config.kway_adaptive_limits_alpha;
         KWayStopRule tmp_stop             = config.kway_stop_rule;
@@ -104,14 +111,14 @@ int multitry_kway_fm::perform_refinement_around_parts(PartitionConfig & config, 
         return (int) overall_improvement;
 }
 
-int multitry_kway_fm::start_more_locallized_search(PartitionConfig & config, graph_access & G, 
-                                                   complete_boundary & boundary, bool init_neighbors, 
+int multitry_kway_fm::start_more_locallized_search(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                                   KaHIP::complete_boundary & boundary, bool init_neighbors, 
                                                    bool compute_touched_blocks, 
                                                    std::unordered_map<PartitionID, PartitionID> & touched_blocks, 
                                                    std::vector<NodeID> & todolist) {
 
-        random_functions::permutate_vector_good(todolist, false);
-        commons = kway_graph_refinement_commons::getInstance(config);
+        KaHIP::random_functions::permutate_vector_good(todolist, false);
+        commons = KaHIP::kway_graph_refinement_commons::getInstance(config);
         
         kway_graph_refinement_core refinement_core;
         int local_step_limit = 0;
@@ -121,7 +128,7 @@ int multitry_kway_fm::start_more_locallized_search(PartitionConfig & config, gra
         int overall_improvement = 0;
         
         while(!todolist.empty()) {
-                int random_idx = random_functions::nextInt(0, idx);
+                int random_idx = KaHIP::random_functions::nextInt(0, idx);
                 NodeID node = todolist[random_idx]; 
 
                 PartitionID maxgainer;

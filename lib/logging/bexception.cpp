@@ -6,7 +6,10 @@
 
 
 
-#include "bexception.h"
+//#include "bexception.h"
+
+#include "extern/VieClus/lib/logging/bexception.h"
+
 #include <sstream>
 #include <iostream>
 

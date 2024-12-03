@@ -10,34 +10,42 @@
 
 #include <vector>
 
-#include "data_structure/priority_queues/priority_queue_interface.h"
-#include "definitions.h"
-#include "random_functions.h"
-#include "uncoarsening/refinement/refinement.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+//#include "data_structure/priority_queues/priority_queue_interface.h"
+//#include "definitions.h"
+//#include "random_functions.h"
+//#include "uncoarsening/refinement/refinement.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+
+#include "lib/data_structure/priority_queues/priority_queue_interface.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/vertex_moved_hashtable.h"
+
+namespace KaHIP {
 
 class kway_graph_refinement_commons  {
         public:
 
                 virtual ~kway_graph_refinement_commons();
 
-                void init( PartitionConfig & config );
+                void init( KaHIP::PartitionConfig & config );
 
-                bool incident_to_more_than_two_partitions(graph_access & G, NodeID & node);
+                bool incident_to_more_than_two_partitions(KaHIP::graph_access & G, NodeID & node);
 
-                EdgeWeight compute_gain(graph_access & G, 
+                EdgeWeight compute_gain(KaHIP::graph_access & G, 
                                         NodeID & node, 
                                         PartitionID & max_gainer, 
                                         EdgeWeight & ext_degree);
 
-                bool int_ext_degree( graph_access & G, 
+                bool int_ext_degree( KaHIP::graph_access & G, 
                                      const NodeID & node,
                                      const PartitionID lhs,
                                      const PartitionID rhs,
                                      EdgeWeight & int_degree,
                                      EdgeWeight & ext_degree);
 
-                static kway_graph_refinement_commons* getInstance( PartitionConfig & config );
+                static kway_graph_refinement_commons* getInstance( KaHIP::PartitionConfig & config );
 
                 inline unsigned getUnderlyingK();
 
@@ -63,7 +71,7 @@ inline unsigned kway_graph_refinement_commons::getUnderlyingK() {
         return m_local_degrees.size();
 }
 
-inline void kway_graph_refinement_commons::init(PartitionConfig & config) {
+inline void kway_graph_refinement_commons::init(KaHIP::PartitionConfig & config) {
         m_local_degrees.resize(config.k);
         for( PartitionID i = 0; i < config.k; i++) {
                 m_local_degrees[i].round        = 0;
@@ -73,7 +81,7 @@ inline void kway_graph_refinement_commons::init(PartitionConfig & config) {
         m_round = 0;//needed for the computation of internal and external degrees
 }
 
-inline bool kway_graph_refinement_commons::incident_to_more_than_two_partitions(graph_access & G, NodeID & node) {
+inline bool kway_graph_refinement_commons::incident_to_more_than_two_partitions(KaHIP::graph_access & G, NodeID & node) {
         bool ret_value = false;
         PartitionID own_partition = G.getPartitionIndex(node);
         PartitionID second_partition = INVALID_PARTITION;
@@ -95,7 +103,7 @@ inline bool kway_graph_refinement_commons::incident_to_more_than_two_partitions(
         return ret_value;
 }
 
-inline bool kway_graph_refinement_commons::int_ext_degree( graph_access & G, 
+inline bool kway_graph_refinement_commons::int_ext_degree( KaHIP::graph_access & G, 
                                                            const NodeID & node,
                                                            const PartitionID lhs,
                                                            const PartitionID rhs,
@@ -127,7 +135,7 @@ inline bool kway_graph_refinement_commons::int_ext_degree( graph_access & G,
         return update_is_difficult;
 }
 
-inline Gain kway_graph_refinement_commons::compute_gain(graph_access & G, 
+inline Gain kway_graph_refinement_commons::compute_gain(KaHIP::graph_access & G, 
                                                         NodeID & node, 
                                                         PartitionID & max_gainer, 
                                                         EdgeWeight & ext_degree) {
@@ -176,6 +184,7 @@ inline Gain kway_graph_refinement_commons::compute_gain(graph_access & G,
         } 
 
         return max_degree-m_local_degrees[source_partition].local_degree;
+}
 }
 
 

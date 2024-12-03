@@ -10,9 +10,13 @@
 #include <math.h>
 #include <unordered_map>
 
-#include "algorithms/push_relabel.h"
-#include "data_structure/flow_graph.h"
-#include "vertex_separator_flow_solver.h"
+//#include "algorithms/push_relabel.h"
+//#include "data_structure/flow_graph.h"
+//#include "vertex_separator_flow_solver.h"
+
+#include "extern/KaHIP/lib/algorithms/push_relabel.h"
+#include "lib/data_structure/flow_graph.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/separator/vertex_separator_flow_solver.h"
 
 vertex_separator_flow_solver::vertex_separator_flow_solver() {
 
@@ -22,8 +26,8 @@ vertex_separator_flow_solver::~vertex_separator_flow_solver() {
 
 }
 
-void vertex_separator_flow_solver::find_separator(const PartitionConfig & config, 
-                                                  graph_access & G, 
+void vertex_separator_flow_solver::find_separator(const KaHIP::PartitionConfig & config, 
+                                                  KaHIP::graph_access & G, 
                                                   PartitionID lhs, 
                                                   PartitionID rhs,  
                                                   boundary_starting_nodes lhs_nodes,
@@ -71,8 +75,8 @@ void vertex_separator_flow_solver::find_separator(const PartitionConfig & config
 
 }
 
-bool vertex_separator_flow_solver::build_flow_pb( const PartitionConfig & config, 
-                               graph_access & G, 
+bool vertex_separator_flow_solver::build_flow_pb( const KaHIP::PartitionConfig & config, 
+                               KaHIP::graph_access & G, 
                                PartitionID & lhs, 
                                PartitionID & rhs, 
                                std::vector<NodeID> & lhs_nodes,

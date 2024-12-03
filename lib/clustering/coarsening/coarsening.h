@@ -8,10 +8,14 @@
 #ifndef COARSENING_H
 #define COARSENING_H
 
+//#include "data_structure/graph_access.h"
+//#include "data_structure/graph_hierarchy.h"
+//#include "partition/partition_config.h"
 
-#include "data_structure/graph_access.h"
-#include "data_structure/graph_hierarchy.h"
-#include "partition/partition_config.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/data_structure/graph_hierarchy.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+
 #include <list>
 #include <unordered_map>
 #include <vector>
@@ -41,10 +45,10 @@ class Coarsening
 
             \return Returns new coarse graph. The memory of this graph needs to be freed.
          */
-        static graph_access *performCoarsening(const PartitionConfig &config,
-                                               graph_access &G,
-                                               graph_hierarchy &graphHierarchy,
-                                               std::list<graph_access *> &coarseGraphsToDelete);
+        static KaHIP::graph_access *performCoarsening(const KaHIP::PartitionConfig &config,
+                                               KaHIP::graph_access &G,
+                                               KaHIP::graph_hierarchy &graphHierarchy,
+                                               std::list<KaHIP::graph_access *> &coarseGraphsToDelete);
 
 
     protected:
@@ -58,7 +62,7 @@ class Coarsening
             \param clusterIDLookUp [out] On return KEY is the old cluster ID and
             VALUE is the new cluster ID.
          */
-        static void buildClusterIDLookUpTable(graph_access &G,
+        static void buildClusterIDLookUpTable(KaHIP::graph_access &G,
                                               std::unordered_map<PartitionID, PartitionID> &clusterIDLookUp);
 
 
@@ -78,7 +82,7 @@ class Coarsening
             \param reverseCoarseMapping [out] On return at position i there is a
             list of nodes that belong to the (new) cluster i.
          */
-        static void buildCoarseMapping(graph_access &G,
+        static void buildCoarseMapping(KaHIP::graph_access &G,
                                        const std::unordered_map<PartitionID, PartitionID> &clusterIDLookUp,
                                        CoarseMapping &coarseMapping,
                                        std::vector<std::vector<NodeID> > &reverseCoarseMapping);

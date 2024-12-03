@@ -7,18 +7,29 @@
 
 #include <sstream>
 
-#include "area_bfs.h"
-#include "algorithms/push_relabel.h"
-#include "graph_io.h"
-#include "most_balanced_minimum_cuts/most_balanced_minimum_cuts.h"
-#include "tools/random_functions.h"
-#include "tools/graph_extractor.h"
-#include "tools/quality_metrics.h"
-#include "tools/graph_extractor.h"
-#include "data_structure/union_find.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/quotient_graph_scheduling/simple_quotient_graph_scheduler.h"
-#include "vertex_separator_algorithm.h"
-#include "vertex_separator_flow_solver.h"
+//#include "area_bfs.h"
+//#include "algorithms/push_relabel.h"
+//#include "graph_io.h"
+//#include "most_balanced_minimum_cuts/most_balanced_minimum_cuts.h"
+//#include "tools/random_functions.h"
+//#include "tools/quality_metrics.h"
+//#include "tools/graph_extractor.h"
+//#include "data_structure/union_find.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/quotient_graph_scheduling/simple_quotient_graph_scheduler.h"
+//#include "vertex_separator_algorithm.h"
+//#include "vertex_separator_flow_solver.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/separator/area_bfs.h"
+#include "extern/KaHIP/lib/algorithms/push_relabel.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/most_balanced_minimum_cuts/most_balanced_minimum_cuts.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/graph_extractor.h"
+#include "lib/data_structure/union_find.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_scheduling/simple_quotient_graph_scheduler.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/separator/vertex_separator_algorithm.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/separator/vertex_separator_flow_solver.h"
 
 vertex_separator_algorithm::vertex_separator_algorithm() {
 
@@ -28,8 +39,8 @@ vertex_separator_algorithm::~vertex_separator_algorithm() {
 
 }
 
-void vertex_separator_algorithm::build_flow_problem(const PartitionConfig & config, 
-                                                          graph_access & G, 
+void vertex_separator_algorithm::build_flow_problem(const KaHIP::PartitionConfig & config, 
+                                                          KaHIP::graph_access & G, 
                                                           std::vector< NodeID > & lhs_nodes,
                                                           std::vector< NodeID > & rhs_nodes,
                                                           std::vector< NodeID > & separator_nodes,
@@ -174,8 +185,8 @@ void vertex_separator_algorithm::build_flow_problem(const PartitionConfig & conf
         rG.finish_construction();
 }
 
-NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionConfig & config, 
-							        graph_access & G, 
+NodeWeight vertex_separator_algorithm::improve_vertex_separator(const KaHIP::PartitionConfig & config, 
+							        KaHIP::graph_access & G, 
 								std::vector< NodeWeight > & block_weights,
 						 	        PartialBoundary & separator) {
 
@@ -190,7 +201,7 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionC
         std::vector< NodeWeight > old_block_weights = block_weights;
 
         do {
-                PartitionConfig cfg               = config;
+                KaHIP::PartitionConfig cfg               = config;
                 cfg.region_factor_node_separators = 1+current_region_factor;
                 solution_imbalanced               = false;
 	
@@ -231,7 +242,7 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionC
         } while ( solution_imbalanced && iteration < 10);
 
         if( solution_imbalanced ) {
-                PartitionConfig cfg = config;
+                KaHIP::PartitionConfig cfg = config;
                 cfg.region_factor_node_separators = 1;
 
                 std::vector< NodeID > old_lhs;
@@ -243,8 +254,8 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionC
         return prev_solution_value-solution_value;
 }
 
-NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const PartitionConfig & config, 
-	                                                                 graph_access & G, 
+NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const KaHIP::PartitionConfig & config, 
+	                                                                 KaHIP::graph_access & G, 
 									 std::vector< NodeWeight > & block_weights,
 			 						 PartialBoundary & separator,
                                                                          std::vector< NodeID > & lhs_nodes, 
@@ -285,7 +296,7 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const P
                         is_in_source_set[v] = true;
                 }
         } else {
-                graph_access residualGraph; 
+                KaHIP::graph_access residualGraph; 
                 convert_residualGraph( G, forward_mapping, source, sink, rG, residualGraph );
 
                 NodeWeight rhs_stripe_weight = 0;
@@ -298,7 +309,7 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const P
                 NodeWeight amount_to_be_added = ideal_new_block_weight - rhs_part_weight;
                 NodeWeight perfect_rhs_stripe_weight = std::max((NodeWeight)(2*amount_to_be_added+value),(NodeWeight)0);
                  
-                PartitionConfig tmpconfig = config;
+                KaHIP::PartitionConfig tmpconfig = config;
                 tmpconfig.mode_node_separators = true;
 
                 most_balanced_minimum_cuts mbmc;
@@ -346,8 +357,8 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const P
 }
 
 
-NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionConfig & config, 
-                                              graph_access & G, 
+NodeWeight vertex_separator_algorithm::improve_vertex_separator(const KaHIP::PartitionConfig & config, 
+                                              KaHIP::graph_access & G, 
                                               std::vector<NodeID> & input_separator,
                                               std::vector<NodeID> & output_separator) {
 
@@ -360,9 +371,9 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionC
         NodeWeight solution_value;
         double current_region_factor = config.region_factor_node_separators;
         double iteration = 0;
-        quality_metrics qm;
+        KaHIP::quality_metrics qm;
         do {
-                PartitionConfig cfg = config;
+                KaHIP::PartitionConfig cfg = config;
                 cfg.region_factor_node_separators = 1+current_region_factor;
                 solution_imbalanced = false;
                 solution_value = improve_vertex_separator_internal( cfg , G, input_separator, output_separator);
@@ -380,7 +391,7 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionC
         } while ( solution_imbalanced && iteration < 10);
 
         if( solution_imbalanced ) {
-                PartitionConfig cfg = config;
+                KaHIP::PartitionConfig cfg = config;
                 cfg.region_factor_node_separators = 1;
                 solution_value = improve_vertex_separator_internal( cfg , G, input_separator, output_separator);
         }
@@ -388,8 +399,8 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator(const PartitionC
         return solution_value;
 }
 
-NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const PartitionConfig & config, 
-                                              graph_access & G, 
+NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const KaHIP::PartitionConfig & config, 
+                                              KaHIP::graph_access & G, 
                                               std::vector<NodeID> & input_separator,
                                               std::vector<NodeID> & output_separator) {
 
@@ -442,7 +453,7 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const P
                         is_in_source_set[v] = true;
                 }
         } else {
-                graph_access residualGraph; 
+                KaHIP::graph_access residualGraph; 
                 convert_residualGraph( G, forward_mapping, source, sink, rG, residualGraph );
 
                 NodeWeight rhs_stripe_weight = 0;
@@ -455,7 +466,7 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const P
                 NodeWeight amount_to_be_added = ideal_new_block_weight - rhs_part_weight;
                 NodeWeight perfect_rhs_stripe_weight = std::max((NodeWeight)(2*amount_to_be_added+value),(NodeWeight)0);
                  
-                PartitionConfig tmpconfig = config;
+                KaHIP::PartitionConfig tmpconfig = config;
                 tmpconfig.mode_node_separators = true;
 
                 most_balanced_minimum_cuts mbmc;
@@ -499,12 +510,12 @@ NodeWeight vertex_separator_algorithm::improve_vertex_separator_internal(const P
         return old_separator_weight - value; // return improvement
 }
 
-void vertex_separator_algorithm::compute_vertex_separator(const PartitionConfig & config, 
-                                                          graph_access & G, 
-                                                          complete_boundary & boundary, 
+void vertex_separator_algorithm::compute_vertex_separator(const KaHIP::PartitionConfig & config, 
+                                                          KaHIP::graph_access & G, 
+                                                          KaHIP::complete_boundary & boundary, 
                                                           std::vector<NodeID> & overall_separator) {
 
-        PartitionConfig cfg     = config;
+        KaHIP::PartitionConfig cfg     = config;
         cfg.bank_account_factor = 1;
 
         std::unordered_map<NodeID, bool> allready_separator;
@@ -564,9 +575,9 @@ void vertex_separator_algorithm::compute_vertex_separator(const PartitionConfig 
         //std::cout <<  "performing check done "  << std::endl;
 }
 
-void vertex_separator_algorithm::compute_vertex_separator(const PartitionConfig & config, 
-                                                          graph_access & G, 
-                                                          complete_boundary & boundary) {
+void vertex_separator_algorithm::compute_vertex_separator(const KaHIP::PartitionConfig & config, 
+                                                          KaHIP::graph_access & G, 
+                                                          KaHIP::complete_boundary & boundary) {
 
         std::vector<NodeID> overall_separator;
         compute_vertex_separator(config, G, boundary, overall_separator); 
@@ -577,12 +588,12 @@ void vertex_separator_algorithm::compute_vertex_separator(const PartitionConfig 
         graph_io::writeVector(overall_separator, filename.str());
 }
 
-void vertex_separator_algorithm::compute_vertex_separator_simpler(const PartitionConfig & config, 
-                                                          graph_access & G, 
-                                                          complete_boundary & boundary, 
+void vertex_separator_algorithm::compute_vertex_separator_simpler(const KaHIP::PartitionConfig & config, 
+                                                          KaHIP::graph_access & G, 
+                                                          KaHIP::complete_boundary & boundary, 
                                                           std::vector<NodeID> & overall_separator) {
 
-        PartitionConfig cfg     = config;
+        KaHIP::PartitionConfig cfg     = config;
         cfg.bank_account_factor = 1;
 
         QuotientGraphEdges qgraph_edges;
@@ -626,12 +637,12 @@ void vertex_separator_algorithm::compute_vertex_separator_simpler(const Partitio
         delete scheduler;
 }
 
-void vertex_separator_algorithm::compute_vertex_separator_simple(const PartitionConfig & config, 
-                                                          graph_access & G, 
-                                                          complete_boundary & boundary, 
+void vertex_separator_algorithm::compute_vertex_separator_simple(const KaHIP::PartitionConfig & config, 
+                                                          KaHIP::graph_access & G, 
+                                                          KaHIP::complete_boundary & boundary, 
                                                           std::vector<NodeID> & overall_separator) {
 
-        PartitionConfig cfg     = config;
+        KaHIP::PartitionConfig cfg     = config;
         cfg.bank_account_factor = 1;
 
         QuotientGraphEdges qgraph_edges;
@@ -680,7 +691,7 @@ void vertex_separator_algorithm::compute_vertex_separator_simple(const Partition
 
 
 
-bool vertex_separator_algorithm::is_vertex_separator(graph_access & G, std::unordered_map<NodeID, bool> & separator) {
+bool vertex_separator_algorithm::is_vertex_separator(KaHIP::graph_access & G, std::unordered_map<NodeID, bool> & separator) {
          forall_nodes(G, node) {
                 forall_out_edges(G, e, node) {
                         NodeID target = G.getEdgeTarget(e);

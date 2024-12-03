@@ -8,15 +8,18 @@
 #ifndef PARTITION_ACCEPT_RULE_4RXUS4P9
 #define PARTITION_ACCEPT_RULE_4RXUS4P9
 
-#include "partition_config.h"
-#include "random_functions.h"
+//#include "partition_config.h"
+//#include "random_functions.h"
+
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 class partition_accept_rule {
         public:
                 partition_accept_rule( ) {};
                 virtual ~partition_accept_rule() {};
 
-                virtual bool accept_partition(PartitionConfig & config, 
+                virtual bool accept_partition(KaHIP::PartitionConfig & config, 
                                               const EdgeWeight edge_cut, 
                                               const NodeWeight lhs_part_weight, 
                                               const NodeWeight rhs_part_weight,
@@ -29,13 +32,13 @@ class partition_accept_rule {
 
 class normal_partition_accept_rule : public partition_accept_rule {
         public:
-                normal_partition_accept_rule(PartitionConfig & config, 
+                normal_partition_accept_rule(KaHIP::PartitionConfig & config, 
                                              const EdgeWeight initial_cut, 
                                              const NodeWeight initial_lhs_part_weight,
                                              const NodeWeight initial_rhs_part_weight);
                 virtual ~normal_partition_accept_rule() {};
 
-                bool accept_partition(PartitionConfig & config, 
+                bool accept_partition(KaHIP::PartitionConfig & config, 
                                       const EdgeWeight edge_cut, 
                                       const NodeWeight lhs_part_weight,
                                       const NodeWeight rhs_part_weight, 
@@ -50,7 +53,7 @@ class normal_partition_accept_rule : public partition_accept_rule {
                 NodeWeight difference;
 };
 
-normal_partition_accept_rule::normal_partition_accept_rule(PartitionConfig & config, 
+normal_partition_accept_rule::normal_partition_accept_rule(KaHIP::PartitionConfig & config, 
                 const EdgeWeight initial_cut, 
                 const NodeWeight initial_lhs_part_weight, 
                 const NodeWeight initial_rhs_part_weight) {
@@ -61,7 +64,7 @@ normal_partition_accept_rule::normal_partition_accept_rule(PartitionConfig & con
         difference          = abs((int)cur_lhs_part_weight - (int)cur_rhs_part_weight);
 }
 
-bool normal_partition_accept_rule::accept_partition(PartitionConfig & config, 
+bool normal_partition_accept_rule::accept_partition(KaHIP::PartitionConfig & config, 
                 const EdgeWeight edge_cut, 
                 const NodeWeight lhs_part_weight, 
                 const NodeWeight rhs_part_weight,
@@ -101,7 +104,7 @@ bool normal_partition_accept_rule::accept_partition(PartitionConfig & config,
 
 class ip_partition_accept_rule : public partition_accept_rule {
         public:
-                ip_partition_accept_rule(PartitionConfig & config, 
+                ip_partition_accept_rule(KaHIP::PartitionConfig & config, 
                                              const EdgeWeight initial_cut, 
                                              const NodeWeight initial_lhs_part_weight,
                                              const NodeWeight initial_rhs_part_weight, 
@@ -109,7 +112,7 @@ class ip_partition_accept_rule : public partition_accept_rule {
                                             const PartitionID rhs);
                 virtual ~ip_partition_accept_rule() {};
 
-                bool accept_partition(PartitionConfig & config, 
+                bool accept_partition(KaHIP::PartitionConfig & config, 
                                       const EdgeWeight edge_cut, 
                                       const NodeWeight lhs_part_weight,
                                       const NodeWeight rhs_part_weight, 
@@ -122,7 +125,7 @@ class ip_partition_accept_rule : public partition_accept_rule {
                 int cur_rhs_overload;
 };
 
-ip_partition_accept_rule::ip_partition_accept_rule(PartitionConfig & config, 
+ip_partition_accept_rule::ip_partition_accept_rule(KaHIP::PartitionConfig & config, 
                 const EdgeWeight initial_cut, 
                 const NodeWeight initial_lhs_part_weight, 
                 const NodeWeight initial_rhs_part_weight,
@@ -134,7 +137,7 @@ ip_partition_accept_rule::ip_partition_accept_rule(PartitionConfig & config,
         cur_rhs_overload = std::max( (int)initial_rhs_part_weight - config.target_weights[rhs],0);
 }
 
-bool ip_partition_accept_rule::accept_partition(PartitionConfig & config, 
+bool ip_partition_accept_rule::accept_partition(KaHIP::PartitionConfig & config, 
                 const EdgeWeight edge_cut, 
                 const NodeWeight lhs_part_weight, 
                 const NodeWeight rhs_part_weight,

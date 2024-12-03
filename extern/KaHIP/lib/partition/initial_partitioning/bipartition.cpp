@@ -4,13 +4,21 @@
  * Source of KaHIP -- Karlsruhe High Quality Partitioning.
  *****************************************************************************/
 
-#include "bipartition.h"
-#include "data_structure/priority_queues/maxNodeHeap.h"
-#include "quality_metrics.h"
-#include "random_functions.h"
-#include "timer.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/quotient_graph_refinement.h"
-#include "uncoarsening/refinement/refinement.h"
+//#include "bipartition.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "quality_metrics.h"
+//#include "random_functions.h"
+//#include "timer.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/quotient_graph_refinement.h"
+//#include "uncoarsening/refinement/refinement.h"
+
+#include "extern/KaHIP/lib/partition/initial_partitioning/bipartition.h"
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "lib/tools/timer.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/quotient_graph_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
 
 bipartition::bipartition() {
 
@@ -20,9 +28,9 @@ bipartition::~bipartition() {
 
 }
 
-void bipartition::initial_partition( const PartitionConfig & config, 
+void bipartition::initial_partition( const KaHIP::PartitionConfig & config, 
                                      const unsigned int seed, 
-                                     graph_access & G, 
+                                     KaHIP::graph_access & G, 
                                      int* partition_map) {
 
         timer t;
@@ -42,7 +50,7 @@ void bipartition::initial_partition( const PartitionConfig & config,
 
                 post_fm(config, G);
 
-                quality_metrics qm;
+                KaHIP::quality_metrics qm;
                 EdgeWeight curcut = qm.edge_cut(G); 
 
                 int lhs_block_weight = 0;
@@ -73,9 +81,9 @@ void bipartition::initial_partition( const PartitionConfig & config,
         PRINT(std::cout <<  "bipartition took " <<  t.elapsed()  << std::endl;)
 }
 
-void bipartition::initial_partition( const PartitionConfig & config, 
+void bipartition::initial_partition( const KaHIP::PartitionConfig & config, 
                                      const unsigned int seed,  
-                                     graph_access & G, 
+                                     KaHIP::graph_access & G, 
                                      int* xadj,
                                      int* adjncy, 
                                      int* vwgt, 
@@ -86,12 +94,12 @@ void bipartition::initial_partition( const PartitionConfig & config,
 
 }
 
-void bipartition::post_fm(const PartitionConfig & config, graph_access & G) {
+void bipartition::post_fm(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
                 refinement* refine          = new quotient_graph_refinement();
-                complete_boundary* boundary = new complete_boundary(&G);
+                KaHIP::complete_boundary* boundary = new KaHIP::complete_boundary(&G);
                 boundary->build();
 
-                PartitionConfig initial_cfg                 = config;
+                KaHIP::PartitionConfig initial_cfg                 = config;
                 initial_cfg.fm_search_limit                 = config.bipartition_post_fm_limits;
                 initial_cfg.refinement_type                 = REFINEMENT_TYPE_FM;
                 initial_cfg.refinement_scheduling_algorithm = REFINEMENT_SCHEDULING_ACTIVE_BLOCKS;
@@ -107,13 +115,13 @@ void bipartition::post_fm(const PartitionConfig & config, graph_access & G) {
 
 }
 
-NodeID bipartition::find_start_node( const PartitionConfig & config, graph_access & G) {
-        NodeID startNode = random_functions::nextInt(0, G.number_of_nodes()-1);
+NodeID bipartition::find_start_node( const KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
+        NodeID startNode = KaHIP::random_functions::nextInt(0, G.number_of_nodes()-1);
         NodeID lastNode = startNode;
 
         int counter = G.number_of_nodes();
         while( G.getNodeDegree(startNode) == 0 && --counter > 0) {
-                startNode = random_functions::nextInt(0, G.number_of_nodes()-1);
+                startNode = KaHIP::random_functions::nextInt(0, G.number_of_nodes()-1);
         }
 
         //now perform a bfs to get a partition
@@ -143,10 +151,10 @@ NodeID bipartition::find_start_node( const PartitionConfig & config, graph_acces
         return lastNode;
 }
 
-void bipartition::grow_regions_bfs(const PartitionConfig & config, graph_access & G) {
+void bipartition::grow_regions_bfs(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
         if(G.number_of_nodes() == 0) return;
 
-        NodeID startNode = random_functions::nextInt(0, G.number_of_nodes()-1);
+        NodeID startNode = KaHIP::random_functions::nextInt(0, G.number_of_nodes()-1);
         if(config.buffoon) { startNode = find_start_node(config, G);  } // more likely to produce connected partitions
 
         std::vector<bool> touched(G.number_of_nodes(), false);
@@ -170,7 +178,7 @@ void bipartition::grow_regions_bfs(const PartitionConfig & config, graph_access 
 
                 if(bfsqueue->empty() && nodes_left > 0) {
                         //disconnected graph -> find a new start node among those that havent been touched
-                        NodeID k = random_functions::nextInt(0, nodes_left-1);
+                        NodeID k = KaHIP::random_functions::nextInt(0, nodes_left-1);
                         NodeID start_node = 0;
                         forall_nodes(G, node) {
                                 if(!touched[node]) {
@@ -221,7 +229,7 @@ void bipartition::grow_regions_bfs(const PartitionConfig & config, graph_access 
 }
 
 
-void bipartition::grow_regions_fm(const PartitionConfig & config, graph_access & G) {
+void bipartition::grow_regions_fm(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
         if(G.number_of_nodes() == 0) return;
 
         //NodeID startNode        = random_functions::nextInt(0, G.number_of_nodes()-1);
@@ -249,7 +257,7 @@ void bipartition::grow_regions_fm(const PartitionConfig & config, graph_access &
 
                 if(queue->empty() && nodes_left > 0) {
                         //disconnected graph -> find a new start node among those that havent been touched
-                        NodeID k = random_functions::nextInt(0, nodes_left-1);
+                        NodeID k = KaHIP::random_functions::nextInt(0, nodes_left-1);
                         NodeID start_node = 0;
                         forall_nodes(G, node) {
                                 if(!touched[node]) {

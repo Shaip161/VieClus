@@ -5,9 +5,13 @@
 
 #include <mpi.h>
 
-#include "exchanger.h"
-#include "tools/quality_metrics.h"
-#include "tools/random_functions.h"
+//#include "exchanger.h"
+//#include "tools/quality_metrics.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/parallel_mh/exchange/exchanger.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 exchanger::exchanger(MPI_Comm communicator) {
         m_prev_best_objective = std::numeric_limits<EdgeWeight>::max();
@@ -67,7 +71,7 @@ exchanger::~exchanger() {
                 
 }
 
-void exchanger::diversify_population( PartitionConfig & config, graph_access & G,  population & island, bool replace ) {
+void exchanger::diversify_population( KaHIP::PartitionConfig & config, KaHIP::graph_access & G,  population & island, bool replace ) {
        
         int rank, comm_size;
         MPI_Comm_rank( m_communicator, &rank);
@@ -108,7 +112,7 @@ void exchanger::diversify_population( PartitionConfig & config, graph_access & G
 
 }
 
-void exchanger::quick_start( PartitionConfig & config, graph_access & G, population & island ) {
+void exchanger::quick_start( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, population & island ) {
         int comm_size;
         MPI_Comm_size( m_communicator, &comm_size);
         
@@ -117,7 +121,7 @@ void exchanger::quick_start( PartitionConfig & config, graph_access & G, populat
         std::cout <<  "creating " <<  no_of_individuals << std::endl;
 
         for(unsigned i = 0; i < no_of_individuals; i++) {
-                PartitionConfig copy            = config;
+                KaHIP::PartitionConfig copy            = config;
                 copy.combine                    = false;
                 copy.graph_allready_partitioned = false;
 
@@ -129,7 +133,7 @@ void exchanger::quick_start( PartitionConfig & config, graph_access & G, populat
         int reps = config.mh_pool_size - no_of_individuals;
         if(reps < 0) reps = 0;
 
-        PartitionConfig div_config   = config;
+        KaHIP::PartitionConfig div_config   = config;
         div_config.mh_diversify_best = false;
         for( unsigned i = 0; i < (unsigned) reps; i++) {
                 diversify_population( div_config , G, island, false); 
@@ -137,7 +141,7 @@ void exchanger::quick_start( PartitionConfig & config, graph_access & G, populat
 }
 
 
-void exchanger::exchange_individum( const PartitionConfig & config,  graph_access & G, 
+void exchanger::exchange_individum( const KaHIP::PartitionConfig & config,  KaHIP::graph_access & G, 
                                     int & from, int & rank, int & to, 
                                     Individuum & in, Individuum & out) {
         //recv. edge cut, partition_map, cut_edges from "from"
@@ -166,7 +170,7 @@ void exchanger::exchange_individum( const PartitionConfig & config,  graph_acces
 
 
 //extended push protocol -- see paper for details
-void exchanger::push_best( PartitionConfig & config, graph_access & G, population & island ) {
+void exchanger::push_best( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, population & island ) {
         int rank, size;
         MPI_Comm_rank( m_communicator, &rank);
         MPI_Comm_size( m_communicator, &size);
@@ -239,7 +243,7 @@ void exchanger::push_best( PartitionConfig & config, graph_access & G, populatio
         }
 }
 
-void exchanger::recv_incoming( PartitionConfig & config, graph_access & G, population & island ) {
+void exchanger::recv_incoming( KaHIP::PartitionConfig & config, KaHIP::graph_access & G, population & island ) {
         int rank;
         MPI_Comm_rank( m_communicator, &rank);
         

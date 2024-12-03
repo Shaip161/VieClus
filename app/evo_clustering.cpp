@@ -4,7 +4,7 @@
  * Source of VieClus -- Vienna Graph Clustering 
  *****************************************************************************/
 
-#include <argtable2.h>
+#include <argtable3.h>
 #include <iostream>
 #include <math.h>
 #include <mpi.h>
@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h> 
 
-#include "algorithms/cycle_search.h"
+/*#include "algorithms/cycle_search.h"
 #include "balance_configuration.h"
 #include "data_structure/graph_access.h"
 #include "graph_io.h"
@@ -24,13 +24,28 @@
 #include "partition/partition_config.h"
 #include "quality_metrics.h"
 #include "random_functions.h"
-#include "timer.h"
+#include "timer.h"*/
+
+#include "extern/KaHIP/lib/algorithms/cycle_search.h"
+#include "extern/KaHIP/app/balance_configuration.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/io/graph_io.h"
+#include "lib/tools/macros_assertions.h"
+#include "extern/KaHIP/lib/parallel_mh_clustering/parallel_mh_async_clustering.h"
+#include "extern/VieClus/app/parse_parameters.h"
+#include "extern/KaHIP/lib/partition/graph_partitioner.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "lib/tools/timer.h"
+
+long getMaxRSS();
 
 int main(int argn, char **argv) {
 
         MPI_Init(&argn, &argv);    /* starts MPI */
 
-        PartitionConfig partition_config;
+        KaHIP::PartitionConfig partition_config;
         std::string graph_filename;
         bool is_graph_weighted = false;
         bool suppress_output   = false;
@@ -45,7 +60,7 @@ int main(int argn, char **argv) {
                 return 0;
         }
 
-        graph_access G;     
+        KaHIP::graph_access G;     
 
         timer t;
         graph_io::readGraphWeighted(G, graph_filename);
@@ -68,6 +83,8 @@ int main(int argn, char **argv) {
                 G.set_partition_count(G.get_partition_count_compute());
                 std::cout << "modularity \t\t\t" << ModularityMetric::computeModularity(G) << std::endl;
                 
+                long overall_max_RSS = getMaxRSS();
+                
                 // write the partition to the disc 
                 std::stringstream filename;
                 if(!partition_config.filename_output.compare("")) {
@@ -77,8 +94,23 @@ int main(int argn, char **argv) {
                         filename << partition_config.filename_output;
                 }
 
-                graph_io::writePartition(G, filename.str());
+                graph_io::writePartition(G, filename.str(), overall_max_RSS);
         }
 
         MPI_Finalize();
+}
+
+
+
+long getMaxRSS() {
+    struct rusage usage;
+
+    if (getrusage(RUSAGE_SELF, &usage) == 0) {
+        // The maximum resident set size is in kilobytes
+        return usage.ru_maxrss;
+    } else {
+        std::cerr << "Error getting resource usage information." << std::endl;
+        // Return a sentinel value or handle the error in an appropriate way
+        return -1;
+    }
 }

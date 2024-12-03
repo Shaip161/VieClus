@@ -9,10 +9,13 @@
 #define BOUNDARY_LOOKUP_2JMSKBSI
 
 #include <unordered_map>
-
-#include "definitions.h"
 #include "limits.h"
-#include "partial_boundary.h"
+
+//#include "definitions.h"
+//#include "partial_boundary.h"
+
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
 
 using namespace __gnu_cxx;
 

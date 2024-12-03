@@ -2,10 +2,15 @@
 // Author: Christian Schulz <christian.schulz@kit.edu>
 // 
 
-#include "data_structure/priority_queues/maxNodeHeap.h"
-#include "greedy_ns_local_search.h"
-#include "tools/quality_metrics.h"
-#include "tools/random_functions.h"
+//#include "data_structure/priority_queues/maxNodeHeap.h"
+//#include "greedy_ns_local_search.h"
+//#include "tools/quality_metrics.h"
+//#include "tools/random_functions.h"
+
+#include "lib/data_structure/priority_queues/maxNodeHeap.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/greedy_ns_local_search.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 greedy_ns_local_search::greedy_ns_local_search() {
                 
@@ -15,7 +20,7 @@ greedy_ns_local_search::~greedy_ns_local_search() {
                 
 }
 
-EdgeWeight greedy_ns_local_search::perform_refinement(const PartitionConfig & config, graph_access & G) {
+EdgeWeight greedy_ns_local_search::perform_refinement(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G) {
         std::vector< maxNodeHeap > queues; queues.resize(2);
         std::vector< bool > moved_out_of_separator(G.number_of_nodes(), false);
         forall_nodes(G, node) {
@@ -70,7 +75,7 @@ EdgeWeight greedy_ns_local_search::perform_refinement(const PartitionConfig & co
                                         queues[0].deleteMax();
                                         queues[1].deleteMax();
                                 } else {
-                                        int block = random_functions::nextInt(0,1);
+                                        int block = KaHIP::random_functions::nextInt(0,1);
                                         queues[block].deleteMax();
                                 }
                         }

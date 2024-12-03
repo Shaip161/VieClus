@@ -5,6 +5,8 @@
  *
  *****************************************************************************/
 
+/*
+
 #ifndef MACROS_COMMON_H 
 #define MACROS_COMMON_H
 
@@ -41,5 +43,5 @@
 #define STR(x) ASSERT_H_XSTR(x)
 
 
-#endif // ifndef MACROS_COMMON_H
+#endif // ifndef MACROS_COMMON_H */
 

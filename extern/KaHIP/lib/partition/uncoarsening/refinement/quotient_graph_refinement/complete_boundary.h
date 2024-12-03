@@ -12,10 +12,15 @@
 #include <unordered_map>
 #include <utility>
 
-#include "boundary_lookup.h"
-#include "data_structure/graph_access.h"
-#include "partial_boundary.h"
-#include "partition_config.h"
+//#include "boundary_lookup.h"
+//#include "data_structure/graph_access.h"
+//#include "partial_boundary.h"
+//#include "partition_config.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/boundary_lookup.h"
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/partial_boundary.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 struct block_informations {
         NodeWeight block_weight;
@@ -24,9 +29,11 @@ struct block_informations {
 
 typedef std::vector<boundary_pair> QuotientGraphEdges;
 
+namespace KaHIP {
+
 class complete_boundary {
         public:
-                complete_boundary(graph_access * G );
+                complete_boundary(KaHIP::graph_access * G );
                 virtual ~complete_boundary();
 
                 void build();
@@ -37,7 +44,7 @@ class complete_boundary {
                 inline void deleteNode(NodeID node, PartitionID partition, boundary_pair * pair);
                 void postMovedBoundaryNodeUpdates(NodeID target, boundary_pair * pair, 
                                                   bool update_edge_cuts, bool update_all_boundaries);
-                void balance_singletons(const PartitionConfig & config, graph_access & G); 
+                void balance_singletons(const KaHIP::PartitionConfig & config, KaHIP::graph_access & G); 
 
                 inline NodeID size(PartitionID partition, boundary_pair * pair);
 
@@ -53,16 +60,16 @@ class complete_boundary {
                 inline void getQuotientGraphEdges(QuotientGraphEdges & qgraph_edges);
                 inline PartialBoundary&  getDirectedBoundary(PartitionID partition, PartitionID lhs, PartitionID rhs);
 
-                inline void setup_start_nodes(graph_access & G, PartitionID partition, 
+                inline void setup_start_nodes(KaHIP::graph_access & G, PartitionID partition, 
                                               boundary_pair & bp, boundary_starting_nodes & start_nodes); 
 
-                inline void setup_start_nodes_around_blocks(graph_access & G, PartitionID & lhs, PartitionID & rhs,
+                inline void setup_start_nodes_around_blocks(KaHIP::graph_access & G, PartitionID & lhs, PartitionID & rhs,
                                                             boundary_starting_nodes & start_nodes);
 
-                inline void setup_start_nodes_all(graph_access & G, boundary_starting_nodes & start_nodes);
+                inline void setup_start_nodes_all(KaHIP::graph_access & G, boundary_starting_nodes & start_nodes);
 
                 inline void get_max_norm();
-                inline void getUnderlyingQuotientGraph( graph_access & qgraph );
+                inline void getUnderlyingQuotientGraph( KaHIP::graph_access & qgraph );
                 inline void getNeighbors(PartitionID & block, std::vector<PartitionID> & neighbors);
 
         private:
@@ -78,14 +85,14 @@ class complete_boundary {
                 size_t             m_last_key; 
                 hash_boundary_pair m_hbp;
 
-                graph_access * m_graph_ref;
+                KaHIP::graph_access * m_graph_ref;
                 //implicit quotient graph structure
                 //
                 block_pairs m_pairs;
                 std::vector<block_informations> m_block_infos;
 
                 //explicit quotient graph structure / may be outdated!
-                graph_access Q;
+                KaHIP::graph_access Q;
                 std::vector< NodeID > m_singletons;
 
                 //////////////////////////////////////////////////////////////
@@ -97,11 +104,12 @@ class complete_boundary {
                 bool assert_boundaries_are_bnodes();
 #endif 
 };
+}
 
-
+namespace KaHIP {
 
 inline void complete_boundary::build() {
-        graph_access & G = *m_graph_ref;
+        KaHIP::graph_access & G = *m_graph_ref;
 
         for(PartitionID block = 0; block < G.get_partition_count(); block++) {
                 m_block_infos[block].block_weight   = 0;
@@ -146,7 +154,7 @@ inline void complete_boundary::build_from_coarser(complete_boundary * coarser_bo
                                                   NodeID coarser_no_nodes, 
                                                   CoarseMapping * cmapping) {
 
-        graph_access & G = *m_graph_ref;
+        KaHIP::graph_access & G = *m_graph_ref;
 
         std::vector<bool> coarse_is_border_node(coarser_no_nodes, false);
         QuotientGraphEdges coarser_qgraph_edges;
@@ -334,7 +342,7 @@ inline void complete_boundary::update_lazy_values(boundary_pair * pair) {
                 m_last_key    = key;
         }
 }
-void complete_boundary::setup_start_nodes(graph_access & G, 
+void complete_boundary::setup_start_nodes(KaHIP::graph_access & G, 
                 PartitionID partition, 
                 boundary_pair & bp, 
                 boundary_starting_nodes & start_nodes) {
@@ -367,8 +375,8 @@ inline void complete_boundary::get_max_norm() {
          std::cout <<  "max norm is " <<  max  << std::endl;
 }
 
-inline void complete_boundary::getUnderlyingQuotientGraph( graph_access & Q_bar ) {
-         basicGraph * graphref = new basicGraph; 
+inline void complete_boundary::getUnderlyingQuotientGraph( KaHIP::graph_access & Q_bar ) {
+         KaHIP::basicGraph * graphref = new KaHIP::basicGraph; 
          
          if(Q_bar.graphref != NULL) {
                 delete Q_bar.graphref;
@@ -421,7 +429,7 @@ inline void complete_boundary::getNeighbors(PartitionID & block, std::vector<Par
         } endfor
 }
 
-void complete_boundary::setup_start_nodes_around_blocks(graph_access & G, 
+void complete_boundary::setup_start_nodes_around_blocks(KaHIP::graph_access & G, 
                                                         PartitionID & lhs, PartitionID & rhs, 
                                                         boundary_starting_nodes & start_nodes) {
 
@@ -476,7 +484,7 @@ void complete_boundary::setup_start_nodes_around_blocks(graph_access & G,
 }
 
 
-void complete_boundary::setup_start_nodes_all(graph_access & G, boundary_starting_nodes & start_nodes) {
+void complete_boundary::setup_start_nodes_all(KaHIP::graph_access & G, boundary_starting_nodes & start_nodes) {
         QuotientGraphEdges quotient_graph_edges;
         getQuotientGraphEdges(quotient_graph_edges);
 
@@ -506,10 +514,11 @@ void complete_boundary::setup_start_nodes_all(graph_access & G, boundary_startin
                 } endfor
         }
 }
+}
 
 
 #ifndef NDEBUG
-inline bool complete_boundary::assert_bnodes_in_boundaries() {
+inline bool KaHIP::complete_boundary::assert_bnodes_in_boundaries() {
         PartitionID k = m_graph_ref->get_partition_count();
 
         for(PartitionID lhs = 0; lhs < k; lhs++) {
@@ -520,7 +529,7 @@ inline bool complete_boundary::assert_bnodes_in_boundaries() {
                         bp.k = m_graph_ref->get_partition_count();
                         bp.lhs = lhs;
                         bp.rhs = rhs;
-                        graph_access & G = *m_graph_ref;
+                        KaHIP::graph_access & G = *m_graph_ref;
 
                         NodeWeight lhs_part_weight = 0;
                         NodeWeight rhs_part_weight = 0;
@@ -564,8 +573,8 @@ inline bool complete_boundary::assert_bnodes_in_boundaries() {
         return true;
 }
 
-inline bool complete_boundary::assert_boundaries_are_bnodes() {
-        graph_access & G = *m_graph_ref;
+inline bool KaHIP::complete_boundary::assert_boundaries_are_bnodes() {
+       KaHIP:: graph_access & G = *m_graph_ref;
         forall_nodes(G, n) {
                  PartitionID partition = G.getPartitionIndex(n);
                  forall_out_edges(G, e, n) {
@@ -594,6 +603,7 @@ inline bool complete_boundary::assert_boundaries_are_bnodes() {
         
         return true;
 }
+
 #endif // #ifndef NDEBUG
 
 #endif /* end of include guard: COMPLETE_BOUNDARY_URZZFDEI */

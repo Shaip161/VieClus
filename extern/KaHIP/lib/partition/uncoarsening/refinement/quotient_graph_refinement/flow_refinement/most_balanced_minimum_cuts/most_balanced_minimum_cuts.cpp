@@ -6,9 +6,16 @@
 
 #include <unordered_map>
 
-#include "algorithms/strongly_connected_components.h"
-#include "algorithms/topological_sort.h"
-#include "most_balanced_minimum_cuts.h"
+//#include "algorithms/strongly_connected_components.h"
+//#include "algorithms/topological_sort.h"
+//#include "most_balanced_minimum_cuts.h"
+
+#include "extern/KaHIP/lib/algorithms/strongly_connected_components.h"
+#include "extern/KaHIP/lib/algorithms/topological_sort.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/most_balanced_minimum_cuts/most_balanced_minimum_cuts.h"
+
+
+
 
 most_balanced_minimum_cuts::most_balanced_minimum_cuts() {
 
@@ -18,8 +25,8 @@ most_balanced_minimum_cuts::~most_balanced_minimum_cuts() {
 
 }
 
-void most_balanced_minimum_cuts::compute_good_balanced_min_cut( graph_access & residualGraph, 
-                                                                const PartitionConfig & config,
+void most_balanced_minimum_cuts::compute_good_balanced_min_cut( KaHIP::graph_access & residualGraph, 
+                                                                const KaHIP::PartitionConfig & config,
                                                                 NodeWeight & perfect_rhs_weight, 
                                                                 std::vector< NodeID > & new_rhs_nodes ) {
 
@@ -40,7 +47,7 @@ void most_balanced_minimum_cuts::compute_good_balanced_min_cut( graph_access & r
         int comp_of_s = components[s];
         int comp_of_t = components[t];
         
-        graph_access scc_graph;
+        KaHIP::graph_access scc_graph;
         build_internal_scc_graph( residualGraph, components, comp_count, scc_graph);
          
         std::vector<int> comp_for_rhs;
@@ -70,8 +77,8 @@ void most_balanced_minimum_cuts::compute_good_balanced_min_cut( graph_access & r
         }
 } 
 
-void most_balanced_minimum_cuts::compute_new_rhs( graph_access & scc_graph, 
-                                                  const PartitionConfig & config,
+void most_balanced_minimum_cuts::compute_new_rhs( KaHIP::graph_access & scc_graph, 
+                                                  const KaHIP::PartitionConfig & config,
                                                   std::vector< NodeWeight > & comp_weights,
                                                   int comp_of_s,
                                                   int comp_of_t,
@@ -149,10 +156,10 @@ void most_balanced_minimum_cuts::compute_new_rhs( graph_access & scc_graph,
         }
 }
 
-void most_balanced_minimum_cuts::build_internal_scc_graph( graph_access & residualGraph,  
+void most_balanced_minimum_cuts::build_internal_scc_graph( KaHIP::graph_access & residualGraph,  
                                                            std::vector<int> & components, 
                                                            int comp_count, 
-                                                           graph_access & scc_graph) {
+                                                           KaHIP::graph_access & scc_graph) {
         std::vector< std::vector<int> > edges(comp_count);
         unsigned edge_count = 0;
         forall_nodes(residualGraph, node) {

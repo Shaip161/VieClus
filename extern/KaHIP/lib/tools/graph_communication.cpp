@@ -5,6 +5,8 @@
  *
  *****************************************************************************/
 
+/*
+
 #include <mpi.h>
 
 #include "graph_communication.h"
@@ -67,3 +69,5 @@ void graph_communication::broadcast_graph( graph_access & G, unsigned root) {
         delete[] adjwgt;
  
 }
+
+*/

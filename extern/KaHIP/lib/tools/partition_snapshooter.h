@@ -5,6 +5,8 @@
  *
  *****************************************************************************/
 
+/*
+
 #ifndef PARTITION_SNAPSHOOTER_LGCUMS2I
 #define PARTITION_SNAPSHOOTER_LGCUMS2I
 

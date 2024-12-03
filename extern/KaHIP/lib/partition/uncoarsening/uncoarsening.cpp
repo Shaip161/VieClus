@@ -5,19 +5,31 @@
  *
   *****************************************************************************/
 
-#include "graph_partition_assertions.h"
-#include "misc.h"
-#include "quality_metrics.h"
-#include "refinement/mixed_refinement.h"
-#include "refinement/node_separators/greedy_ns_local_search.h"
-#include "refinement/node_separators/fm_ns_local_search.h"
-#include "refinement/node_separators/localized_fm_ns_local_search.h"
-#include "refinement/label_propagation_refinement/label_propagation_refinement.h"
-#include "refinement/refinement.h"
-#include "separator/vertex_separator_algorithm.h"
-#include "tools/random_functions.h"
-#include "uncoarsening.h"
+//#include "graph_partition_assertions.h"
+//#include "misc.h"
+//#include "quality_metrics.h"
+//#include "refinement/mixed_refinement.h"
+//#include "refinement/node_separators/greedy_ns_local_search.h"
+//#include "refinement/node_separators/fm_ns_local_search.h"
+//#include "refinement/node_separators/localized_fm_ns_local_search.h"
+//#include "refinement/label_propagation_refinement/label_propagation_refinement.h"
+//#include "refinement/refinement.h"
+//#include "separator/vertex_separator_algorithm.h"
+//#include "tools/random_functions.h"
+//#include "uncoarsening.h"
 
+#include "lib/tools/graph_partition_assertions.h"
+#include "lib/tools/misc.h"
+#include "extern/KaHIP/lib/tools/quality_metrics.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/mixed_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/greedy_ns_local_search.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/fm_ns_local_search.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/node_separators/localized_fm_ns_local_search.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/label_propagation_refinement/label_propagation_refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/separator/vertex_separator_algorithm.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/uncoarsening.h"
 
 uncoarsening::uncoarsening() {
 
@@ -27,7 +39,7 @@ uncoarsening::~uncoarsening() {
 
 }
 
-int uncoarsening::perform_uncoarsening(const PartitionConfig & config, graph_hierarchy & hierarchy) {
+int uncoarsening::perform_uncoarsening(const KaHIP::PartitionConfig & config, KaHIP::graph_hierarchy & hierarchy) {
 
         if(config.mode_node_separators) {
                 if( config.faster_ns ) {
@@ -40,10 +52,10 @@ int uncoarsening::perform_uncoarsening(const PartitionConfig & config, graph_hie
         }
 }
 
-int uncoarsening::perform_uncoarsening_cut(const PartitionConfig & config, graph_hierarchy & hierarchy) {
+int uncoarsening::perform_uncoarsening_cut(const KaHIP::PartitionConfig & config, KaHIP::graph_hierarchy & hierarchy) {
         int improvement = 0;
 
-        PartitionConfig cfg     = config;
+        KaHIP::PartitionConfig cfg     = config;
         refinement* refine      = NULL;
 
         if(config.label_propagation_refinement) {
@@ -52,30 +64,30 @@ int uncoarsening::perform_uncoarsening_cut(const PartitionConfig & config, graph
                 refine      = new mixed_refinement();
         }
 
-        graph_access * coarsest = hierarchy.get_coarsest();
+        KaHIP::graph_access * coarsest = hierarchy.get_coarsest();
         PRINT(std::cout << "log>" << "unrolling graph with " << coarsest->number_of_nodes() << std::endl;)
 
-        complete_boundary* finer_boundary   = NULL;
-        complete_boundary* coarser_boundary = NULL;
+        KaHIP::complete_boundary* finer_boundary   = NULL;
+        KaHIP::complete_boundary* coarser_boundary = NULL;
         double factor = config.balance_factor;
         cfg.upper_bound_partition = ((!hierarchy.isEmpty()) * factor +1.0)*config.upper_bound_partition;
 
         if(!config.label_propagation_refinement) {
-                coarser_boundary = new complete_boundary(coarsest);
+                coarser_boundary = new KaHIP::complete_boundary(coarsest);
                 coarser_boundary->build();
                 improvement += (int)refine->perform_refinement(cfg, *coarsest, *coarser_boundary);
         } else {
-                complete_boundary dummy_boundary(coarsest);
+                KaHIP::complete_boundary dummy_boundary(coarsest);
                 improvement += (int)refine->perform_refinement(cfg, *coarsest, dummy_boundary);
         }
         
         NodeID coarser_no_nodes = coarsest->number_of_nodes();
-        graph_access* finest    = NULL;
-        graph_access* to_delete = NULL;
+        KaHIP::graph_access* finest    = NULL;
+        KaHIP::graph_access* to_delete = NULL;
         unsigned int hierarchy_deepth = hierarchy.size();
 
         while(!hierarchy.isEmpty()) {
-                graph_access* G = hierarchy.pop_finer_and_project();
+                KaHIP::graph_access* G = hierarchy.pop_finer_and_project();
 
                 PRINT(std::cout << "log>" << "unrolling graph with " << G->number_of_nodes()<<  std::endl;)
                 
@@ -84,11 +96,11 @@ int uncoarsening::perform_uncoarsening_cut(const PartitionConfig & config, graph
                 PRINT(std::cout <<  "cfg upperbound " <<  cfg.upper_bound_partition  << std::endl;)
 
                 if(!config.label_propagation_refinement) {
-                        finer_boundary = new complete_boundary(G); 
+                        finer_boundary = new KaHIP::complete_boundary(G); 
                         finer_boundary->build_from_coarser(coarser_boundary, coarser_no_nodes, hierarchy.get_mapping_of_current_finer());
                         improvement += (int)refine->perform_refinement(cfg, *G, *finer_boundary);
                 } else {
-                        complete_boundary dummy_boundary(G);
+                        KaHIP::complete_boundary dummy_boundary(G);
                         improvement += (int)refine->perform_refinement(cfg, *G, dummy_boundary);
                 }
 
@@ -128,12 +140,12 @@ int uncoarsening::perform_uncoarsening_cut(const PartitionConfig & config, graph
         return improvement;
 }
 
-int uncoarsening::perform_uncoarsening_nodeseparator(const PartitionConfig & config, graph_hierarchy & hierarchy) {
+int uncoarsening::perform_uncoarsening_nodeseparator(const KaHIP::PartitionConfig & config, KaHIP::graph_hierarchy & hierarchy) {
 
         std::cout <<  "log> starting uncoarsening ---------------"  << std::endl;
-        PartitionConfig cfg     = config;
-        graph_access * coarsest = hierarchy.get_coarsest();
-        quality_metrics qm;
+        KaHIP::PartitionConfig cfg     = config;
+        KaHIP::graph_access * coarsest = hierarchy.get_coarsest();
+        KaHIP::quality_metrics qm;
         std::cout << "log>" << "unrolling graph with " << coarsest->number_of_nodes() << std::endl;
 
         if( !config.sep_fm_disabled ) {
@@ -141,7 +153,7 @@ int uncoarsening::perform_uncoarsening_nodeseparator(const PartitionConfig & con
                         fm_ns_local_search fmnsls;
                         fmnsls.perform_refinement(config, (*coarsest));
 
-                        int rnd_block = random_functions::nextInt(0,1);
+                        int rnd_block = KaHIP::random_functions::nextInt(0,1);
                         fmnsls.perform_refinement(config, (*coarsest),true, rnd_block);
                         fmnsls.perform_refinement(config, (*coarsest),true, rnd_block == 0 ? 1 : 0);
                 }
@@ -165,9 +177,9 @@ int uncoarsening::perform_uncoarsening_nodeseparator(const PartitionConfig & con
                 }
         }
 
-        graph_access* to_delete = NULL;
+        KaHIP::graph_access* to_delete = NULL;
         while(!hierarchy.isEmpty()) {
-                graph_access* G = hierarchy.pop_finer_and_project();
+                KaHIP::graph_access* G = hierarchy.pop_finer_and_project();
                 std::cout << "log>" << "unrolling graph with " << G->number_of_nodes() << std::endl;
 
                 if( !config.sep_fm_disabled) {
@@ -175,7 +187,7 @@ int uncoarsening::perform_uncoarsening_nodeseparator(const PartitionConfig & con
                                 fm_ns_local_search fmnsls;
                                 fmnsls.perform_refinement(config, (*G));
 
-                                int rnd_block = random_functions::nextInt(0,1);
+                                int rnd_block = KaHIP::random_functions::nextInt(0,1);
                                 fmnsls.perform_refinement(config, (*G), true, rnd_block);
                                 fmnsls.perform_refinement(config, (*G), true, rnd_block == 0? 1 : 0);
                         }
@@ -186,7 +198,7 @@ int uncoarsening::perform_uncoarsening_nodeseparator(const PartitionConfig & con
                                 localized_fm_ns_local_search fmnsls;
                                 fmnsls.perform_refinement(config, (*G));
 
-                                int rnd_block = random_functions::nextInt(0,1);
+                                int rnd_block = KaHIP::random_functions::nextInt(0,1);
                                 fmnsls.perform_refinement(config, (*G), true, rnd_block);
                                 fmnsls.perform_refinement(config, (*G), true, rnd_block == 0? 1 : 0);
                         }
@@ -221,11 +233,11 @@ int uncoarsening::perform_uncoarsening_nodeseparator(const PartitionConfig & con
         return 0;
 }
 
-int uncoarsening::perform_uncoarsening_nodeseparator_fast(const PartitionConfig & config, graph_hierarchy & hierarchy) {
+int uncoarsening::perform_uncoarsening_nodeseparator_fast(const KaHIP::PartitionConfig & config, KaHIP::graph_hierarchy & hierarchy) {
 
         std::cout <<  "log> starting uncoarsening ---------------"  << std::endl;
-        PartitionConfig cfg     = config;
-        graph_access * coarsest = hierarchy.get_coarsest();
+        KaHIP::PartitionConfig cfg     = config;
+        KaHIP::graph_access * coarsest = hierarchy.get_coarsest();
         std::cout << "log>" << "unrolling graph with " << coarsest->number_of_nodes() << std::endl;
 
         std::vector< NodeWeight > block_weights(3,0); PartialBoundary current_separator;
@@ -244,7 +256,7 @@ int uncoarsening::perform_uncoarsening_nodeseparator_fast(const PartitionConfig 
                         fm_ns_local_search fmnsls;
                         fmnsls.perform_refinement(config, (*coarsest), block_weights, moved_out_of_S, current_separator);
 
-                        int rnd_block = random_functions::nextInt(0,1);
+                        int rnd_block = KaHIP::random_functions::nextInt(0,1);
                         fmnsls.perform_refinement(config, (*coarsest), block_weights, moved_out_of_S, current_separator, true, rnd_block);
                         fmnsls.perform_refinement(config, (*coarsest), block_weights, moved_out_of_S, current_separator, true, rnd_block == 0? 1 : 0);
                 }
@@ -260,9 +272,9 @@ int uncoarsening::perform_uncoarsening_nodeseparator_fast(const PartitionConfig 
                 }
         }
 
-        graph_access* to_delete = NULL;
+        KaHIP::graph_access* to_delete = NULL;
         while(!hierarchy.isEmpty()) {
-                graph_access* G = hierarchy.pop_finer_and_project_ns(current_separator);
+                KaHIP::graph_access* G = hierarchy.pop_finer_and_project_ns(current_separator);
                 std::cout << "log>" << "unrolling graph with " << G->number_of_nodes() << std::endl;
 
                 std::vector< bool > moved_out_of_S(G->number_of_nodes(), false);
@@ -273,7 +285,7 @@ int uncoarsening::perform_uncoarsening_nodeseparator_fast(const PartitionConfig 
                                 NodeWeight improvement = 0;
                                 improvement += fmnsls.perform_refinement(config, (*G), block_weights, moved_out_of_S, current_separator);
 
-                                int rnd_block = random_functions::nextInt(0,1);
+                                int rnd_block = KaHIP::random_functions::nextInt(0,1);
                                 improvement += fmnsls.perform_refinement(config, (*G), block_weights, moved_out_of_S, current_separator, true, rnd_block);
                                 improvement += fmnsls.perform_refinement(config, (*G), block_weights, moved_out_of_S, current_separator, true, rnd_block == 0 ? 1 : 0);
                                 if( improvement == 0 ) break;
@@ -286,7 +298,7 @@ int uncoarsening::perform_uncoarsening_nodeseparator_fast(const PartitionConfig 
                                 NodeWeight improvement = 0;
                                 improvement += fmnsls.perform_refinement(config, (*G), block_weights, moved_out_of_S, current_separator);
 
-                                int rnd_block = random_functions::nextInt(0,1);
+                                int rnd_block = KaHIP::random_functions::nextInt(0,1);
                                 improvement += fmnsls.perform_refinement(config, (*G), block_weights, moved_out_of_S, current_separator, true, rnd_block);
                                 improvement += fmnsls.perform_refinement(config, (*G), block_weights, moved_out_of_S, current_separator, true, rnd_block == 0 ? 1 : 0);
                         }

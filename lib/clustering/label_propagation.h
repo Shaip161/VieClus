@@ -6,10 +6,14 @@
 
 #pragma once
 
-#include "data_structure/graph_access.h"
+/*#include "data_structure/graph_access.h"
 #include "definitions.h"
 #include "tools/random_functions.h"
-// #include "common/logger.h"
+// #include "common/logger.h"*/
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
 
 #include <cstdlib>
 #include <cstdint>
@@ -21,14 +25,14 @@ public:
     label_propagation() {};
     virtual ~label_propagation() {};
 
-    void propagate_labels(graph_access & G,
+    void propagate_labels(KaHIP::graph_access & G,
                           std::vector<NodeID> & cluster_id,
                           std::vector<std::vector<NodeID>> & reverse_mapping) {
         // in this case the _matching paramter is not used
         // coarse_mappng stores cluster id and the mapping (it is identical)
         std::vector<NodeID> permutation(G.number_of_nodes());
         cluster_id.resize(G.number_of_nodes());
-        random_functions::setSeed(time(NULL));
+        KaHIP::random_functions::setSeed(time(NULL));
         std::vector<PartitionID> hash_map(G.number_of_nodes(),0);
 
         for (size_t i = 0; i < cluster_id.size(); ++i) {
@@ -37,7 +41,7 @@ public:
 
         //node_ordering n_ordering;
         //n_ordering.order_nodes(partition_config, G, permutation);
-        random_functions::permutate_vector_fast(permutation, true);
+        KaHIP::random_functions::permutate_vector_fast(permutation, true);
 
         int iterations = 3;
 
@@ -69,7 +73,7 @@ public:
                     PartitionID cur_block     = cluster_id[target];
                     PartitionID cur_value     = hash_map[cur_block];
                     if(cur_value > max_value || (cur_value == max_value &&
-                                                  random_functions::nextBool()))
+                                                  KaHIP::random_functions::nextBool()))
                     {
                         max_value = cur_value;
                         max_block = cur_block;
@@ -90,7 +94,7 @@ public:
     }
 
     void remap_cluster_ids(
-        graph_access & G,
+        KaHIP::graph_access & G,
         std::vector<NodeID> & cluster_id,
         std::vector<std::vector<NodeID>> & reverse_mapping) {
 

@@ -8,15 +8,19 @@
 #define FULL_SEARCH_SPACE_PRUNED_H49ZQ8A4
 
 #include <utility>
-#include "data_structure/graph_access.h"
-#include "partition_config.h"
+
+//#include "data_structure/graph_access.h"
+//#include "partition_config.h"
+
+#include "extern/KaHIP/lib/data_structure/graph_access.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 class full_search_space_pruned {
 public:
-        full_search_space_pruned(PartitionConfig & config, NodeID number_of_nodes);
+        full_search_space_pruned(KaHIP::PartitionConfig & config, NodeID number_of_nodes);
         virtual ~full_search_space_pruned();
 
-        void set_graph_ref( graph_access * C ) {}
+        void set_graph_ref( KaHIP::graph_access * C ) {}
 
         bool done() {
              return m_unsucc_tries > m_ub && m_internal_k+1 == ceil(m_number_of_nodes/(double) config.search_space_s);
@@ -62,7 +66,7 @@ private:
         NodeID m_unsucc_tries;
         NodeID m_number_of_nodes;
 
-        PartitionConfig config;
+        KaHIP::PartitionConfig config;
         std::vector< std::pair< NodeID, NodeID > > m_search_space_pointers;
 };
 

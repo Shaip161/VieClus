@@ -7,8 +7,13 @@
 #include <queue>
 #include <vector>
 
-#include "boundary_bfs.h"
-#include "random_functions.h"
+//#include "boundary_bfs.h"
+//#include "random_functions.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/flow_refinement/boundary_bfs.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+
+
 
 boundary_bfs::boundary_bfs() {
                 
@@ -18,7 +23,7 @@ boundary_bfs::~boundary_bfs() {
                 
 }
 
-bool boundary_bfs::boundary_bfs_search(graph_access & G, 
+bool boundary_bfs::boundary_bfs_search(KaHIP::graph_access & G, 
                                        std::vector<NodeID> & start_nodes, 
                                        PartitionID partition, 
                                        NodeWeight upper_bound_no_nodes, 
@@ -31,7 +36,7 @@ bool boundary_bfs::boundary_bfs_search(graph_access & G,
 	int cur_deepth = 0;
        
         if(flow_tiebreaking) {
-                random_functions::permutate_vector_good(start_nodes, false);
+                KaHIP::random_functions::permutate_vector_good(start_nodes, false);
         } 
 	/***************************
 	 * Initialize the Queue

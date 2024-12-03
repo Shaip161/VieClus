@@ -11,11 +11,17 @@
 #include <algorithm>
 #include <vector>
 
-#include "augmented_Qgraph.h"
-#include "definitions.h"
-#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
-#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
-#include "uncoarsening/refinement/refinement.h"
+//#include "augmented_Qgraph.h"
+//#include "definitions.h"
+//#include "uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+//#include "uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
+//#include "uncoarsening/refinement/refinement.h"
+
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/augmented_Qgraph.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/kway_graph_refinement/kway_graph_refinement_commons.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/refinement.h"
+#include "extern/KaHIP/lib/partition/uncoarsening/refinement/quotient_graph_refinement/2way_fm_refinement/two_way_fm.h"
 
 class augmented_Qgraph_fabric {
         public:
@@ -24,88 +30,88 @@ class augmented_Qgraph_fabric {
 
                 //return false if the network will be feasable for the desired model
                 //returns true iff rebalance = true and the fall back solution has been applied
-                bool build_augmented_quotient_graph( PartitionConfig & config, 
-                                                     graph_access & G, 
-                                                     complete_boundary & boundary, 
+                bool build_augmented_quotient_graph( KaHIP::PartitionConfig & config, 
+                                                     KaHIP::graph_access & G, 
+                                                     KaHIP::complete_boundary & boundary, 
                                                      augmented_Qgraph & aqg,
                                                      unsigned & s, bool rebalance, bool plus = false);
 
                 void cleanup_eligible();
 
         private:
-                bool construct_local_searches_on_qgraph_edge( PartitionConfig & config, 
-                                                              graph_access & G, 
-                                                              complete_boundary & boundary,
+                bool construct_local_searches_on_qgraph_edge( KaHIP::PartitionConfig & config, 
+                                                              KaHIP::graph_access & G, 
+                                                              KaHIP::complete_boundary & boundary,
                                                               augmented_Qgraph & aqg,
                                                               boundary_pair & pair,
                                                               unsigned s,
                                                               bool plus);
 
-                bool local_search(PartitionConfig & config, 
+                bool local_search(KaHIP::PartitionConfig & config, 
                                   bool  plus,
-                                  graph_access & G, 
-                                  complete_boundary & boundary,
+                                  KaHIP::graph_access & G, 
+                                  KaHIP::complete_boundary & boundary,
                                   augmented_Qgraph & aqg,
                                   boundary_pair & bp,
                                   unsigned s);
 
 
-                void directed_more_locallized_search(PartitionConfig & config, graph_access & G, 
-                                complete_boundary & boundary, 
+                void directed_more_locallized_search(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary, 
                                 PartitionID & lhs, PartitionID & rhs,
                                 NodeID start_node, unsigned & number_of_swaps, pairwise_local_search & pls);
 
         public:
-                void more_locallized_search(PartitionConfig & config, graph_access & G, 
-                                complete_boundary & boundary, 
+                void more_locallized_search(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary, 
                                 PartitionID & lhs, PartitionID & rhs,
                                 NodeID start_node, unsigned & number_of_swaps, pairwise_local_search & pls);
         private:
-                void directed_more_locallized_search_all_bnd(PartitionConfig & config, graph_access & G, 
-                                complete_boundary & boundary,  
+                void directed_more_locallized_search_all_bnd(KaHIP::PartitionConfig & config, KaHIP::graph_access & G, 
+                                KaHIP::complete_boundary & boundary,  
                                 PartitionID & lhs, PartitionID & rhs,
                                 unsigned & number_of_swaps, pairwise_local_search & pls);
 
-                void move_node(PartitionConfig & config, 
-                               graph_access & G, 
+                void move_node(KaHIP::PartitionConfig & config, 
+                               KaHIP::graph_access & G, 
                                NodeID & node, 
                                refinement_pq * queue, 
-                               complete_boundary & boundary, 
+                               KaHIP::complete_boundary & boundary, 
                                PartitionID & from, 
                                PartitionID & to);
 
-                void move_node(PartitionConfig & config, 
-                               graph_access & G, 
+                void move_node(KaHIP::PartitionConfig & config, 
+                               KaHIP::graph_access & G, 
                                NodeID & node, 
                                refinement_pq * queue, 
                                refinement_pq * to_queue, 
-                               complete_boundary & boundary, 
+                               KaHIP::complete_boundary & boundary, 
                                PartitionID & from, 
                                PartitionID & to);
 
-                Gain find_eligible_start_node( graph_access  & G, 
+                Gain find_eligible_start_node( KaHIP::graph_access  & G, 
                                                PartitionID & lhs, 
                                                PartitionID & rhs, 
                                                std::vector<NodeID> & lhs_boundary, 
                                                std::vector<bool> & eligible,
                                                NodeID & start_node, bool rebalance = false); 
 
-                void rebalance_fall_back(PartitionConfig & config, 
-                                         graph_access & G,     
-                                         graph_access & G_bar, 
-                                         complete_boundary & boundary, 
+                void rebalance_fall_back(KaHIP::PartitionConfig & config, 
+                                         KaHIP::graph_access & G,     
+                                         KaHIP::graph_access & G_bar, 
+                                         KaHIP::complete_boundary & boundary, 
                                          std::vector< NodeID > & candidates, 
                                          std::vector< int > & parent,
                                          augmented_Qgraph & aqg); 
 
-                void perform_simple_move( PartitionConfig & config, 
-                                          graph_access & G, 
-                                          complete_boundary & boundary, 
+                void perform_simple_move( KaHIP::PartitionConfig & config, 
+                                          KaHIP::graph_access & G, 
+                                          KaHIP::complete_boundary & boundary, 
                                           NodeID & node,
                                           PartitionID & from, 
                                           PartitionID & to);
 
-                kway_graph_refinement_commons* commons;
+                KaHIP::kway_graph_refinement_commons* commons;
                 two_way_fm          m_twfm;
                 std::vector<bool>   m_eligible;
                 std::vector<NodeID> m_tomake_eligible;
@@ -113,7 +119,7 @@ class augmented_Qgraph_fabric {
 
 
 inline 
-Gain augmented_Qgraph_fabric::find_eligible_start_node( graph_access  & G, 
+Gain augmented_Qgraph_fabric::find_eligible_start_node( KaHIP::graph_access  & G, 
                                                          PartitionID & lhs, 
                                                          PartitionID & rhs, 
                                                          std::vector<NodeID> & lhs_boundary,  
@@ -127,7 +133,7 @@ Gain augmented_Qgraph_fabric::find_eligible_start_node( graph_access  & G,
         Gain max_gain = std::numeric_limits<Gain>::min();
         do {
                 max_gain   = std::numeric_limits<Gain>::min();
-                random_idx = random_functions::nextInt(0, max_idx-1);
+                random_idx = KaHIP::random_functions::nextInt(0, max_idx-1);
                 for( unsigned i = 0; i < lhs_boundary.size(); i++) {
                         NodeID node = lhs_boundary[i];
                         if(eligible_[node]) {
@@ -158,7 +164,7 @@ Gain augmented_Qgraph_fabric::find_eligible_start_node( graph_access  & G,
                         } 
                 }
 
-                random_idx = random_functions::nextInt(0, eligibles.size()-1);
+                random_idx = KaHIP::random_functions::nextInt(0, eligibles.size()-1);
                 start_node = eligibles[random_idx]; 
 
                 for( unsigned i = 0; i < lhs_boundary.size(); i++) {
@@ -175,16 +181,16 @@ Gain augmented_Qgraph_fabric::find_eligible_start_node( graph_access  & G,
 }
 
 inline
-void augmented_Qgraph_fabric::rebalance_fall_back(PartitionConfig & config, 
-                                                  graph_access  & G, 
-                                                  graph_access & G_bar, 
-                                                  complete_boundary & boundary, 
+void augmented_Qgraph_fabric::rebalance_fall_back(KaHIP::PartitionConfig & config, 
+                                                  KaHIP::graph_access  & G, 
+                                                  KaHIP::graph_access & G_bar, 
+                                                  KaHIP::complete_boundary & boundary, 
                                                   std::vector< NodeID > & candidates, 
                                                   std::vector< int > & parent,
                                                   augmented_Qgraph & aqg) {
 
         std::vector<bool> eligible_(G.number_of_nodes(), true); 
-        random_functions::permutate_vector_good_small(candidates);
+        KaHIP::random_functions::permutate_vector_good_small(candidates);
 
         std::vector<simple_move> best_path;
         Gain best_path_gain = std::numeric_limits< Gain >::min();
@@ -250,9 +256,9 @@ void augmented_Qgraph_fabric::rebalance_fall_back(PartitionConfig & config,
 }
 
 inline
-void augmented_Qgraph_fabric::perform_simple_move( PartitionConfig & config, 
-                                                    graph_access & G, 
-                                                    complete_boundary & boundary, 
+void augmented_Qgraph_fabric::perform_simple_move( KaHIP::PartitionConfig & config, 
+                                                    KaHIP::graph_access & G, 
+                                                    KaHIP::complete_boundary & boundary, 
                                                     NodeID & node,
                                                     PartitionID & from, 
                                                     PartitionID & to) {
@@ -275,12 +281,12 @@ void augmented_Qgraph_fabric::perform_simple_move( PartitionConfig & config,
 }
 
 inline 
-void augmented_Qgraph_fabric::move_node(PartitionConfig & config, 
-                                        graph_access &  G, 
+void augmented_Qgraph_fabric::move_node(KaHIP::PartitionConfig & config, 
+                                        KaHIP::graph_access &  G, 
                                         NodeID & node, 
                                         refinement_pq * queue, 
                                         refinement_pq * to_queue, 
-                                        complete_boundary & boundary, 
+                                        KaHIP::complete_boundary & boundary, 
                                         PartitionID & from, 
                                         PartitionID & to) {
 
@@ -341,11 +347,11 @@ void augmented_Qgraph_fabric::move_node(PartitionConfig & config,
 }
 
 inline 
-void augmented_Qgraph_fabric::move_node(PartitionConfig & config, 
-                                        graph_access &  G, 
+void augmented_Qgraph_fabric::move_node(KaHIP::PartitionConfig & config, 
+                                        KaHIP::graph_access &  G, 
                                         NodeID & node, 
                                         refinement_pq * queue, 
-                                        complete_boundary & boundary, 
+                                        KaHIP::complete_boundary & boundary, 
                                         PartitionID & from, 
                                         PartitionID & to) {
 
@@ -398,10 +404,10 @@ void augmented_Qgraph_fabric::move_node(PartitionConfig & config,
 
 
 inline
-bool augmented_Qgraph_fabric::local_search(PartitionConfig & config, 
+bool augmented_Qgraph_fabric::local_search(KaHIP::PartitionConfig & config, 
                                         bool plus,
-                                        graph_access & G, 
-                                        complete_boundary & boundary,
+                                        KaHIP::graph_access & G, 
+                                        KaHIP::complete_boundary & boundary,
                                         augmented_Qgraph & aqg,
                                         boundary_pair & pair,
                                         unsigned s ) {

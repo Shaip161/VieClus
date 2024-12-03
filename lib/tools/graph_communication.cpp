@@ -7,7 +7,9 @@
 
 #include <mpi.h>
 
-#include "graph_communication.h"
+//#include "graph_communication.h"
+
+#include "extern/VieClus/lib/tools/graph_communication.h"
 
 graph_communication::graph_communication() {
                 
@@ -17,7 +19,7 @@ graph_communication::~graph_communication() {
                 
 }
 
-void graph_communication::broadcast_graph( graph_access & G, unsigned root) {
+void graph_communication::broadcast_graph( KaHIP::graph_access & G, unsigned root) {
         int rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 

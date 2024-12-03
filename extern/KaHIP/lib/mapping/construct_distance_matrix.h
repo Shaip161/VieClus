@@ -7,16 +7,20 @@
 #ifndef CONSTRUCT_DISTANCE_MATRIX_HUPBUT8O
 #define CONSTRUCT_DISTANCE_MATRIX_HUPBUT8O
 
-#include "data_structure/matrix/matrix.h"
-#include "partition_config.h"
-#include "tools/random_functions.h"
+//#include "data_structure/matrix/matrix.h"
+//#include "partition_config.h"
+//#include "tools/random_functions.h"
+
+#include "extern/KaHIP/lib/data_structure/matrix/matrix.h"
+#include "extern/KaHIP/lib/tools/random_functions.h"
+#include "extern/KaHIP/lib/partition/partition_config.h"
 
 class construct_distance_matrix {
 public:
         construct_distance_matrix();
         virtual ~construct_distance_matrix();
 
-        void construct_matrix( PartitionConfig & config, matrix & D ) {
+        void construct_matrix( KaHIP::PartitionConfig & config, matrix & D ) {
                 //check wether distance matrix is a square matrix
                 if(D.get_x_dim() != D.get_y_dim()) {
                         std::cout <<  "distance matrix is not symmetric."  << std::endl;
@@ -42,7 +46,7 @@ public:
 
 private:
 
-        void construct_matrix_random( PartitionConfig & config, matrix & D ) {
+        void construct_matrix_random( KaHIP::PartitionConfig & config, matrix & D ) {
                 for( unsigned int i = 0; i < D.get_x_dim(); i++) {
                         for( unsigned int j = 0; j <= i ; j++) {
                                 NodeWeight value = random_functions::nextInt(1,100);
@@ -52,7 +56,7 @@ private:
                 }
         }
 
-        void construct_matrix_identity( PartitionConfig & config, matrix & D ) {
+        void construct_matrix_identity( KaHIP::PartitionConfig & config, matrix & D ) {
                 for( unsigned int i = 0; i < D.get_x_dim(); i++) {
                         for( unsigned int j = 0; j <= i ; j++) {
                                 D.set_xy(i,j, 1);
@@ -61,7 +65,7 @@ private:
                 }
         }
 
-        void construct_matrix_hierarchy( PartitionConfig & config, matrix & D ) {
+        void construct_matrix_hierarchy( KaHIP::PartitionConfig & config, matrix & D ) {
                 std::vector< int > interval_sizes(config.group_sizes.size(),0);
                 interval_sizes[0] =  config.group_sizes[0]; 
                 for( unsigned i = 1; i < interval_sizes.size(); i++) {

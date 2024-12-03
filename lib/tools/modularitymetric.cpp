@@ -5,17 +5,19 @@
  *****************************************************************************/
 
 
-#include "modularitymetric.h"
-
+/*#include "modularitymetric.h"
 //#include "definitions.h"
-#include "logging/log.h"
+#include "logging/log.h"*/
+
+#include "extern/VieClus/lib/tools/modularitymetric.h"
+#include "extern/VieClus/lib/logging/log.h"
 
 #include <cassert>
 
 
 using namespace std;
 
-ModularityMetric::ModularityMetric(graph_access &G)
+ModularityMetric::ModularityMetric(KaHIP::graph_access &G)
     : m_G(G)
 {
     // initialize own data structures
@@ -134,7 +136,7 @@ void ModularityMetric::computeWeightedNodeDegrees()
 
 
 // static members
-void ModularityMetric::computeEdgeWeightsPerCluster(graph_access& G,
+void ModularityMetric::computeEdgeWeightsPerCluster(KaHIP::graph_access& G,
                                                     std::vector<EdgeWeight>& edgeWeightsPerCluster,
                                                     std::vector<EdgeWeight>& weightedEdgeEndsPerCluster)
 {
@@ -183,7 +185,7 @@ void ModularityMetric::computeEdgeWeightsPerCluster(graph_access& G,
     } endfor
 }
 
-double ModularityMetric::computeModularity(graph_access &G)
+double ModularityMetric::computeModularity(KaHIP::graph_access &G)
 {
     double modularity = 0.0;
     // the number of edges counts for ingoing and outgoing edges separately
@@ -208,7 +210,7 @@ double ModularityMetric::computeModularity(graph_access &G)
     return modularity;
 }
 
-double ModularityMetric::computeModularityBound(graph_access &G)
+double ModularityMetric::computeModularityBound(KaHIP::graph_access &G)
 {
     double modularity = 0.0;
     // the number of edges counts for ingoing and outgoing edges separately
@@ -232,7 +234,7 @@ double ModularityMetric::computeModularityBound(graph_access &G)
     return 1+modularity;
 }
 
-double ModularityMetric::computeModularitySlow(graph_access &G)
+double ModularityMetric::computeModularitySlow(KaHIP::graph_access &G)
 {
     double modularity = 0.0;
     // the number of edges counts for ingoing and outgoing edges separately
@@ -283,7 +285,7 @@ double ModularityMetric::computeModularitySlow(graph_access &G)
 }
 
 
-EdgeWeight ModularityMetric::computeSumOfAllEdgeWeights(graph_access& G)
+EdgeWeight ModularityMetric::computeSumOfAllEdgeWeights(KaHIP::graph_access& G)
 {
     EdgeWeight sum = 0;
 
@@ -307,7 +309,7 @@ EdgeWeight ModularityMetric::computeSumOfAllEdgeWeights(graph_access& G)
 }
 
 
-EdgeWeight ModularityMetric::getWeightedOutEdgeToOtherNode(graph_access& G, NodeID v, NodeID w)
+EdgeWeight ModularityMetric::getWeightedOutEdgeToOtherNode(KaHIP::graph_access& G, NodeID v, NodeID w)
 {
     // take care for self loop
     if (v == w && G.containsSelfLoops())

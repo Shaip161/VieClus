@@ -8,26 +8,36 @@
 #ifndef COARSENING_CONFIGURATOR_8UJ78WYS
 #define COARSENING_CONFIGURATOR_8UJ78WYS
 
-#include "contraction.h"
-#include "data_structure/graph_hierarchy.h"
-#include "definitions.h"
-#include "edge_rating/edge_ratings.h"
-#include "matching/gpa/gpa_matching.h"
-#include "matching/random_matching.h"
-#include "clustering/size_constraint_label_propagation.h"
-#include "stop_rules/stop_rules.h"
+//#include "contraction.h"
+//#include "data_structure/graph_hierarchy.h"
+//#include "definitions.h"
+//#include "edge_rating/edge_ratings.h"
+//#include "matching/gpa/gpa_matching.h"
+//#include "matching/random_matching.h"
+//#include "clustering/size_constraint_label_propagation.h"
+//#include "stop_rules/stop_rules.h"
+
+#include "extern/KaHIP/lib/partition/coarsening/contraction.h"
+#include "extern/KaHIP/lib/data_structure/graph_hierarchy.h"
+#include "lib/definitions.h"
+#include "extern/KaHIP/lib/partition/coarsening/edge_rating/edge_ratings.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/gpa/gpa_matching.h"
+#include "extern/KaHIP/lib/partition/coarsening/matching/random_matching.h"
+#include "extern/KaHIP/lib/partition/coarsening/clustering/size_constraint_label_propagation.h"
+#include "extern/KaHIP/lib/partition/coarsening/stop_rules/stop_rules.h"
+
 
 class coarsening_configurator {
         public:
                 coarsening_configurator( ) {};
                 virtual ~coarsening_configurator() {};
 
-                void configure_coarsening(const PartitionConfig & partition_config, 
+                void configure_coarsening(const KaHIP::PartitionConfig & partition_config, 
                                           matching** edge_matcher, 
                                           unsigned level); 
 };
 
-inline void coarsening_configurator::configure_coarsening( const PartitionConfig & partition_config, 
+inline void coarsening_configurator::configure_coarsening( const KaHIP::PartitionConfig & partition_config, 
                                                            matching** edge_matcher, 
                                                            unsigned level) {
 

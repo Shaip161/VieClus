@@ -84,9 +84,11 @@ int main(int argn, char **argv) {
                 std::cout << "modularity \t\t\t" << ModularityMetric::computeModularity(G) << std::endl;
                 
                 long overall_max_RSS = getMaxRSS();
+
+                std::cout<<"Memory Consumption" << overall_max_RSS <<std::endl;
                 
                 // write the partition to the disc 
-                std::stringstream filename;
+                /*std::stringstream filename;
                 if(!partition_config.filename_output.compare("")) {
                         // no output filename given
                         filename << "tmpclustering";
@@ -94,7 +96,7 @@ int main(int argn, char **argv) {
                         filename << partition_config.filename_output;
                 }
 
-                graph_io::writePartition(G, filename.str(), overall_max_RSS);
+                graph_io::writePartition(G, filename.str(), overall_max_RSS);*/
         }
 
         MPI_Finalize();

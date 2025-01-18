@@ -173,6 +173,7 @@ extern/KaHIP/lib/partition/uncoarsening/refinement/cycle_improvements/cycle_refi
 extern/KaHIP/lib/partition/uncoarsening/refinement/tabu_search/tabu_search.cpp )
 #extern/argtable3-3.0.3/argtable3.c)
 add_library(libkaffpa_kahip OBJECT ${LIBKAFFPA_SOURCE_FILES})
+target_link_libraries(libkaffpa_kahip PRIVATE absl::flat_hash_set)
 
 set(ARGTABLE_SOURCE_FILES
   extern/argtable3-3.0.3/argtable3.c)

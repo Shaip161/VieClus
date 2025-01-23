@@ -697,13 +697,13 @@ void population_clustering::print() {
         int rank;
         MPI_Comm_rank( m_communicator, &rank);
 
-        std::cout <<  "rank " <<  rank << " fingerprint ";
+        //std::cout <<  "rank " <<  rank << " fingerprint ";
 
         for( unsigned i = 0; i < m_internal_population_clustering.size(); i++) {
-                std::cout <<  m_internal_population_clustering[i].objective << " ";
+                //std::cout <<  m_internal_population_clustering[i].objective << " ";
         }         
 
-        std::cout <<  std::endl;
+        //std::cout <<  std::endl;
 }
 
 void population_clustering::write_log(std::string & filename) {

@@ -111,7 +111,7 @@ void parallel_mh_async_clustering::initialize(KaHIP::PartitionConfig & working_c
         Individuum first_one;
         m_t.restart();
         m_island->createIndividuum( working_config, G, first_one, true); 
-        std::cout <<  "created with objective " <<  first_one.objective << std::endl;
+        //std::cout <<  "created with objective " <<  first_one.objective << std::endl;
 
         double time_spend = m_t.elapsed();
         m_island->insert(G, first_one);
@@ -135,7 +135,7 @@ void parallel_mh_async_clustering::initialize(KaHIP::PartitionConfig & working_c
         }
 
         population_size = std::min(std::max(10, population_size),(int)working_config.mh_pool_size);
-        std::cout <<  "poolsize = " <<  population_size  << std::endl;
+        //std::cout <<  "poolsize = " <<  population_size  << std::endl;
 
         //set S
         m_island->set_pool_size(population_size);

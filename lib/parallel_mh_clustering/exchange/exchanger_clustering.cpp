@@ -29,7 +29,7 @@ exchanger_clustering::exchanger_clustering(MPI_Comm communicator) {
         if(comm_size > 2) m_max_num_pushes = ceil(log2(comm_size));
         else              m_max_num_pushes = 1;
 
-        std::cout <<  "max num pushes " <<  m_max_num_pushes  << std::endl;
+        //std::cout <<  "max num pushes " <<  m_max_num_pushes  << std::endl;
 
         m_allready_send_to.resize(comm_size);
 

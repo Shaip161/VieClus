@@ -285,9 +285,10 @@ double ModularityMetric::computeModularitySlow(KaHIP::graph_access &G)
 }
 
 
-EdgeWeight ModularityMetric::computeSumOfAllEdgeWeights(KaHIP::graph_access& G)
+double ModularityMetric::computeSumOfAllEdgeWeights(KaHIP::graph_access& G)
 {
-    EdgeWeight sum = 0;
+    //EdgeWeight sum = 0;
+    double sum = 0;
 
     forall_edges(G, e)
     {

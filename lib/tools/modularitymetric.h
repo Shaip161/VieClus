@@ -151,7 +151,7 @@ class ModularityMetric
          *  Considers also the self loops, if any.
          *  May cause an integer overflow, so be careful when the graph has large weights.
          */
-        static EdgeWeight computeSumOfAllEdgeWeights(KaHIP::graph_access &G);
+        static double computeSumOfAllEdgeWeights(KaHIP::graph_access &G);
 
     protected:
         /**

@@ -39,7 +39,9 @@ int parse_parameters(int argn, char **argv,
         struct arg_lit *mh_print_log                         = arg_lit0(NULL, "mh_print_log", "Each PE prints a logfile (timestamp, edgecut).");
         struct arg_int *cluster_upperbound                   = arg_int0(NULL, "cluster_upperbound", NULL, "Set a size-constraint on the size of a cluster. Default: none");
         struct arg_int *label_propagation_iterations         = arg_int0(NULL, "label_propagation_iterations", NULL, "Set the number of label propgation iterations. Default: 10.");
-
+        struct arg_str *output_path                          = arg_str0(NULL, "output_path", NULL, "Specify the path of the output file(s).");
+        struct arg_lit *suppress_file_output                 = arg_lit0(NULL, "suppress_file_output", "(Default: file output enabled)");
+        
         // for graph clustering we need some own parameters (by BSc)
         struct arg_dbl *lm_minimum_quality_improvement              = arg_dbl0(NULL, "lm_minimum_quality_improvement", NULL, "Minimum quality (modularity) improvement necessary to perform another turn in the Louvain method. Default: 1e-6.");
         struct arg_int *lm_number_of_label_propagation_levels       = arg_int0(NULL, "lm_number_of_label_propagation_levels", NULL, "Number of label propagation levels used before the Louvain method. Default: 0.");
@@ -61,6 +63,8 @@ int parse_parameters(int argn, char **argv,
                 //local_partitioning_repetitions,
                 //input_partition,
                 filename_output,
+                output_path,
+                suppress_file_output,
 #elif defined MODE_EVALUATOR
                 input_partition,
 #elif defined MODE_CLUSTERING
@@ -114,7 +118,14 @@ int parse_parameters(int argn, char **argv,
 
         cfg.strong(partition_config);
 
+        if (output_path->count > 0) {
+                partition_config.output_path = output_path->sval[0];
+        }
         
+        if (suppress_file_output->count > 0) {
+                partition_config.suppress_file_output = true;
+        }
+
         if(filename_output->count > 0) {
                 partition_config.filename_output = filename_output->sval[0];
         }

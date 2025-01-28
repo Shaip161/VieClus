@@ -390,6 +390,9 @@ struct PartitionConfig
 
         bool enable_mapping;
 
+        std::string output_path;
+        bool suppress_file_output;
+
         //=======================================
         //===============Shared Mem OMP==========
         //=======================================

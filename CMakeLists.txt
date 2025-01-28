@@ -251,18 +251,18 @@ target_include_directories(VieClus
 
 add_executable(graphchecker extern/KaHIP/app/graphchecker.cpp $<TARGET_OBJECTS:libkaffpa_kahip>)
 target_compile_definitions(graphchecker PRIVATE "-DMODE_GRAPHCHECKER")
-target_link_libraries(graphchecker ${OpenMP_CXX_LIBRARIES})
+target_link_libraries(graphchecker flatbuffers ${OpenMP_CXX_LIBRARIES})
 install(TARGETS graphchecker DESTINATION bin)
 
 add_executable(evaluator app/evaluator.cpp $<TARGET_OBJECTS:libeval> $<TARGET_OBJECTS:libpadygrcl> )
 target_compile_definitions(evaluator PRIVATE "-DMODE_EVALUATOR")
 target_include_directories(evaluator PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_link_libraries(evaluator argtab_kahip ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
+target_link_libraries(evaluator argtab_kahip flatbuffers ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
 install(TARGETS evaluator DESTINATION bin)
 
 add_executable(evolutionary_clustering app/evo_clustering.cpp $<TARGET_OBJECTS:libkaffpa_kahip> $<TARGET_OBJECTS:libclustering> )
 target_compile_definitions(evolutionary_clustering PRIVATE "-DMODE_KAFFPAE")
 target_include_directories(evolutionary_clustering PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_link_libraries(evolutionary_clustering argtab_kahip ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
+target_link_libraries(evolutionary_clustering argtab_kahip flatbuffers ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
 install(TARGETS evolutionary_clustering DESTINATION bin)
 

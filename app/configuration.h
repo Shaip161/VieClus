@@ -488,7 +488,7 @@ inline void configuration::standard( KaHIP::PartitionConfig & partition_config )
         partition_config.distances.push_back(10);
         partition_config.distances.push_back(100);
 
-
+        partition_config.suppress_file_output = false;
 
 }
 

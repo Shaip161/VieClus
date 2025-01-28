@@ -323,8 +323,8 @@ int graph_io::readGraphWeightedFast(KaHIP::graph_access & G, std::string filenam
 
 void graph_io::writePartition(KaHIP::graph_access & G, std::string filename, long overall_max_RSS) {
         std::ofstream f(filename.c_str());
-        std::cout<<"Space in KB : "<< overall_max_RSS<<std::endl;
-        std::cout <<"writing partition to " << filename << " ... " << std::endl;
+        //std::cout<<"Space in KB : "<< overall_max_RSS<<std::endl;
+        //std::cout <<"writing partition to " << filename << " ... " << std::endl;
 
         forall_nodes(G, node) {
                 f << G.getPartitionIndex(node) <<  std::endl;

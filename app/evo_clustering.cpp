@@ -13,6 +13,9 @@
 #include <stdio.h>
 #include <string.h> 
 
+#include "extern/VieClus/lib/VieClus_FlatBufferWriter.h"
+
+
 /*#include "algorithms/cycle_search.h"
 #include "balance_configuration.h"
 #include "data_structure/graph_access.h"
@@ -41,6 +44,8 @@
 
 long getMaxRSS();
 
+std::string extractBaseFilename(const std::string &fullPath);
+
 int main(int argn, char **argv) {
 
         MPI_Init(&argn, &argv);    /* starts MPI */
@@ -50,6 +55,11 @@ int main(int argn, char **argv) {
         bool is_graph_weighted = false;
         bool suppress_output   = false;
         bool recursive         = false;
+        
+        timer io_t, mapping_t, total_t;
+        double io_time = 0;
+        double mapping_time = 0;
+        double total_time = 0;
 
         int ret_code = parse_parameters(argn, argv, 
                         partition_config, graph_filename, 
@@ -60,18 +70,22 @@ int main(int argn, char **argv) {
                 return 0;
         }
 
-        KaHIP::graph_access G;     
+        total_t.restart();
 
-        timer t;
+        KaHIP::graph_access G;
+
+        io_t.restart();
         graph_io::readGraphWeighted(G, graph_filename);
-
-        std::cout << "io time: " << t.elapsed()  << std::endl;
+        io_time += io_t.elapsed();
+        
         omp_set_num_threads(1);
-        t.restart();
         
         partition_config.k = 1;
+
+        mapping_t.restart();
         parallel_mh_async_clustering mh;
         mh.perform_partitioning(partition_config, G);
+        mapping_time += mapping_t.elapsed();
 
         int rank, size;
         MPI_Comm communicator = MPI_COMM_WORLD; 
@@ -79,24 +93,32 @@ int main(int argn, char **argv) {
         MPI_Comm_size( communicator, &size);
 
         if( rank == ROOT ) {
-                std::cout << "time spent " << t.elapsed()  << std::endl;
-                G.set_partition_count(G.get_partition_count_compute());
-                std::cout << "modularity \t\t\t" << ModularityMetric::computeModularity(G) << std::endl;
-                
-                long overall_max_RSS = getMaxRSS();
+            total_time = total_t.elapsed();
+            G.set_partition_count(G.get_partition_count_compute());
+            //std::cout << "modularity \t\t\t" << ModularityMetric::computeModularity(G) << std::endl;
+            //std::cout<<"Memory Consumption" << overall_max_RSS <<std::endl;
+       
+            long overall_max_RSS = getMaxRSS();
+        
+            double score = ModularityMetric::computeModularity(G);
+            int clusters_amount = G.get_partition_count_compute();
 
-                std::cout<<"Memory Consumption" << overall_max_RSS <<std::endl;
-                
-                // write the partition to the disc 
-                /*std::stringstream filename;
-                if(!partition_config.filename_output.compare("")) {
-                        // no output filename given
-                        filename << "tmpclustering";
-                } else {
-                        filename << partition_config.filename_output;
-                }
+            EdgeID num_edges = G.number_of_edges() / 2;
+            EdgeID num_nodes = G.number_of_nodes();
 
-                graph_io::writePartition(G, filename.str(), overall_max_RSS);*/
+            std::string baseFilename = extractBaseFilename(graph_filename);
+
+            // write the partition to the disc 
+            std::string filename;
+            if(!partition_config.suppress_file_output) {
+                filename = partition_config.output_path + baseFilename + ".txt";
+                graph_io::writePartition(G, filename, overall_max_RSS);
+            }
+
+            FlatBufferWriter fb_writer;
+            fb_writer.updateResourceConsumption(io_time, mapping_time,total_time, overall_max_RSS);
+            fb_writer.updateClusteringMetrics(score, clusters_amount);
+            fb_writer.writeClustering(baseFilename, partition_config, num_edges ,num_nodes);
         }
 
         MPI_Finalize();
@@ -114,5 +136,20 @@ long getMaxRSS() {
         std::cerr << "Error getting resource usage information." << std::endl;
         // Return a sentinel value or handle the error in an appropriate way
         return -1;
+    }
+}
+
+// Function to extract the base filename without path and extension
+std::string extractBaseFilename(const std::string &fullPath) {
+    size_t lastSlash = fullPath.find_last_of('/');
+    size_t lastDot = fullPath.find_last_of('.');
+
+    if (lastSlash != std::string::npos) {
+        // Found a slash, extract the substring after the last slash
+        return fullPath.substr(lastSlash + 1, lastDot - lastSlash - 1);
+    }
+    else {
+        // No slash found, just extract the substring before the last dot
+        return fullPath.substr(0, lastDot);
     }
 }

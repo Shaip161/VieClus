@@ -171,10 +171,7 @@ PartitionID LouvainMethod::performClusteringWithLPP(const KaHIP::PartitionConfig
         // phase 1: maximize modularity by assigning nodes to new clusters
         // as long as there is a (minimum) improvement
         // refinement of result
-
-        // CHANGE : SHAI - Want to only use the lovain algorithm so no more
-        //                 Node movement optimization in the uncoarsening phase
-        //numberOfMoves = performNodeMoves(config);
+        numberOfMoves = performNodeMoves(config);
     }
 
     // graph hierarchy does not free the coarse graphs

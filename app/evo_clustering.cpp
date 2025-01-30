@@ -83,8 +83,18 @@ int main(int argn, char **argv) {
         partition_config.k = 1;
 
         mapping_t.restart();
-        parallel_mh_async_clustering mh;
-        mh.perform_partitioning(partition_config, G);
+        //parallel_mh_async_clustering mh;
+        //mh.perform_partitioning(partition_config, G);
+        
+        KaHIP::PartitionConfig copy = partition_config;
+        
+        copy.upper_bound_partition                     = G.number_of_nodes() + 1;
+        copy.graph_allready_partitioned                = false;
+        copy.node_ordering                             = RANDOM_NODEORDERING; //Louvain algorithm uses random node ordering
+        copy.lm_number_of_label_propagation_levels = 0; //We want to skip the LPP phase in the performClustering method (only louvain is wished)
+
+        LouvainMethod{}.performClustering(copy, &G, true);
+
         mapping_time += mapping_t.elapsed();
 
         int rank, size;

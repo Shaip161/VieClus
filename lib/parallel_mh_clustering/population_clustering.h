@@ -220,12 +220,14 @@ class population_clustering {
 
                 /* executes the louvain algorithm on the given graph in all its multilevel
                  * glory, and returns the found clustering along with its found quality. */
-                std::pair<clustering_t, double> do_louvain(KaHIP::graph_access& G, clustering_t const& c = clustering_t{}) {
+                std::pair<clustering_t, double> do_louvain(KaHIP::graph_access& G, unsigned int max_cluster_edge_volume, clustering_t const& c = clustering_t{}) {
                         assert((!c.size() || G.number_of_nodes() == c.size()) && "clustering <-> graph size mismatch");
 
                         //srand(rand());
                         KaHIP::PartitionConfig partition_config;
                         VieClus::configuration{}.standard(partition_config);
+                        
+                        partition_config.max_cluster_edge_volume = max_cluster_edge_volume;
 
                         partition_config.lm_number_of_label_propagation_levels = KaHIP::random_functions::nextInt(0,5); 
 

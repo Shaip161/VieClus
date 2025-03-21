@@ -208,7 +208,7 @@ void population_clustering::combine_basic_flat(const KaHIP::PartitionConfig & pa
         KaHIP::graph_access contracted_graph = contract_by_clustering(G, output);
 
         clustering_t contracted_clustering; double quality;
-        std::tie(contracted_clustering, quality) = do_louvain(contracted_graph);
+        std::tie(contracted_clustering, quality) = do_louvain(contracted_graph, partition_config.max_cluster_edge_volume);
         update_clustering(output, contracted_clustering);
 
         int* partition_map = new int[G.number_of_nodes()];
@@ -355,7 +355,7 @@ void population_clustering::combine_improved_flat(const KaHIP::PartitionConfig &
         } endfor
 
         clustering_t new_contracted_clustering; double quality;
-        std::tie(new_contracted_clustering, quality) = do_louvain(contracted_graph, contracted_clustering);
+        std::tie(new_contracted_clustering, quality) = do_louvain(contracted_graph, partition_config.max_cluster_edge_volume ,contracted_clustering);
         update_clustering(output, new_contracted_clustering);
 
         int* partition_map = new int[G.number_of_nodes()];
@@ -429,7 +429,7 @@ void population_clustering::combine_improved_flat_with_partitioning(const KaHIP:
         } endfor
 
         clustering_t new_contracted_clustering; double quality;
-        std::tie(new_contracted_clustering, quality) = do_louvain(contracted_graph, contracted_clustering);
+        std::tie(new_contracted_clustering, quality) = do_louvain(contracted_graph, partition_config.max_cluster_edge_volume ,contracted_clustering);
         update_clustering(output, new_contracted_clustering);
 
         int* partition_map = new int[G.number_of_nodes()];
@@ -490,7 +490,7 @@ void population_clustering::combine_improved_flat_with_sclp(const KaHIP::Partiti
         } endfor
 
         clustering_t new_contracted_clustering; double quality;
-        std::tie(new_contracted_clustering, quality) = do_louvain(contracted_graph, contracted_clustering);
+        std::tie(new_contracted_clustering, quality) = do_louvain(contracted_graph, partition_config.max_cluster_edge_volume ,contracted_clustering);
         update_clustering(output, new_contracted_clustering);
 
         int* partition_map = new int[G.number_of_nodes()];

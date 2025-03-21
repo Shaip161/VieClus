@@ -436,6 +436,8 @@ struct PartitionConfig
 
         double mh_mutate_fraction;
 
+        unsigned int max_cluster_edge_volume;
+
 };
 }
 

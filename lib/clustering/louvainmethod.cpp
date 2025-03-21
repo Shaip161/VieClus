@@ -80,6 +80,7 @@ PartitionID LouvainMethod::performClusteringWithLPP(const KaHIP::PartitionConfig
     //     Build coarse graph in which nodes represent clusters
     for (unsigned i = 0; i < config.lm_number_of_label_propagation_levels; ++i)
     {
+        break;
         timer.restart();
         // initialize each node as own cluster
         if(start_w_singletons) { initializeSingletonClusters(); }
@@ -314,6 +315,8 @@ NodeID LouvainMethod::performNodeMoves(const KaHIP::PartitionConfig &config)
                     selfLoop = m_G->getSelfLoop(node);
                 }
 
+                EdgeWeight original_cluster_volume = objective->get_weightedEdgeEndsOfCluster(oldCluster);
+
                 // remove the current node from its cluster
                 objective->removeNode(node, oldCluster, neighborhood.getEdgeWeightToNeighboringCluster(oldCluster), selfLoop);
 
@@ -323,6 +326,13 @@ NodeID LouvainMethod::performNodeMoves(const KaHIP::PartitionConfig &config)
                 for (NodeID i = 0; i < neighborhood.getNumberOfNeighboringClusters(); ++i)
                 {
                     PartitionID newCluster = neighborhood.getClusterIDOfNeighbor(i);
+                    
+                    EdgeWeight newClusterVolume = objective->get_weightedEdgeEndsOfCluster(newCluster);
+
+                    if(2 * neighborhood.getEdgeWeightToNeighboringCluster(newCluster) + original_cluster_volume + newClusterVolume > config.max_cluster_edge_volume) {
+                        continue;
+                    }
+
                     // the gain is not normalized, it is not the real improvement
                     double gain = objective->gain(node, newCluster, neighborhood.getEdgeWeightToNeighboringCluster(newCluster));
 

@@ -125,6 +125,11 @@ class ModularityMetric
         static double computeModularityBound(KaHIP::graph_access &G);
         static double computeModularity(KaHIP::graph_access &G, int * partition_map);
 
+        /**
+         * \brief return edge volume of a cluster accounting for self loops 
+         */
+        EdgeWeight get_weightedEdgeEndsOfCluster(PartitionID cluster);
+
 
         /**
          *  \brief Returns the modularity of the given graph clustering.

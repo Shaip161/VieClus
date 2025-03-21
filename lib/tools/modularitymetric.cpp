@@ -332,3 +332,7 @@ EdgeWeight ModularityMetric::getWeightedOutEdgeToOtherNode(KaHIP::graph_access& 
     return 0;
 }
 
+EdgeWeight ModularityMetric::get_weightedEdgeEndsOfCluster(PartitionID cluster) {
+    return m_weightedEdgeEndsPerCluster[cluster];
+}
+

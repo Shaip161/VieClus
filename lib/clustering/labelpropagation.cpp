@@ -55,6 +55,7 @@ PartitionID LabelPropagation::performMultiLevelLabelPropagation(const KaHIP::Par
     //     Build coarse graph in which nodes represent clusters
     for (unsigned i = 0; i < config.lm_number_of_label_propagation_levels; ++i)
     {
+        break;
         timer.elapsed();
 
         // initialize each node as own cluster

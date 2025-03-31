@@ -195,6 +195,7 @@ double parallel_mh_async_clustering::perform_local_partitioning(KaHIP::Partition
                         m_island->get_two_individuals_tournament(first_rnd, second_rnd);
                         
                         int decision = KaHIP::random_functions::nextInt(0,86);
+                        decision = 0;
                         if( 0 <= decision && decision <= 20) {
                               m_island->combine_basic_flat(working_config, G, first_rnd, second_rnd, output);
                         }        
